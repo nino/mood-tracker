@@ -3,6 +3,8 @@ import './App.css'
 import {Container, Button, Loader} from 'semantic-ui-react'
 import DropboxController from './DropboxController'
 import MainUI from './MainUI'
+import AppHeader from './AppHeader'
+import Footer from './Footer'
 
 function receiveAction(sender, action, params) {
     switch(action) {
@@ -20,8 +22,10 @@ function receiveAction(sender, action, params) {
 
 function logMetricAction(name, rating) {
     console.log('logging metric ' + name + ': ' + rating)
+    let date = new Date()
+    date.setHours(date.getHours() - date.getTimezoneOffset() / 60)
     let newEntry = {
-        date: (new Date()).toJSON(),
+        date: date.toJSON(),
         value: rating
     }
     let metricIndex = this.state.data.findIndex(
@@ -51,7 +55,12 @@ class App extends Component {
 
     componentDidMount() {
         loadData(data => {
-            this.setState({data})
+            if (data) {
+                this.setState({data})
+            }
+            else {
+                this.setState({error: 'data not present'})
+            }
         })
     }
 
@@ -64,11 +73,68 @@ class App extends Component {
                 />
             )
         }
-        else if (DropboxController.isAuthenticated()) {
+        else if (DropboxController.isAuthenticated() && !this.state.error) {
             return (
                 <Container>
-                <h2>Mood tracking app</h2>
-                <Loader content='Loading' />
+                <AppHeader />
+                Loading ...
+                <Footer onAction={receiveAction.bind(this)} />
+                </Container>
+            )
+        }
+        else if (DropboxController.isAuthenticated() && this.state.error === 'data not present') {
+            let exampleData = [
+                        {
+                            "name": "Mood",
+                            "type": "int",
+                            "minValue": 1,
+                            "maxValue": 10,
+                            "colorGroups": [
+                                {
+                                    "minValue": 1,
+                                    "maxValue": 3,
+                                    "color": "red"
+                                },
+                                {
+                                    "minValue": 4,
+                                    "maxValue": 6,
+                                    "color": "yellow"
+                                },
+                                {
+                                    "minValue": 7,
+                                    "maxValue": 9,
+                                    "color": "green"
+                                },
+                                {
+                                    "minValue": 10,
+                                    "maxValue": 10,
+                                    "color": "blue"
+                                }
+                            ],
+                            "entries": []
+                        },
+                        {
+                            "name": "Burns depression score",
+                            "type": "int",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "entries": []
+                        }
+                    ]
+
+            return (
+                <Container>
+                    <p>Couldn't find data file</p>
+                    <p>
+                        To set up the app, create the file <code>data.json</code>
+                        in <code>Dropbox/Apps/Mood-tracker</code> and paste in the
+                        following contents:
+                    </p>
+                    <p>
+                    <code>
+                    {JSON.stringify(exampleData, null, 2)}
+                    </code>
+                    </p>
                 </Container>
             )
         }

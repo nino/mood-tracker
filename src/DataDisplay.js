@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {LineChart} from 'react-d3'
+import DataDisplayGraph from './DataDisplayGraph'
 
 class DataDisplay extends Component {
     render() {
@@ -9,6 +9,7 @@ class DataDisplay extends Component {
             containers.push(
                 <div key={metric.name}>
                 {metric.name}
+                <DataDisplayGraph metric={metric} />
                 </div>
             )
         })
