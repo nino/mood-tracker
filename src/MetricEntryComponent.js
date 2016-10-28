@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import {Container, Button, Input, Form} from 'semantic-ui-react'
 import './MetricEntryComponent.css'
 import RatingInputButtonRow from './RatingInputButtonRow'
 import RatingInputFormField from './RatingInputFormField'

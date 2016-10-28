@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import './App.css'
-import {Container, Button, Loader} from 'semantic-ui-react'
+import {Container, Button} from 'semantic-ui-react'
 import DropboxController from './DropboxController'
 import MainUI from './MainUI'
 import AppHeader from './AppHeader'

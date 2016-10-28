@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import AppHeader from './AppHeader'
 import Footer from './Footer'
-import {Container, Divider} from 'semantic-ui-react'
+import {Divider} from 'semantic-ui-react'
 import DataDisplay from './DataDisplay'
 import DataEntryForm from './DataEntryForm'
 import Settings from './Settings'
