@@ -2,6 +2,11 @@ import React, {Component} from 'react'
 import {Button} from 'semantic-ui-react'
 
 class RatingInputButtonRow extends Component {
+    propTypes: {
+        metric: React.PropTypes.object.isRequired,
+        onAction: React.PropTypes.func.isRequired
+    }
+
     sendRating(rating) {
         this.props.onAction(this, 'log metric', {
             name: this.props.metric.name,

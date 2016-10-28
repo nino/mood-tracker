@@ -5,14 +5,21 @@ import RatingInputButtonRow from './RatingInputButtonRow'
 import RatingInputFormField from './RatingInputFormField'
 
 class MetricEntryComponent extends Component {
-    handleRate(error, {rating}) {
-        this.props.onAction(this, 'logMetric', {
-            metric: this.props.metric.name,
-            score: rating
-        })
+    propTypes: {
+        metric: React.PropTypes.object.isRequired,
+        onAction: React.PropTypes.func.isRequired,
     }
 
-    hasFewOptions(metric) {
+    metricIsValid() {
+        let metric = this.props.metric
+        return (
+            metric.type === 'int' &&
+            metric.minValue <= metric.maxValue
+        )
+    }
+
+    metricHasFewOptions() {
+        let metric = this.props.metric
         return (
             metric.type === 'int' &&
             metric.minValue < metric.maxValue &&
@@ -22,7 +29,12 @@ class MetricEntryComponent extends Component {
 
     render() {
         let entryForm
-        if (this.hasFewOptions(this.props.metric)) {
+        if (!this.metricIsValid()) {
+            entryForm = (
+                <span>Error: invalid metric provided</span>
+            )
+        }
+        else if (this.metricHasFewOptions()) {
             entryForm = (
                 <RatingInputButtonRow metric={this.props.metric} onAction={this.props.onAction} />
             )
@@ -42,12 +54,6 @@ class MetricEntryComponent extends Component {
             </div>
         )
     }
-}
-
-MetricEntryComponent.propTypes = {
-    metric: React.PropTypes.object.isRequired,
-    onAction: React.PropTypes.func.isRequired,
-    error: React.PropTypes.string
 }
 
 export default MetricEntryComponent

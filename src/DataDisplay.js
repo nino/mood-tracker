@@ -2,8 +2,11 @@ import React, {Component} from 'react'
 import DataDisplayGraph from './DataDisplayGraph'
 
 class DataDisplay extends Component {
-    render() {
-        console.log('metrics: ', this.props.metrics)
+    propTypes: {
+        metrics: React.PropTypes.array.isRequired
+    }
+
+    createGraphs() {
         let containers = []
         this.props.metrics.forEach(function(metric) {
             containers.push(
@@ -19,10 +22,17 @@ class DataDisplay extends Component {
             </div>
         )
     }
-}
 
-DataDisplay.propTypes = {
-    metrics: React.PropTypes.array.isRequired
+    render() {
+        if (this.props.metrics.length > 0) {
+            return this.createGraphs()
+        }
+        else {
+            return (
+                <div>No metrics found.</div>
+            )
+        }
+    }
 }
 
 export default DataDisplay

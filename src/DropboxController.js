@@ -73,10 +73,10 @@ function logout() {
 }
 
 module.exports = {
-    loginClicked: loginClicked,
-    isAuthenticated: isAuthenticated,
-    getFiles: getFiles,
-    getFileContents: getFileContents,
-    logout: logout,
-    writeFile: writeFile
+    loginClicked,
+    isAuthenticated,
+    getFiles,
+    getFileContents,
+    logout,
+    writeFile
 }
