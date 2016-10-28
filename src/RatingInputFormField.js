@@ -2,6 +2,11 @@ import React, {Component} from 'react'
 import {Form, Input, Button} from 'semantic-ui-react'
 
 class RatingInputFormField extends Component {
+    propTypes: {
+        metric: React.PropTypes.object.isRequired,
+        onAction: React.PropTypes.func.isRequired
+    }
+
     handleSubmit(e, formData) {
         e.preventDefault()
         this.props.onAction(this, 'log metric', {
@@ -18,11 +23,6 @@ class RatingInputFormField extends Component {
             </Form>
         )
     }
-}
-
-RatingInputFormField.propTypes = {
-    metric: React.PropTypes.object.isRequired,
-    onAction: React.PropTypes.func.isRequired
 }
 
 export default RatingInputFormField

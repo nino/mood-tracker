@@ -8,11 +8,16 @@ import Settings from './Settings'
 import './MainUI.css'
 
 class MainUI extends Component {
+    propTypes: {
+        data: React.PropTypes.array.isRequired,
+        onAction: React.PropTypes.func.isRequired
+    }
+
     render() {
         return (
             <div id='app-root'>
             <AppHeader />
-            <Container>
+            <div className='ui container'>
             <DataEntryForm
                 onAction={this.props.onAction}
                 metrics={this.props.data}
@@ -23,16 +28,11 @@ class MainUI extends Component {
             />
             <Divider />
             <Settings onAction={this.props.onAction} />
+            </div>
             <Footer onAction={this.props.onAction}/>
-            </Container>
             </div>
         )
     }
-}
-
-MainUI.propTypes = {
-    data: React.PropTypes.array.isRequired,
-    onAction: React.PropTypes.func.isRequired
 }
 
 export default MainUI
