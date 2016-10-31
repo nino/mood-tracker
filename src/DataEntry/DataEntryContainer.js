@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
-import MetricEntryComponent from './MetricEntryComponent'
+import MetricEntryContainer from './MetricEntryContainer'
 
-class DataEntryForm extends Component {
+class DataEntryContainer extends Component {
     propTypes: {
         metrics: React.PropTypes.array.isRequired,
         onAction: React.PropTypes.func.isRequired
@@ -11,7 +11,7 @@ class DataEntryForm extends Component {
         let entryComponents = []
         this.props.metrics.forEach(function(metric) {
             entryComponents.push(
-                <MetricEntryComponent
+                <MetricEntryContainer
                 onAction={this.props.onAction}
                 metric={metric}
                 key={metric.name}
@@ -26,4 +26,4 @@ class DataEntryForm extends Component {
     }
 }
 
-export default DataEntryForm
+export default DataEntryContainer

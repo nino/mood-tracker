@@ -1,16 +1,16 @@
 import React from 'react'
 import {shallow, mount} from 'enzyme'
 import {expect} from 'chai'
-import RatingInputFormField from './RatingInputFormField'
-import SampleMetricsWithEntries from '../test/SampleMetricsWithEntries'
-import SampleMetricsWithoutEntries from '../test/SampleMetricsWithoutEntries'
-import SampleMetricsCorruptData from '../test/SampleMetricsCorruptData'
+import MetricEntryFormField from './MetricEntryFormField'
+import SampleMetricsWithEntries from '../../test/SampleMetricsWithEntries'
+import SampleMetricsWithoutEntries from '../../test/SampleMetricsWithoutEntries'
+import SampleMetricsCorruptData from '../../test/SampleMetricsCorruptData'
 
-describe('RatingInputFormField', () => {
+describe('MetricEntryFormField', () => {
     it('renders an input field and a button', () => {
         const callback = () => null
         const component = shallow(
-            <RatingInputFormField metric={SampleMetricsWithEntries[1]} onAction={callback} />
+            <MetricEntryFormField metric={SampleMetricsWithEntries[1]} onAction={callback} />
         )
         expect(component.find('Input')).to.have.length(1)
         expect(component.find('Button')).to.have.length(1)
@@ -26,7 +26,7 @@ describe('RatingInputFormField', () => {
             cbParams = params
         }
         const component = mount(
-            <RatingInputFormField metric={SampleMetricsWithEntries[1]} onAction={callback} />
+            <MetricEntryFormField metric={SampleMetricsWithEntries[1]} onAction={callback} />
         )
 
         const inputField = component.find('input')

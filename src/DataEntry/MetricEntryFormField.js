@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {Form, Input, Button} from 'semantic-ui-react'
 
-class RatingInputFormField extends Component {
+class MetricEntryFormField extends Component {
     propTypes: {
         metric: React.PropTypes.object.isRequired,
         onAction: React.PropTypes.func.isRequired
@@ -25,4 +25,4 @@ class RatingInputFormField extends Component {
     }
 }
 
-export default RatingInputFormField
+export default MetricEntryFormField

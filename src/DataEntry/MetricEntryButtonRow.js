@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {Button} from 'semantic-ui-react'
 
-class RatingInputButtonRow extends Component {
+class MetricEntryButtonRow extends Component {
     propTypes: {
         metric: React.PropTypes.object.isRequired,
         onAction: React.PropTypes.func.isRequired
@@ -54,4 +54,4 @@ class RatingInputButtonRow extends Component {
 
 
 
-export default RatingInputButtonRow
+export default MetricEntryButtonRow
