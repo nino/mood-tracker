@@ -3,18 +3,18 @@ import ReactDOM from 'react-dom'
 import {shallow, mount} from 'enzyme'
 import {expect} from 'chai'
 import {Button} from 'semantic-ui-react'
-import RatingInputButtonRow from './RatingInputButtonRow'
-import SampleMetricsWithEntries from '../test/SampleMetricsWithEntries'
-import SampleMetricsWithoutEntries from '../test/SampleMetricsWithoutEntries'
-import SampleMetricsCorruptData from '../test/SampleMetricsCorruptData'
+import MetricEntryButtonRow from './MetricEntryButtonRow'
+import SampleMetricsWithEntries from '../../test/SampleMetricsWithEntries'
+import SampleMetricsWithoutEntries from '../../test/SampleMetricsWithoutEntries'
+import SampleMetricsCorruptData from '../../test/SampleMetricsCorruptData'
 
 
 
-describe('RatingInputButtonRow', () => {
+describe('MetricEntryButtonRow', () => {
     it('renders 10 buttons', () => {
         let callback = () => null
         const component = shallow(
-            <RatingInputButtonRow onAction={callback} metric={SampleMetricsWithoutEntries[0]} />
+            <MetricEntryButtonRow onAction={callback} metric={SampleMetricsWithoutEntries[0]} />
         )
         expect(component.children().nodes).to.have.length(10)
         expect(component.children().nodes[0].props).to.have.property('color', 'red')
@@ -39,7 +39,7 @@ describe('RatingInputButtonRow', () => {
             callbackParams = params
         }
         const component = mount(
-            <RatingInputButtonRow onAction={callback} metric={SampleMetricsWithoutEntries[0]} />
+            <MetricEntryButtonRow onAction={callback} metric={SampleMetricsWithoutEntries[0]} />
         )
 
         component.find('button').at(0).simulate('click')

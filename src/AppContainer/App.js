@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import './App.css'
 import {Container, Button} from 'semantic-ui-react'
-import DropboxController from './DropboxController'
+import DropboxController from '../controllers/DropboxController'
 import MainUI from './MainUI'
 import AppHeader from './AppHeader'
-import Footer from './Footer'
-import SampleData from '../test/SampleMetricsWithoutEntries'
+import AppFooter from './AppFooter'
+import SampleData from '../../test/SampleMetricsWithoutEntries'
 
 function receiveAction(sender, action, params) {
     switch(action) {
@@ -109,7 +109,7 @@ class App extends Component {
             <div id='app-root'>
             <AppHeader />
             {child}
-            <Footer onAction={receiveAction.bind(this)} loggedIn={DropboxController.isAuthenticated()} />
+            <AppFooter onAction={receiveAction.bind(this)} loggedIn={DropboxController.isAuthenticated()} />
             </div>
         )
     }

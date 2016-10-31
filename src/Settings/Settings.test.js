@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom'
 import Settings from './Settings'
 import {expect} from 'chai'
 import {shallow} from 'enzyme'
-import SampleMetricsEmpty from '../test/SampleMetricsEmpty'
-import SampleMetricsWithEntries from '../test/SampleMetricsWithEntries'
-import SampleMetricsWithoutEntries from '../test/SampleMetricsWithoutEntries'
-import SampleMetricsCorruptData from '../test/SampleMetricsCorruptData'
+import SampleMetricsEmpty from '../../test/SampleMetricsEmpty'
+import SampleMetricsWithEntries from '../../test/SampleMetricsWithEntries'
+import SampleMetricsWithoutEntries from '../../test/SampleMetricsWithoutEntries'
+import SampleMetricsCorruptData from '../../test/SampleMetricsCorruptData'
 
 describe('Settings', () => {
     it('has two MetricSettings children and a "Add Metric" button', () => {

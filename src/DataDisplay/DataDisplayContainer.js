@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
-import DataDisplayGraph from './DataDisplayGraph'
+import DataChart from './DataChart'
 
-class DataDisplay extends Component {
+class DataDisplayContainer extends Component {
     propTypes: {
         metrics: React.PropTypes.array.isRequired
     }
@@ -12,7 +12,7 @@ class DataDisplay extends Component {
             containers.push(
                 <div key={metric.name}>
                 {metric.name}
-                <DataDisplayGraph metric={metric} />
+                <DataChart metric={metric} />
                 </div>
             )
         })
@@ -35,4 +35,4 @@ class DataDisplay extends Component {
     }
 }
 
-export default DataDisplay
+export default DataDisplayContainer

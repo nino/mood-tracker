@@ -1,8 +1,8 @@
 import React, {Component} from 'react'
 import {Divider} from 'semantic-ui-react'
-import DataDisplay from './DataDisplay'
-import DataEntryForm from './DataEntryForm'
-import Settings from './Settings'
+import DataDisplayContainer from '../DataDisplay/DataDisplayContainer'
+import DataEntryContainer from '../DataEntry/DataEntryContainer'
+import Settings from '../Settings/Settings'
 import './MainUI.css'
 
 class MainUI extends Component {
@@ -14,12 +14,12 @@ class MainUI extends Component {
     render() {
         return (
             <div className='ui container'>
-                <DataEntryForm
+                <DataEntryContainer
                     onAction={this.props.onAction}
                     metrics={this.props.data}
                 />
                 <Divider />
-                <DataDisplay
+                <DataDisplayContainer
                     metrics={this.props.data}
                 />
                 <Divider />

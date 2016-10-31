@@ -1,9 +1,9 @@
 import React, {Component} from 'react'
-import './MetricEntryComponent.css'
-import RatingInputButtonRow from './RatingInputButtonRow'
-import RatingInputFormField from './RatingInputFormField'
+import './MetricEntryContainer.css'
+import MetricEntryButtonRow from './MetricEntryButtonRow'
+import MetricEntryFormField from './MetricEntryFormField'
 
-class MetricEntryComponent extends Component {
+class MetricEntryContainer extends Component {
     propTypes: {
         metric: React.PropTypes.object.isRequired,
         onAction: React.PropTypes.func.isRequired,
@@ -35,12 +35,12 @@ class MetricEntryComponent extends Component {
         }
         else if (this.metricHasFewOptions()) {
             entryForm = (
-                <RatingInputButtonRow metric={this.props.metric} onAction={this.props.onAction} />
+                <MetricEntryButtonRow metric={this.props.metric} onAction={this.props.onAction} />
             )
         }
         else {
             entryForm = (
-                <RatingInputFormField metric={this.props.metric} onAction={this.props.onAction} />
+                <MetricEntryFormField metric={this.props.metric} onAction={this.props.onAction} />
             )
         }
 
@@ -55,4 +55,4 @@ class MetricEntryComponent extends Component {
     }
 }
 
-export default MetricEntryComponent
+export default MetricEntryContainer
