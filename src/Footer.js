@@ -14,7 +14,9 @@ class Footer extends Component {
                 <Button
                     basic
                     compact
+                    size='mini'
                     onClick={() => this.props.onAction(this, 'logoutClicked')}
+                    floated='right'
                 >
                     Log out
                 </Button>
@@ -22,7 +24,7 @@ class Footer extends Component {
         }
 
         return (
-            <div>
+            <div className='ui container'>
             <small>© 2016, Nino Annighöfer</small>
             {logoutButton}
             </div>

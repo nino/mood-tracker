@@ -6,7 +6,7 @@ class DataDisplayGraph extends Component {
         let dates = this.props.metric.entries.map(entry => new Date(entry.date))
         let thedata = this.props.metric.entries.map(entry => entry.value)
         let context = document.getElementById(this.props.metric.name + '-chart')
-        var myChart = new Chart(context, {
+        new Chart(context, {
             type: 'line',
             data: {
                 labels: dates,

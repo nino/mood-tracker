@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import {Container, Button, Loader} from 'semantic-ui-react'
 import MetricEntryComponent from './MetricEntryComponent'
 
 class DataEntryForm extends Component {

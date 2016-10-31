@@ -34,36 +34,49 @@ function isAuthenticated() {
     return !!getAccessToken()
 }
 
-function getFiles(callback) {
+function getFileList() {
     let dbx = new Dropbox({accessToken: getAccessToken()})
-    dbx.filesListFolder({path: ''}).then(function(response) {returnFiles(response, callback)}).catch(err => {console.log('error', err)})
+    return dbx.filesListFolder({path: ''}).then(response => response.entries)
 }
 
-function returnFiles(response, callback) {
-    console.log('from returnFiles: ', response.entries)
-    callback(response.entries)
+function fileExists(fileName) {
+    return (
+        getFileList()
+        .then(files => !!files.find(file => file.name === fileName))
+    )
 }
 
-function getFileContents(fileName, callback) {
-   let dbx = new Dropbox({accessToken: getAccessToken()})
-   dbx.filesDownload({path: '/' + fileName}).then(function handleFileContents(response) {
-       let blobReader = new FileReader()
-       blobReader.addEventListener('loadend', function() {
-           callback(blobReader.result)
-       })
-       blobReader.readAsText(response.fileBlob)
-   })
+function getFileContents(fileName) {
+    let dbx = new Dropbox({accessToken: getAccessToken()})
+    return new Promise((resolve, reject) => {
+        fileExists(fileName)
+        .then(exists => { if (!exists) throw Error('file does not exist') })
+        .then(() => dbx.filesDownload({path: '/' + fileName}))
+        .then(response =>  readFileBlob(response.fileBlob))
+        .then(resolve)
+        .catch(reject)
+    })
+}
+
+function readFileBlob(fileBlob) {
+    console.log('reading file blob')
+    let blobReader = new FileReader()
+    return new Promise(function(resolve, reject) {
+        blobReader.addEventListener('loadend', function() {
+            console.log('finished reading')
+            resolve(blobReader.result)
+        })
+        blobReader.readAsText(fileBlob)
+    })
 }
 
 function writeFile(fileName, contents, callback) {
     let dbx = new Dropbox({accessToken: getAccessToken()})
-    dbx.filesUpload({
+    return dbx.filesUpload({
         path: '/' + fileName,
         mode: {'.tag': 'overwrite'},
         contents: contents,
         mute: true
-    }).then(function(response) {
-        callback(response)
     })
 }
 
@@ -75,7 +88,7 @@ function logout() {
 module.exports = {
     loginClicked,
     isAuthenticated,
-    getFiles,
+    getFileList,
     getFileContents,
     logout,
     writeFile
