@@ -9,7 +9,7 @@ class MetricEntryFormField extends Component {
 
     handleSubmit(e, formData) {
         e.preventDefault()
-        this.props.onAction(this, 'log metric', {
+        this.props.onAction('log metric', {
             name: this.props.metric.name,
             rating: formData.rating
         })

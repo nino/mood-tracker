@@ -15,7 +15,7 @@ class Footer extends Component {
                     basic
                     compact
                     size='mini'
-                    onClick={() => this.props.onAction(this, 'logoutClicked')}
+                    onClick={() => this.props.onAction('logoutClicked')}
                     floated='right'
                 >
                     Log out

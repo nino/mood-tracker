@@ -8,7 +8,7 @@ class MetricEntryButtonRow extends Component {
     }
 
     sendRating(rating) {
-        this.props.onAction(this, 'log metric', {
+        this.props.onAction('log metric', {
             name: this.props.metric.name,
             rating: rating
         })

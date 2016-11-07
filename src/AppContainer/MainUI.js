@@ -7,7 +7,7 @@ import './MainUI.css'
 
 class MainUI extends Component {
     propTypes: {
-        data: React.PropTypes.array.isRequired,
+        metrics: React.PropTypes.array.isRequired,
         onAction: React.PropTypes.func.isRequired
     }
 
@@ -16,11 +16,11 @@ class MainUI extends Component {
             <div className='ui container'>
                 <DataEntryContainer
                     onAction={this.props.onAction}
-                    metrics={this.props.data}
+                    metrics={this.props.metrics}
                 />
                 <Divider />
                 <DataDisplayContainer
-                    metrics={this.props.data}
+                    metrics={this.props.metrics}
                 />
                 <Divider />
                 <Settings

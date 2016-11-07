@@ -21,7 +21,7 @@ describe('Settings', () => {
     it('calls the "add metric" action', () => {
         let cbAction
         let cbParams
-        const callback = (sender, action, params) => {
+        const callback = (action, params) => {
             cbAction = action
             cbParams = params
         }

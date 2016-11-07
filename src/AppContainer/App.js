@@ -6,40 +6,7 @@ import MainUI from './MainUI'
 import AppHeader from './AppHeader'
 import AppFooter from './AppFooter'
 import SampleData from '../../test/SampleMetricsWithoutEntries'
-
-function receiveAction(sender, action, params) {
-    switch(action) {
-        case 'logoutClicked':
-            DropboxController.logout()
-            this.forceUpdate()
-            break
-        case 'log metric':
-            logMetricAction.bind(this)(params.name, params.rating)
-            break
-        default:
-            console.log('Nothing happens')
-    }
-}
-
-function logMetricAction(name, rating) {
-    console.log('logging metric ' + name + ': ' + rating)
-    let date = new Date()
-    date.setHours(date.getHours() - date.getTimezoneOffset() / 60)
-    let newEntry = {
-        date: date.toJSON(),
-        value: rating
-    }
-    let metricIndex = this.state.data.findIndex(
-        metric => metric.name === name
-    )
-    let newData = []
-    Object.assign(newData, this.state.data)
-    newData[metricIndex].entries.push(newEntry)
-    this.setState({data: newData})
-    DropboxController.writeFile('data.json', JSON.stringify(this.state.data, null, 2), (response) => {
-        console.log('data written')
-    })
-}
+import Actions from '../controllers/actions'
 
 function loadData() {
     return (
@@ -58,7 +25,7 @@ class App extends Component {
             this.setState({data})
         }).catch((error) => {
             console.log('Error loading data')
-            this.setState({error: 'data file not found'})
+            this.setState({'error': 'data file not found'})
         })
     }
 
@@ -67,8 +34,9 @@ class App extends Component {
         if (DropboxController.isAuthenticated() && this.state.data) {
             child = (
                 <MainUI
-                    onAction={receiveAction.bind(this)}
-                    data={this.state.data}
+                    onAction={Actions.receiveAction.bind(this)}
+                    metrics={this.state.data}
+                    appState={this.state}
                 />
             )
         }
@@ -109,7 +77,7 @@ class App extends Component {
             <div id='app-root'>
             <AppHeader />
             {child}
-            <AppFooter onAction={receiveAction.bind(this)} loggedIn={DropboxController.isAuthenticated()} />
+            <AppFooter onAction={Actions.receiveAction.bind(this)} loggedIn={DropboxController.isAuthenticated()} />
             </div>
         )
     }

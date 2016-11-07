@@ -17,11 +17,9 @@ describe('MetricEntryFormField', () => {
     })
 
     it('calls the correct callback', () => {
-        let cbSender
         let cbAction
         let cbParams
-        const callback = (sender, action, params) => {
-            cbSender = sender
+        const callback = (action, params) => {
             cbAction = action
             cbParams = params
         }
