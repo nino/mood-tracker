@@ -9,17 +9,18 @@ class MetricEntryFormField extends Component {
 
     handleSubmit(e, formData) {
         e.preventDefault()
-        this.props.onAction(this, 'log metric', {
-            name: this.props.metric.name,
+        this.props.onAction('log metric', {
+            id: this.props.metric.id,
             rating: formData.rating
         })
     }
 
     render() {
         return (
-            <Form size='mini' onSubmit={this.handleSubmit.bind(this)}>
-                <Input size='mini' name='rating' />
-                <Button basic compact size='mini' type='submit'>Submit</Button>
+            <Form onSubmit={this.handleSubmit.bind(this)}
+                className='metric-entry-text-form'>
+                <Input name='rating' />
+                <Button type='submit'>Submit</Button>
             </Form>
         )
     }

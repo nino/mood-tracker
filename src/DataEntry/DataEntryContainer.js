@@ -14,7 +14,7 @@ class DataEntryContainer extends Component {
                 <MetricEntryContainer
                 onAction={this.props.onAction}
                 metric={metric}
-                key={metric.name}
+                key={metric.id}
                 />
             )
         }.bind(this))

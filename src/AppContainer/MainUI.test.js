@@ -13,7 +13,10 @@ const callback = () => {
 
 describe('MainUI', () => {
     it('renders all subcomponents without crashing', () => {
-        const component = shallow(<MainUI data={SampleMetricsWithEntries} onAction={callback} />)
+        const component = shallow(
+          <MainUI appState={{metrics: SampleMetricsWithEntries}}
+            onAction={callback}/>
+        )
         expect(component.find('DataEntryContainer')).to.have.length(1)
         expect(component.find('DataDisplayContainer')).to.have.length(1)
         expect(component.find('Settings')).to.have.length(1)

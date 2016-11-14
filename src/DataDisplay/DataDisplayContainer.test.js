@@ -21,7 +21,6 @@ describe('DataDisplayContainer', () => {
             <DataDisplayContainer metrics={SampleMetricsWithEntries} />
         )
         expect(component.children().nodes).to.have.length(2)
-        expect(component.text()).to.include('Mood').and.to.include('Burns')
     })
 })
 
