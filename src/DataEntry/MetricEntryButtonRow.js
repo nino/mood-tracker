@@ -9,7 +9,7 @@ class MetricEntryButtonRow extends Component {
 
     sendRating(rating) {
         this.props.onAction('log metric', {
-            name: this.props.metric.name,
+            id: this.props.metric.id,
             rating: rating
         })
     }
@@ -38,7 +38,6 @@ class MetricEntryButtonRow extends Component {
                 <Button
                     onClick={() => this.sendRating(i)}
                     color={color}
-                    basic
                     key={i}>
                     {i}
                 </Button>

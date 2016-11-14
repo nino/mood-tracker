@@ -30,11 +30,9 @@ describe('MetricEntryButtonRow', () => {
     })
 
     it('sends the correct callback', () => {
-        let callbackSender
         let callbackAction
         let callbackParams
-        let callback = (sender, action, params) => {
-            callbackSender = sender
+        let callback = (action, params) => {
             callbackAction = action
             callbackParams = params
         }
@@ -45,18 +43,18 @@ describe('MetricEntryButtonRow', () => {
         component.find('button').at(0).simulate('click')
         expect(callbackAction).to.equal('log metric')
         expect(callbackParams).to.have.property('rating', 1)
-        expect(callbackParams).to.have.property('name', 'Mood')
+        expect(callbackParams).to.have.property('id', 1)
 
 
         component.find('button').at(2).simulate('click')
         expect(callbackAction).to.equal('log metric')
         expect(callbackParams).to.have.property('rating', 3)
-        expect(callbackParams).to.have.property('name', 'Mood')
+        expect(callbackParams).to.have.property('id', 1)
 
 
         component.find('button').at(9).simulate('click')
         expect(callbackAction).to.equal('log metric')
         expect(callbackParams).to.have.property('rating', 10)
-        expect(callbackParams).to.have.property('name', 'Mood')
+        expect(callbackParams).to.have.property('id', 1)
     })
 })

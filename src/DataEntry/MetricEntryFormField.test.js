@@ -33,7 +33,7 @@ describe('MetricEntryFormField', () => {
         component.find('form').simulate('submit')
         expect(component.find('button')).to.have.length(1)
         expect(cbAction).to.equal('log metric')
-        expect(cbParams).to.have.property('name').and.to.include('Burns')
+        expect(cbParams).to.have.property('id').and.to.equal(2)
         expect(cbParams).to.have.property('rating', '32')
     })
 })
