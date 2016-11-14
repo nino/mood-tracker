@@ -12,4 +12,8 @@ let localStorageMock = {
     }
 }
 
+let DropboxControllerMock = {
+}
+
 global.localStorage = localStorageMock
+global.DropboxController = DropboxControllerMock
