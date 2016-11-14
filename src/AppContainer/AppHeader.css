@@ -3,3 +3,10 @@
     margin: 0px;
     padding: 3mm;
 }
+
+#app-header > h3 {
+    font-family: Baskerville;
+    font-weight: normal;
+    font-size: 2.2em;
+    font-style: italic;
+}

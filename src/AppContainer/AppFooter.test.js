@@ -22,7 +22,7 @@ describe('AppFooter', () => {
 
     it('calls the onAction function when logoutButton is clicked', () => {
         let callbackCalled = false
-        let callback = (sender, action) => {
+        let callback = (action) => {
             callbackCalled = true
             expect(action).to.equal('logoutClicked')
         }

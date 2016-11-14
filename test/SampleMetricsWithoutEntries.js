@@ -1,6 +1,7 @@
 module.exports = [
   {
     "name": "Mood",
+    "id": 1,
     "type": "int",
     "minValue": 1,
     "maxValue": 10,
@@ -31,6 +32,7 @@ module.exports = [
   },
   {
     "name": "Burns depression score",
+    "id": 2,
     "type": "int",
     "minValue": 0,
     "maxValue": 100,

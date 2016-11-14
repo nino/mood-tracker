@@ -10,9 +10,8 @@ class DataDisplayContainer extends Component {
         let containers = []
         this.props.metrics.forEach(function(metric) {
             containers.push(
-                <div key={metric.name}>
-                {metric.name}
-                <DataChart metric={metric} />
+                <div key={metric.id}>
+                    <DataChart metric={metric} />
                 </div>
             )
         })
