@@ -70,7 +70,7 @@ function readFileBlob(fileBlob) {
     })
 }
 
-function writeFile(fileName, contents, callback) {
+function writeFile(fileName, contents) {
     let dbx = new Dropbox({accessToken: getAccessToken()})
     return dbx.filesUpload({
         path: '/' + fileName,
