@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import './App.css'
-import {Container, Button} from 'semantic-ui-react'
+import {Container, Button, Modal} from 'semantic-ui-react'
 import DropboxController from '../controllers/DropboxController'
 import MainUI from './MainUI'
 import AppHeader from './AppHeader'
@@ -81,6 +81,37 @@ class App extends Component {
             </div>
         )
     }
+
+    return (
+      <div id='app-root'>
+        <AppHeader />
+        {this.state.modal ? (
+            <Modal
+                open={true}
+                closeOnRootNodeClick={false}>
+                <Modal.Header>{this.state.modal.title}</Modal.Header>
+                <Modal.Content>{this.state.modal.message}</Modal.Content>
+                <Modal.Actions>
+                    <Button
+                        onClick={Actions.receiveAction.bind(this, 'confirm modal')}>
+                        {this.state.modal.buttons.find(b=>b.purpose==='confirm')
+                            .label}
+                    </Button>
+                    <Button
+                        onClick={Actions.receiveAction.bind(this, 'cancel modal')}>
+                        {this.state.modal.buttons.find(b=>b.purpose==='cancel')
+                            .label}
+                    </Button>
+                </Modal.Actions>
+            </Modal>
+        ) : (<div />)}
+        {child}
+        <AppFooter
+          onAction={Actions.receiveAction.bind(this)}
+          loggedIn={DropboxController.isAuthenticated()} />
+      </div>
+    )
+  }
 }
 
 export default App
