@@ -5,8 +5,9 @@ import DropboxController from '../controllers/DropboxController'
 import MainUI from './MainUI'
 import AppHeader from './AppHeader'
 import AppFooter from './AppFooter'
-import SampleData from '../../test/SampleMetricsWithoutEntries'
+import SampleData from '../../test/SampleMetricsWithoutEntries' // for welcome screen
 import Actions from '../controllers/actions'
+import ActivityIndicator from '../ActivityIndicator'
 
 function loadData() {
   return DropboxController.getFileContents('data.json').then(JSON.parse)
@@ -97,6 +98,7 @@ class App extends Component {
                 </Modal.Actions>
             </Modal>
         ) : (<div />)}
+        <ActivityIndicator activities={this.state.activity} />
         {child}
         <AppFooter
           onAction={Actions.receiveAction.bind(this)}

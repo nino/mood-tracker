@@ -44,6 +44,12 @@ function receiveAction(action, params) {
         case 'cancel modal':
             cancelModalAction.bind(this)(params)
             break
+        case 'begin sync data':
+            beginSyncDataAction.bind(this)(params.activityId)
+            break
+        case 'finish sync data':
+            finishSyncDataAction.bind(this)(params.activityId, params.error)
+            break
         default:
             console.log('Unknown action sent')
     }
@@ -95,12 +101,7 @@ function updateMetricAction(id, newProps) {
     )
     this.setState({metrics: updatedMetrics})
     this.setState({editing: null})
-    if (process.env.NODE_ENV !== 'test') {
-        DropboxController.writeFile(
-            'data.json', JSON.stringify(this.state.metrics, null, 2)
-        ).then(() => {console.log('data written')})
-        .catch((error) => {console.error('error writing data', error)})
-    }
+    beginSyncDataAction.bind(this)()
 }
 
 function logMetricAction(id, rating) {
@@ -119,12 +120,7 @@ function logMetricAction(id, rating) {
     newData[metricIndex] = Object.assign({}, newData[metricIndex])
     newData[metricIndex].entries = newData[metricIndex].entries.concat(newEntry)
     this.setState({metrics: newData})
-    if (process.env.NODE_ENV !== 'test') {
-        DropboxController.writeFile(
-            'data.json', JSON.stringify(this.state.metrics, null, 2)
-        ).then(() => {console.log('data written')})
-        .catch((error) => {console.error('error writing data', error)})
-    }
+    beginSyncDataAction.bind(this)()
 }
 
 function stopEditingAction(discard) {
@@ -179,12 +175,7 @@ function addMetricAction() {
     let editedMetric = Object.assign({}, newMetric)
     delete editedMetric.entries
     this.setState({metrics: updatedMetrics, editing: editedMetric})
-    if (process.env.NODE_ENV !== 'test') {
-        DropboxController.writeFile(
-            'data.json', JSON.stringify(this.state.metrics, null, 2)
-        ).then(() => {console.log('data written')})
-        .catch((error) => {console.error('error writing data', error)})
-    }
+    beginSyncDataAction.bind(this)()
 }
 
 function reorderMetricsAction(metricId, direction) {
@@ -224,12 +215,7 @@ function reorderMetricsAction(metricId, direction) {
         }
         this.setState({...this.state, metrics: updatedMetrics})
     }
-    if (process.env.NODE_ENV !== 'test') {
-        DropboxController.writeFile(
-            'data.json', JSON.stringify(this.state.metrics, null, 2)
-        ).then(() => {console.log('data written')})
-        .catch((error) => {console.error('error writing data', error)})
-    }
+    beginSyncDataAction.bind(this)()
 }
 
 function deleteMetricAction(id, confirmed) {
@@ -261,12 +247,7 @@ function deleteMetricAction(id, confirmed) {
         this.setState({modal})
     }
 
-    if (process.env.NODE_ENV !== 'test') {
-        DropboxController.writeFile(
-            'data.json', JSON.stringify(this.state.metrics, null, 2)
-        ).then(() => {console.log('data written')})
-        .catch((error) => {console.error('error writing data', error)})
-    }
+    beginSyncDataAction.bind(this)()
 }
 
 function updateFormElementAction(params) {
@@ -304,6 +285,54 @@ function confirmModalAction(params) {
 function cancelModalAction(params) {
     let ed = this.state.editing
     this.setState({editing: ed, modal: null})
+}
+
+function beginSyncDataAction() {
+    if (process.env.NODE_ENV !== 'test') {
+        let newId = 0
+        if (this.state.activity && this.state.activity.length > 0) {
+            newId = max(this.state.activity.map(a=>a.id))+1
+        }
+        let newActivities = [ {
+            name: 'Syncing data',
+            id: newId
+        } ]
+        if (this.state.activity) {
+            newActivities = this.state.activity.concat(newActivities)
+        }
+        this.setState({activity: newActivities})
+        DropboxController.writeFile(
+            'data.json', JSON.stringify(this.state.metrics, null, 2)
+        ).then(() => finishSyncDataAction.bind(this)(newId))
+        .catch(finishSyncDataAction.bind(this, newId))
+    }
+}
+
+function finishSyncDataAction(activityId, error) {
+    console.log('activityId: ', activityId)
+    console.log('error', error);
+    console.log('deleting one activity')
+    console.log('activities now', this.state.activity)
+    let index = this.state.activity.findIndex(a => a.id === activityId)
+    console.log(index);
+    const newActivities = this.state.activity.slice(0,index)
+        .concat(this.state.activity.slice(index+1, this.state.activity.length))
+    this.setState({activity: newActivities})
+    console.log('activity after', this.state.activity);
+    if (!error) {
+        console.log('data written')
+        this.setState({message: 'Synced'})
+    }
+    else {
+        console.log('error writing data')
+        this.setState({message: 'Error while syncing' })
+    }
+
+    dismissMessageAfterTimeoutAction.bind(this)
+}
+
+function dismissMessageAfterTimeoutAction() {
+
 }
 
 function isEditedMetricUnchanged() {

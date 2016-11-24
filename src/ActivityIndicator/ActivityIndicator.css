@@ -1,0 +1,32 @@
+#activities {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+}
+
+.activity  {
+    background-color: #efefef;
+    padding: 4px 10px;
+}
+
+.displayActivities-enter {
+    opacity: 0;
+    position: relative;
+    left: 100px;
+}
+
+.displayActivities-enter.displayActivities-enter-active {
+    opacity: 1;
+    left: 0px;
+    transition: left 100ms ease-out;
+    transition: opacity 200ms ease-out;
+}
+
+.displayActivities-leave {
+    opacity: 1;
+}
+
+.displayActivities-leave.displayActivities-leave-active {
+    opacity: 0;
+    transition: opacity 200ms linear;
+}
