@@ -36,13 +36,16 @@ function isAuthenticated() {
 
 function getFileList() {
     let dbx = new Dropbox({accessToken: getAccessToken()})
-    return dbx.filesListFolder({path: ''}).then(response => response.entries)
+    return dbx.filesListFolder({path: ''})
+        .then(response => response.entries)
+        .catch(error => ({ 'error': error }))
 }
 
 function fileExists(fileName) {
     return (
         getFileList()
         .then(files => !!files.find(file => file.name === fileName))
+        .catch(err => ({error: err}))
     )
 }
 
@@ -50,21 +53,26 @@ function getFileContents(fileName) {
     let dbx = new Dropbox({accessToken: getAccessToken()})
     return new Promise((resolve, reject) => {
         fileExists(fileName)
-        .then(exists => { if (!exists) throw Error('file does not exist') })
-        .then(() => dbx.filesDownload({path: '/' + fileName}))
-        .then(response =>  readFileBlob(response.fileBlob))
-        .then(resolve)
-        .catch(reject)
+            .then(exists => { if (!exists) throw Error('file does not exist') })
+            .then(() => dbx.filesDownload({path: '/' + fileName}))
+            .then(response =>  readFileBlob(response.fileBlob))
+            .then(resolve)
+            .catch(reject)
     })
 }
 
 function readFileBlob(fileBlob) {
     console.log('reading file blob')
     let blobReader = new FileReader()
-    return new Promise(function(resolve, reject) {
-        blobReader.addEventListener('loadend', function() {
+    return new Promise((resolve, reject) => {
+        blobReader.addEventListener('loadend', () => {
             console.log('finished reading')
-            resolve(blobReader.result)
+            if (blobReader.result) {
+                resolve(blobReader.result)
+            }
+            else {
+                reject(Error('could not read file'))
+            }
         })
         blobReader.readAsText(fileBlob)
     })
@@ -77,7 +85,7 @@ function writeFile(fileName, contents) {
         mode: {'.tag': 'overwrite'},
         contents: contents,
         mute: true
-    })
+    }).catch(e => ({error: e}))
 }
 
 function logout() {

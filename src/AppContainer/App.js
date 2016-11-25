@@ -10,7 +10,8 @@ import Actions from '../controllers/actions'
 import ActivityIndicator from '../ActivityIndicator'
 
 function loadData() {
-  return DropboxController.getFileContents('data.json').then(JSON.parse)
+    return DropboxController.getFileContents('data.json')
+        .then(JSON.parse).catch((e) => ({error: e}))
 }
 
 class App extends Component {
