@@ -99,28 +99,33 @@ function updateMetricAction(id, newProps) {
         updatedMetrics[metricIndex],
         newProps
     )
-    this.setState({metrics: updatedMetrics})
+    this.setState({metrics: updatedMetrics}, beginSyncDataAction.bind(this))
     this.setState({editing: null})
-    beginSyncDataAction.bind(this)()
 }
 
 function logMetricAction(id, rating) {
     console.log('logging metric ' + id + ': ' + rating)
     let date = new Date()
     date.setHours(date.getHours() - date.getTimezoneOffset() / 60)
-    let newEntry = {
+    const newEntry = {
         date: date.toJSON(),
         value: rating
     }
-    let metricIndex = this.state.metrics.findIndex(
+    const metricIndex = this.state.metrics.findIndex(
         metric => metric.id === id
     )
-    let newData = Object.assign([], this.state.metrics)
+    const metricsCopy = Object.assign([], this.state.metrics)
+    const updatedMetric = Object.assign(
+        {},
+        metricsCopy[metricIndex],
+        { entries: metricsCopy[metricIndex].entries.concat(newEntry) }
+    )
+    const newData = metricsCopy.slice(0, metricIndex)
+        .concat([updatedMetric])
+        .concat(metricsCopy.slice(metricIndex+1, metricsCopy.length))
 
-    newData[metricIndex] = Object.assign({}, newData[metricIndex])
-    newData[metricIndex].entries = newData[metricIndex].entries.concat(newEntry)
-    this.setState({metrics: newData})
-    beginSyncDataAction.bind(this)()
+    this.setState({metrics: newData}, beginSyncDataAction.bind(this))
+    console.log('new metrics after logging:', newData)
 }
 
 function stopEditingAction(discard) {
@@ -174,8 +179,7 @@ function addMetricAction() {
     let updatedMetrics = metrics.concat(newMetric)
     let editedMetric = Object.assign({}, newMetric)
     delete editedMetric.entries
-    this.setState({metrics: updatedMetrics, editing: editedMetric})
-    beginSyncDataAction.bind(this)()
+    this.setState({metrics: updatedMetrics, editing: editedMetric}, beginSyncDataAction.bind(this))
 }
 
 function reorderMetricsAction(metricId, direction) {
@@ -213,9 +217,8 @@ function reorderMetricsAction(metricId, direction) {
         else {
             return // unknown direction
         }
-        this.setState({...this.state, metrics: updatedMetrics})
+        this.setState({metrics: updatedMetrics}, beginSyncDataAction.bind(this))
     }
-    beginSyncDataAction.bind(this)()
 }
 
 function deleteMetricAction(id, confirmed) {
@@ -224,7 +227,7 @@ function deleteMetricAction(id, confirmed) {
         let updatedMetrics = this.state.metrics.slice(0, index).concat(
             this.state.metrics.slice(index+1, this.state.metrics.length)
         )
-        this.setState({editing: null, metrics: updatedMetrics})
+        this.setState({editing: null, metrics: updatedMetrics}, beginSyncDataAction.bind(this))
     }
     else {
         let message = 'Are you sure you wish to delete the metric "'
@@ -247,7 +250,7 @@ function deleteMetricAction(id, confirmed) {
         this.setState({modal})
     }
 
-    beginSyncDataAction.bind(this)()
+    
 }
 
 function updateFormElementAction(params) {
@@ -289,22 +292,23 @@ function cancelModalAction(params) {
 
 function beginSyncDataAction() {
     if (process.env.NODE_ENV !== 'test') {
-        let newId = 0
+        let newActivityId = 0
         if (this.state.activity && this.state.activity.length > 0) {
-            newId = max(this.state.activity.map(a=>a.id))+1
+            newActivityId = max(this.state.activity.map(a=>a.id))+1
         }
         let newActivities = [ {
             name: 'Syncing data',
-            id: newId
+            id: newActivityId
         } ]
         if (this.state.activity) {
             newActivities = this.state.activity.concat(newActivities)
         }
         this.setState({activity: newActivities})
+        console.log('uploading', this.state.metrics)
         DropboxController.writeFile(
             'data.json', JSON.stringify(this.state.metrics, null, 2)
-        ).then(() => finishSyncDataAction.bind(this)(newId))
-        .catch(finishSyncDataAction.bind(this, newId))
+        ).then(() => finishSyncDataAction.bind(this)(newActivityId))
+        .catch(finishSyncDataAction.bind(this, newActivityId))
     }
 }
 
