@@ -10,7 +10,10 @@ import Actions from '../controllers/actions'
 import ActivityIndicator from '../ActivityIndicator'
 
 function loadData() {
-    return DropboxController.getFileContents('data.json')
+    const dataFile = process.env.NODE_ENV === 'production'
+      ? 'data.json'
+      : 'dev/data.json'
+    return DropboxController.getFileContents(dataFile)
         .then(JSON.parse).catch((e) => ({error: e}))
 }
 
@@ -23,6 +26,10 @@ class App extends Component {
   componentDidMount() {
     loadData().then((metrics) => {
       this.setState({metrics})
+    }).then(() => {
+      if (!(this.state.metrics instanceof Array)) {
+        Actions.receiveAction.bind(this)('add metric')
+      }
     }).catch((error) => {
         if (error.message === 'file does not exist') {
             Actions.receiveAction.bind(this)('add metric')
@@ -35,7 +42,9 @@ class App extends Component {
 
   render() {
     let child
-    if (DropboxController.isAuthenticated() && this.state.metrics) {
+    if (DropboxController.isAuthenticated()
+      && this.state.metrics
+      && this.state.metrics instanceof Array) {
       child = (
         <MainUI
           onAction={Actions.receiveAction.bind(this)}

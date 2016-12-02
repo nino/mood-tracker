@@ -291,25 +291,28 @@ function cancelModalAction(params) {
 }
 
 function beginSyncDataAction() {
-    if (process.env.NODE_ENV !== 'test') {
-        let newActivityId = 0
-        if (this.state.activity && this.state.activity.length > 0) {
-            newActivityId = max(this.state.activity.map(a=>a.id))+1
-        }
-        let newActivities = [ {
-            name: 'Syncing data',
-            id: newActivityId
-        } ]
-        if (this.state.activity) {
-            newActivities = this.state.activity.concat(newActivities)
-        }
-        this.setState({activity: newActivities})
-        console.log('uploading', this.state.metrics)
-        DropboxController.writeFile(
-            'data.json', JSON.stringify(this.state.metrics, null, 2)
-        ).then(() => finishSyncDataAction.bind(this)(newActivityId))
-        .catch(finishSyncDataAction.bind(this, newActivityId))
+  if (process.env.NODE_ENV !== 'test') {
+    let newActivityId = 0
+    if (this.state.activity && this.state.activity.length > 0) {
+      newActivityId = max(this.state.activity.map(a=>a.id))+1
     }
+    let newActivities = [ {
+      name: 'Syncing data',
+      id: newActivityId
+    } ]
+    if (this.state.activity) {
+      newActivities = this.state.activity.concat(newActivities)
+    }
+    this.setState({activity: newActivities})
+    console.log('uploading', this.state.metrics)
+    const dataFile = process.env.NODE_ENV === 'production'
+      ? 'data.json'
+      : 'dev/data.json'
+    DropboxController.writeFile(
+      dataFile, JSON.stringify(this.state.metrics, null, 2)
+    ).then(() => finishSyncDataAction.bind(this)(newActivityId))
+      .catch(finishSyncDataAction.bind(this, newActivityId))
+  }
 }
 
 function finishSyncDataAction(activityId, error) {
