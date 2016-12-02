@@ -9,7 +9,7 @@ import sinon from 'sinon'
 
 describe('DropboxController', () => {
 
-    it('', () => {
-    })
+  it('', () => {
+  })
 
 })

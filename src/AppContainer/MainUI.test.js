@@ -8,17 +8,17 @@ import SampleMetricsCorruptData from '../../test/SampleMetricsCorruptData'
 
 let callbackCounter = 0
 const callback = () => {
-    callbackCounter += 1
+  callbackCounter += 1
 }
 
 describe('MainUI', () => {
-    it('renders all subcomponents without crashing', () => {
-        const component = shallow(
-          <MainUI appState={{metrics: SampleMetricsWithEntries}}
-            onAction={callback}/>
-        )
-        expect(component.find('DataEntryContainer')).to.have.length(1)
-        expect(component.find('DataDisplayContainer')).to.have.length(1)
-        expect(component.find('Settings')).to.have.length(1)
-    })
+  it('renders all subcomponents without crashing', () => {
+    const component = shallow(
+      <MainUI appState={{metrics: SampleMetricsWithEntries}}
+        onAction={callback}/>
+    )
+    expect(component.find('DataEntryContainer')).to.have.length(1)
+    expect(component.find('DataDisplayContainer')).to.have.length(1)
+    expect(component.find('Settings')).to.have.length(1)
+  })
 })

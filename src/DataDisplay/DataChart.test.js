@@ -8,11 +8,11 @@ import SampleMetricsCorruptData from '../../test/SampleMetricsCorruptData'
 
 describe('DataChart', () => {
 
-    it('renders a canvas', () => {
-        const component = shallow(
-            <DataChart metric={SampleMetricsWithEntries[0]} />
-        )
-        expect(component.find('canvas')).to.have.length(1)
-    })
+  it('renders a canvas', () => {
+    const component = shallow(
+      <DataChart metric={SampleMetricsWithEntries[0]} />
+    )
+    expect(component.find('canvas')).to.have.length(1)
+  })
 
 })

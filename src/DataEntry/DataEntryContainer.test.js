@@ -7,11 +7,11 @@ import SampleMetricsWithoutEntries from '../../test/SampleMetricsWithEntries'
 import SampleMetricsCorruptData from '../../test/SampleMetricsCorruptData'
 
 describe('DataEntryContainer', () => {
-    it('renders 2 MetricEntryContainers', () => {
-        const callback = () => null
-        const component = shallow(
-            <DataEntryContainer metrics={SampleMetricsWithEntries} onAction={callback} />
-        )
-        expect(component.find('MetricEntryContainer')).to.have.length(2)
-    })
+  it('renders 2 MetricEntryContainers', () => {
+    const callback = () => null
+    const component = shallow(
+      <DataEntryContainer metrics={SampleMetricsWithEntries} onAction={callback} />
+    )
+    expect(component.find('MetricEntryContainer')).to.have.length(2)
+  })
 })

@@ -57,7 +57,7 @@ class App extends Component {
       )
     }
     else if (DropboxController.isAuthenticated()
-             && this.state.error === 'data file not found') {
+      && this.state.error === 'data file not found') {
       child = (
         <Container>
           <p>Couldn't find data file</p>
@@ -89,24 +89,24 @@ class App extends Component {
       <div id='app-root'>
         <AppHeader />
         {this.state.modal ? (
-            <Modal
-                open={true}
-                closeOnRootNodeClick={false}>
-                <Modal.Header>{this.state.modal.title}</Modal.Header>
-                <Modal.Content>{this.state.modal.message}</Modal.Content>
-                <Modal.Actions>
-                    <Button
-                        onClick={Actions.receiveAction.bind(this, 'confirm modal')}>
-                        {this.state.modal.buttons.find(b=>b.purpose==='confirm')
-                            .label}
-                    </Button>
-                    <Button
-                        onClick={Actions.receiveAction.bind(this, 'cancel modal')}>
-                        {this.state.modal.buttons.find(b=>b.purpose==='cancel')
-                            .label}
-                    </Button>
-                </Modal.Actions>
-            </Modal>
+          <Modal
+            open={true}
+            closeOnRootNodeClick={false}>
+            <Modal.Header>{this.state.modal.title}</Modal.Header>
+            <Modal.Content>{this.state.modal.message}</Modal.Content>
+            <Modal.Actions>
+              <Button
+                onClick={Actions.receiveAction.bind(this, 'confirm modal')}>
+                {this.state.modal.buttons.find(b=>b.purpose==='confirm')
+                    .label}
+                  </Button>
+                  <Button
+                    onClick={Actions.receiveAction.bind(this, 'cancel modal')}>
+                    {this.state.modal.buttons.find(b=>b.purpose==='cancel')
+                        .label}
+                      </Button>
+                    </Modal.Actions>
+                  </Modal>
         ) : (<div />)}
         <ActivityIndicator activities={this.state.activity} />
         {child}
