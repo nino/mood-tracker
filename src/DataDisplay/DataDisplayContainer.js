@@ -1,20 +1,15 @@
-import React, {Component} from 'react'
-import DataChart from './DataChart'
+import React, {Component} from 'react';
+import DataChart from './DataChart';
 
 class DataDisplayContainer extends Component {
-  propTypes: {
-    metrics: React.PropTypes.array.isRequired
-  }
 
   createGraphs() {
-    let containers = []
-    this.props.metrics.forEach(function(metric) {
-      containers.push(
+    const { metrics } = this.props;
+    const containers = metrics.map((metric) => (
         <div key={metric.id}>
           <DataChart metric={metric} />
         </div>
-      )
-    })
+    ));
     return (
       <div>
       {containers}
@@ -34,4 +29,9 @@ class DataDisplayContainer extends Component {
   }
 }
 
-export default DataDisplayContainer
+
+DataDisplayContainer.propTypes = {
+  metrics: React.PropTypes.array.isRequired
+};
+
+export default DataDisplayContainer;
