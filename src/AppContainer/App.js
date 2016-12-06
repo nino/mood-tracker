@@ -12,7 +12,7 @@ import ActivityIndicator from '../ActivityIndicator';
 function loadData() {
     const dataFile = process.env.NODE_ENV === 'production'
       ? 'data.json'
-      : 'dev/data.json';
+      : 'dev-data.json';
     return DropboxController.getFileContents(dataFile)
         .then(JSON.parse).catch((e) => ({error: e}));
 }
