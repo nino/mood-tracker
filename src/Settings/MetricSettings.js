@@ -1,7 +1,7 @@
-import React  from 'react'
-import {Input, Segment, Dropdown, Button, Form} from 'semantic-ui-react'
-import './MetricSettings.css'
-import ColorGroupsSettings from './ColorGroupsSettings'
+import React  from 'react';
+import { Input, Segment, Dropdown, Button, Form } from 'semantic-ui-react';
+import './MetricSettings.css';
+import ColorGroupsSettings from './ColorGroupsSettings';
 
 /**
  * Settings panel for a single metric, e.g. "Mood" or "Burns depression score".
@@ -11,30 +11,30 @@ import ColorGroupsSettings from './ColorGroupsSettings'
  * Clicking the component should activate edit-mode.
  */
 const MetricSettings = ({metric, editing, onAction}) => {
-  const formId = 'metric-settings-form-' + metric.id
+  const formId = 'metric-settings-form-' + metric.id;
 
   const handleClickToEdit = (event) => {
     if (!editing) {
-      event.preventDefault()
-      onAction('start editing', {id: metric.id})
+      event.preventDefault();
+      onAction('start editing', {id: metric.id});
     }
-  }
+  };
 
   const handleFormSubmit = (event) => {
-    event.preventDefault()
+    event.preventDefault();
     onAction('update metric', {
       id: metric.id,
-      newProps: metric
-    })
-  }
+      newProps: metric,
+    });
+  };
 
   const handleChange = (event) => {
     onAction('update form element', {
       formId: formId,
       name: event.target.name,
-      value: event.target.value
-    })
-  }
+      value: event.target.value,
+    });
+  };
 
   return (
     <Segment className='MetricSettings' onClick={handleClickToEdit}>
@@ -114,27 +114,27 @@ const MetricSettings = ({metric, editing, onAction}) => {
         )}
       </Form>
     </Segment>
-  )
-}
+  );
+};
 
 MetricSettings.propTypes = {
   /**
    * A tracking metric must be provided.
    */
-    metric: React.PropTypes.object.isRequired,
+  metric: React.PropTypes.object.isRequired,
 
   /**
    * Setting this to true will enable the form fields
    * for manipulation by the user.
    * default value: false.
    */
-    editing: React.PropTypes.bool,
+  editing: React.PropTypes.bool,
 
   /**
    * Send action to parent.
    */
-    onAction: React.PropTypes.func.isRequired
-}
+  onAction: React.PropTypes.func.isRequired,
+};
 
-  export default MetricSettings
+export default MetricSettings;
 

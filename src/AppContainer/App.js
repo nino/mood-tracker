@@ -1,47 +1,47 @@
-import React, { Component } from 'react'
-import './App.css'
-import {Container, Button, Modal} from 'semantic-ui-react'
-import DropboxController from '../controllers/DropboxController'
-import MainUI from './MainUI'
-import AppHeader from './AppHeader'
-import AppFooter from './AppFooter'
-import SampleData from '../../test/SampleMetricsWithoutEntries' // for welcome screen
-import Actions from '../controllers/actions'
-import ActivityIndicator from '../ActivityIndicator'
+import React, { Component } from 'react';
+import './App.css';
+import {Container, Button, Modal} from 'semantic-ui-react';
+import DropboxController from '../controllers/DropboxController';
+import MainUI from './MainUI';
+import AppHeader from './AppHeader';
+import AppFooter from './AppFooter';
+import SampleData from '../../test/SampleMetricsWithoutEntries'; // for welcome screen
+import Actions from '../controllers/actions';
+import ActivityIndicator from '../ActivityIndicator';
 
 function loadData() {
     const dataFile = process.env.NODE_ENV === 'production'
       ? 'data.json'
-      : 'dev/data.json'
+      : 'dev/data.json';
     return DropboxController.getFileContents(dataFile)
-        .then(JSON.parse).catch((e) => ({error: e}))
+        .then(JSON.parse).catch((e) => ({error: e}));
 }
 
 class App extends Component {
   constructor(props) {
-    super(props)
-    this.state = { }
+    super(props);
+    this.state = { };
   }
 
   componentDidMount() {
     loadData().then((metrics) => {
-      this.setState({metrics})
+      this.setState({metrics});
     }).then(() => {
       if (!(this.state.metrics instanceof Array)) {
-        Actions.receiveAction.bind(this)('add metric')
+        Actions.receiveAction.bind(this)('add metric');
       }
     }).catch((error) => {
         if (error.message === 'file does not exist') {
-            Actions.receiveAction.bind(this)('add metric')
+            Actions.receiveAction.bind(this)('add metric');
         }
         else {
-            this.setState({'error': 'unknown error'})
+            this.setState({'error': 'unknown error'});
         }
-    })
+    });
   }
 
   render() {
-    let child
+    let child;
     if (DropboxController.isAuthenticated()
       && this.state.metrics
       && this.state.metrics instanceof Array) {
@@ -49,12 +49,12 @@ class App extends Component {
         <MainUI
           onAction={Actions.receiveAction.bind(this)}
           appState={this.state}/>
-      )
+      );
     }
     else if (DropboxController.isAuthenticated() && !this.state.error) {
       child = (
         <Container>Loading ...</Container>
-      )
+      );
     }
     else if (DropboxController.isAuthenticated()
       && this.state.error === 'data file not found') {
@@ -72,7 +72,7 @@ class App extends Component {
             </pre>
           </code>
         </Container>
-      )
+      );
     }
     else {
       child = (
@@ -82,7 +82,7 @@ class App extends Component {
             Log into Dropbox
           </Button>
         </Container>
-      )
+      );
     }
 
     return (
@@ -114,8 +114,8 @@ class App extends Component {
           onAction={Actions.receiveAction.bind(this)}
           loggedIn={DropboxController.isAuthenticated()} />
       </div>
-    )
+    );
   }
 }
 
-export default App
+export default App;
