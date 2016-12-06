@@ -1,29 +1,26 @@
-import React, {Component} from 'react'
-import MetricEntryContainer from './MetricEntryContainer'
+import React, { Component } from 'react';
+import MetricEntryContainer from './MetricEntryContainer';
 
 class DataEntryContainer extends Component {
-    propTypes: {
-        metrics: React.PropTypes.array.isRequired,
-        onAction: React.PropTypes.func.isRequired
-    }
-
-    render() {
-        let entryComponents = []
-        this.props.metrics.forEach(function(metric) {
-            entryComponents.push(
-                <MetricEntryContainer
-                onAction={this.props.onAction}
-                metric={metric}
-                key={metric.id}
-                />
-            )
-        }.bind(this))
-        return (
-            <div>
-            {entryComponents}
-            </div>
-        )
-    }
+  render() {
+    const { metrics } = this.props;
+    const entryComponents = metrics.map(metric => (
+      <MetricEntryContainer
+        onAction={this.props.onAction}
+        metric={metric}
+        key={metric.id} />
+    ));
+    return (
+      <div>
+        {entryComponents}
+      </div>
+    );
+  }
 }
 
-export default DataEntryContainer
+DataEntryContainer.propTypes = {
+  metrics: React.PropTypes.array.isRequired,
+  onAction: React.PropTypes.func.isRequired
+};
+
+export default DataEntryContainer;

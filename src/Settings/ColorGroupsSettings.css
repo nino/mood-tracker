@@ -1,20 +1,20 @@
 .color-groups-settings {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 6px;
-    margin: 6px 0px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 6px;
+  margin: 6px 0px;
 }
 
 .color-groups-settings-title {
-    font-weight: bold;
-    font-size: 1.1em;
-    padding-bottom: 6px;
+  font-weight: bold;
+  font-size: 1.1em;
+  padding-bottom: 6px;
 }
 
 .color-group-minValue-field, .color-group-maxValue-field {
-    width: 30px;
+  width: 30px;
 }
 
 .single-color-group-settings {
-    margin-bottom: 16px;
+  margin-bottom: 16px;
 }

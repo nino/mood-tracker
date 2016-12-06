@@ -1,6 +1,6 @@
-import React from 'react'
-import MetricSettings from './MetricSettings'
-import {Button} from 'semantic-ui-react'
+import React from 'react';
+import MetricSettings from './MetricSettings';
+import {Button} from 'semantic-ui-react';
 
 /**
  * Container for the settings UI elements.
@@ -29,14 +29,13 @@ const Settings = ({metrics, editing, onAction}) => {
         Add metric
       </Button>
     </div>
-  )
-}
-
+  );
+};
 
 Settings.propTypes = {
   metrics: React.PropTypes.array.isRequired,
   editing: React.PropTypes.object,
-  onAction: React.PropTypes.func.isRequired
-}
+  onAction: React.PropTypes.func.isRequired,
+};
 
-export default Settings
+export default Settings;
