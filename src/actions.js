@@ -77,10 +77,11 @@ export function beginSyncData() {
   };
 };
 
-export function successSyncData(data) {
+export function successSyncData(data, lastSynced) {
   return {
     type: 'success sync data',
     data,
+    lastSynced,
   };
 };
 
