@@ -107,11 +107,15 @@ export const MoodWithoutEntries = {
 };
 
 export const BurnsWithEntries = {
-  "name": "Burns depression score",
-  "type": "int",
   "id": 2,
-  "minValue": 0,
-  "maxValue": 100,
+  lastModified: 1325809,
+  props: {
+    "name": "Burns depression score",
+    "type": "int",
+    "minValue": 0,
+    "maxValue": 100,
+    colorGroups: [],
+  },
   "entries": [
     {
       "date": "2016-10-17T14:46:40.919Z",
@@ -121,10 +125,14 @@ export const BurnsWithEntries = {
 };
 
 export const BurnsWithoutEntries = {
-  "name": "Burns depression score",
-  "type": "int",
   "id": 2,
-  "minValue": 0,
-  "maxValue": 100,
+  lastModified: 135987,
+  props: {
+    "name": "Burns depression score",
+    "type": "int",
+    "minValue": 0,
+    "maxValue": 100,
+    colorGroups: [],
+  },
   "entries": [],
 };
