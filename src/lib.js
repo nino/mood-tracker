@@ -28,7 +28,7 @@ function upgradeOneMetric(metric) {
   if (isValidMetric(metric)) {
     return metric;
   }
-  else if (metric.hasOwnProperty('props')) {
+  else if (metric.props) {
     return {
       id: metric.id,
       lastModified: metric.lastModified ? metric.lastModified : 0,
@@ -59,31 +59,34 @@ function upgradeOneMetric(metric) {
 }
 
 function isValidMetric(metric) {
-  if (!metric.hasOwnProperty('id') || !(Number.isInteger(metric.id))) {
+  if (typeof metric !== 'object') {
     return false;
   }
-  if (!metric.hasOwnProperty('props')) {
+  if (typeof metric.id !== 'number') {
     return false;
   }
-  if (!metric.props.hasOwnProperty('name') || !(typeof metric.props.name === 'string')) {
+  if (typeof metric.props !== 'object') {
     return false;
   }
-  if (!metric.props.hasOwnProperty('maxValue') || !Number.isFinite(metric.props.maxValue)) {
+  if (typeof metric.props.name !== 'string') {
     return false;
   }
-  if (!metric.props.hasOwnProperty('minValue') || !Number.isFinite(metric.props.minValue)) {
+  if (typeof metric.props.maxValue !== 'number') {
     return false;
   }
-  if (!metric.props.hasOwnProperty('colorGroups') || !(metric.props.colorGroups instanceof Array)) {
+  if (typeof metric.props.minValue !== 'number') {
     return false;
   }
-  if (!metric.props.hasOwnProperty('type') || !(typeof metric.props.type === 'string')) {
+  if (!(metric.props.colorGroups instanceof Array)) {
     return false;
   }
-  if (!metric.hasOwnProperty('lastModified') || !Number.isInteger(metric.lastModified)) {
+  if (typeof metric.props.type !== 'string') {
     return false;
   }
-  if (!metric.hasOwnProperty('entries') || !(metric.entries instanceof Array)) {
+  if (typeof metric.lastModified !== 'number') {
+    return false;
+  }
+  if (!(metric.entries instanceof Array)) {
     return false;
   }
   return true;
