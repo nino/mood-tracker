@@ -1,4 +1,9 @@
-import { MoodWithEntries, MoodWithoutEntries, BurnsWithEntries, BurnsWithoutEntries } from './SampleMetrics';
+import {
+  MoodWithEntries,
+  MoodWithoutEntries,
+  BurnsWithEntries,
+  BurnsWithoutEntries,
+} from './SampleMetrics';
 
 export const INITIAL_STATE = {
   metrics: {
@@ -47,4 +52,62 @@ export const STATE_WITH_SOME_METRICS = {
   },
 };
 
-export const EDITING_SETTINGS = null; // TODO
+export const STATE_EDITING_METRIC1_MODIFIED = {
+  metrics: {
+    isSyncing: false,
+    isLoaded: true,
+    lastSynced: null,
+    items: [
+      MoodWithEntries,
+      BurnsWithoutEntries,
+    ],
+    hasError: false,
+  },
+  authentication: {
+    isAuthenticated: false,
+    hasError: false,
+    accessToken: null,
+    lastAuthenticated: null,
+    isAuthenticating: false,
+  },
+  modals: [],
+  settings: {
+    editedMetric: {
+      id: MoodWithEntries.id,
+      props: {
+        ...MoodWithEntries.props,
+        maxValue: 12,
+      },
+    },
+    isModified: true,
+  },
+};
+
+
+export const STATE_EDITING_METRIC1_NOT_MODIFIED = {
+  metrics: {
+    isSyncing: false,
+    isLoaded: true,
+    lastSynced: null,
+    items: [
+      MoodWithEntries,
+      BurnsWithoutEntries,
+    ],
+    hasError: false,
+  },
+  authentication: {
+    isAuthenticated: false,
+    hasError: false,
+    accessToken: null,
+    lastAuthenticated: null,
+    isAuthenticating: false,
+  },
+  modals: [],
+  settings: {
+    editedMetric: {
+      id: MoodWithEntries.id,
+      props: MoodWithEntries.props,
+    },
+    isModified: false,
+  },
+};

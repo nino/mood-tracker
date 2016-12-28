@@ -1,3 +1,5 @@
+import * as Actions from './actions';
+
 export const INITIAL_STATE = {
   metrics: {
     isSyncing: false,
@@ -27,11 +29,64 @@ export function reducer(state=INITIAL_STATE, action) {
   switch(action.type) {
     case 'log metric':
       return logMetric(state, action);
+    case 'start editing':
+      return startEditingMetric(state, action);
     default:
       return state;
   }
 };
-  return state;
+
+function startEditingMetric(state, action) {
+  const { metrics, settings } = state;
+  const { editedMetric, isModified } = settings;
+  const { items } = metrics;
+  const { metricId, discard } = action;
+  const index = items.findIndex(m => (m.id === metricId));
+  if (index === -1) {
+    return state;
+  }
+  else {
+    if (!editedMetric || discard || !isModified) {
+      return {
+        ...state,
+        settings: {
+          editedMetric: {
+            id: metricId,
+            props: items[index].props,
+          },
+          isModified: false,
+        },
+      };
+    }
+    else if (editedMetric.id === metricId) {
+      return state;
+    }
+    else {
+      const newModal = {
+        title: 'Discard changes?',
+        message: 'There are unsaved changes in the metric '
+        + editedMetric.props.name
+        + '. Do you wish to discard them and start editing '
+        + items[index].props.name + '?',
+        actions: {
+          confirm: {
+            label: 'Discard changes',
+            action: Actions.startEditingMetric(metricId, true),
+          },
+          cancel: {
+            label: 'Continue editing ' + editedMetric.props.name,
+            action: { type: 'default action' },
+          },
+        },
+      };
+      return {
+        ...state,
+        modals: state.modals.concat(newModal),
+      };
+    }
+  }
+}
+
 function logMetric(state, action) {
   const { metrics } = state;
   const { items } = metrics;

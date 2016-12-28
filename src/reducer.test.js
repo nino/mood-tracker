@@ -1,8 +1,20 @@
 import { reducer } from './reducer';
 import { expect } from 'chai';
-import { INITIAL_STATE, STATE_WITH_SOME_METRICS } from '../test/SampleApplicationStates';
+import {
+  INITIAL_STATE,
+  STATE_WITH_SOME_METRICS,
+  STATE_EDITING_METRIC1_MODIFIED,
+  STATE_EDITING_METRIC1_NOT_MODIFIED,
+} from '../test/SampleApplicationStates';
+import {
+  MoodWithEntries,
+  MoodWithoutEntries,
+  BurnsWithEntries,
+  BurnsWithoutEntries,
+} from '../test/SampleMetrics';
 import {
   logMetric,
+  startEditingMetric,
 } from './actions';
 
 describe('reducer', () => {
@@ -41,6 +53,87 @@ describe('reducer', () => {
         logMetric(5, 6, dateString),
       );
       expect(newState).to.eql(STATE_WITH_SOME_METRICS);
+    });
+  });
+
+  describe('start editing metric', () => {
+    it('sets `editedMetric` in state.settings to the correct metric', () => {
+      const newState = reducer(
+        STATE_WITH_SOME_METRICS,
+        startEditingMetric(1),
+      );
+      expect(newState).to.have.property('metrics')
+      .and.to.eql(STATE_WITH_SOME_METRICS.metrics);
+      expect(newState).to.have.property('settings')
+      .and.to.have.property('editedMetric').and.to.have.property('id', 1);
+      expect(newState.settings.editedMetric)
+      .to.eql({
+        id: STATE_WITH_SOME_METRICS.metrics.items[0].id,
+        props: STATE_WITH_SOME_METRICS.metrics.items[0].props,
+      });
+      expect(newState.settings).to.have.property('isModified', false);
+    });
+
+    it('creates a modal if already modified another metric', () => {
+      const newState = reducer(
+        STATE_EDITING_METRIC1_MODIFIED,
+        startEditingMetric(2),
+      );
+      expect(newState).to.have.property('settings')
+      .and.to.eql(STATE_EDITING_METRIC1_MODIFIED.settings);
+      expect(newState).to.have.property('modals').and.to.have.length(1);
+      expect(newState.modals[0]).to.have.property('title', 'Discard changes?');
+      expect(newState.modals[0]).to.have.property('message')
+      .and.to.include('unsaved');
+      expect(newState.modals[0]).to.have.property('actions');
+      expect(newState.modals[0].actions).to.have.property('confirm');
+      expect(newState.modals[0].actions.confirm).to.have.property('action');
+      expect(newState.modals[0].actions.confirm.action)
+      .to.eql(startEditingMetric(2, true));
+      expect(newState.modals[0].actions.confirm).to.have.property('label');
+      expect(newState.modals[0].actions).to.have.property('cancel');
+      expect(newState.modals[0].actions.cancel).to.have.property('action');
+      expect(newState.modals[0].actions.cancel.action)
+      .to.eql({type: 'default action'});
+      expect(newState.modals[0].actions.cancel).to.have.property('label');
+    });
+
+    it('sets editedMetric if editing but not modified another metric', () => {
+      const newState = reducer(
+        STATE_EDITING_METRIC1_NOT_MODIFIED,
+        startEditingMetric(2),
+      );
+      expect(newState).to.have.property('settings').and.to.eql({
+        editedMetric: {
+          id: 2,
+          props: BurnsWithEntries.props,
+        },
+        isModified: false,
+      });
+      expect(newState).to.have.property('modals').and.to.have.length(0);
+    });
+
+    it('discards changes and starts editing if discard = true', () => {
+      const newState = reducer(
+        STATE_EDITING_METRIC1_MODIFIED,
+        startEditingMetric(2, true),
+      );
+      expect(newState).to.have.property('settings').and.to.eql({
+        editedMetric: {
+          id: 2,
+          props: BurnsWithoutEntries.props,
+        },
+        isModified: false,
+      });
+      expect(newState).to.have.property('modals').and.to.have.length(0);
+    });
+
+    it('does nothing if no metric with given ID is found', () => {
+      const newState = reducer(
+        STATE_WITH_SOME_METRICS,
+        startEditingMetric(325),
+      );
+      expect(newState).to.deep.equal(STATE_WITH_SOME_METRICS);
     });
   });
 });
