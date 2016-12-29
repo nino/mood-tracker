@@ -1,4 +1,6 @@
 import * as Actions from './actions';
+import { DEFAULT_METRIC_PROPS } from './constants';
+import { max } from 'lodash';
 
 export const INITIAL_STATE = {
   metrics: {
@@ -35,6 +37,8 @@ export function reducer(state=INITIAL_STATE, action) {
       return updateMetric(state, action);
     case 'stop editing':
       return stopEditing(state, action);
+    case 'add metric':
+      return addMetric(state, action);
     default:
       return state;
   }
@@ -189,4 +193,67 @@ function stopEditing(state, action) {
     };
   }
   return state;
+}
+
+function addMetric(state, action) {
+  const { discard } = action;
+  const { metrics, settings, modals } = state;
+  const { items } = metrics;
+  const { editedMetric, isModified } = settings;
+  if (items === null) {
+    return {
+      ...state,
+      metrics: {
+        ...metrics,
+        items: [{
+          id: 1,
+          props: DEFAULT_METRIC_PROPS,
+          lastModified: null,
+          entries: [],
+        }],
+      },
+    };
+  } else if (editedMetric && isModified && !discard) {
+    const newModal = {
+        title: 'Discard changes?',
+        message: ('There are unsaved changes in "' +
+          editedMetric.props.name + '". ' +
+          'Do you wish to discard them and create a new metric?'),
+        actions: {
+          confirm: {
+            action: Actions.addMetric(true),
+            label: 'Discard changes',
+          },
+          cancel: {
+            action: { type: 'default action' },
+            label: 'Continue editing',
+          },
+        },
+    };
+    return {
+      ...state,
+      modals: modals.concat(newModal),
+    };
+  } else {
+    const id = max(items.map(item => item.id)) + 1;
+    return {
+      ...state,
+      metrics: {
+        ...metrics,
+        items: items.concat({
+          id,
+          props: DEFAULT_METRIC_PROPS,
+          entries: [],
+          lastModified: null,
+        }),
+      },
+      settings: {
+        editedMetric: {
+          id,
+          props: DEFAULT_METRIC_PROPS,
+        },
+        isModified: true,
+      },
+    };
+  }
 }

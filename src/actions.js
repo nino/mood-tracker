@@ -31,9 +31,10 @@ export function stopEditing(discard=false) {
   };
 };
 
-export function addMetric() {
+export function addMetric(discard=false) {
   return {
     type: 'add metric',
+    discard,
   };
 };
 

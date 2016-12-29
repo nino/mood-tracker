@@ -18,6 +18,7 @@ import {
   startEditingMetric,
   updateMetric,
   stopEditing,
+  addMetric,
 } from './actions';
 
 describe('reducer', () => {
@@ -221,6 +222,70 @@ describe('reducer', () => {
       expect(newState).to.have.property('modals').and.to.have.length(0);
       expect(newState).to.have.property('metrics')
         .and.to.eql(STATE_EDITING_METRIC1_MODIFIED.metrics);
+    });
+  });
+
+  describe('add metric', () => {
+    it('creates a new metric with default values', () => {
+      const newState = reducer(
+        STATE_WITH_SOME_METRICS,
+        addMetric(),
+      );
+      expect(newState).to.have.property('metrics')
+        .and.to.have.property('items').and.to.have.length(3);
+      const { items } = newState.metrics;
+      expect(items[2]).to.have.property('props').and.to.have.property('name', 'Untitled metric');
+      const { props } = items[2];
+      expect(props).to.have.property('maxValue', 10);
+      expect(props).to.have.property('minValue', 1);
+      expect(props).to.have.property('colorGroups').and.to.eql([]);
+      expect(props).to.have.property('type', 'int');
+      expect(items[2]).to.have.property('entries').and.to.have.length(0);
+      expect(items[2]).to.have.property('lastModified', null);
+    });
+
+    it('starts editing the new metric', () => {
+      const newState = reducer(
+        STATE_WITH_SOME_METRICS,
+        addMetric(),
+      );
+      expect(newState).to.have.property('settings')
+        .and.to.have.property('editedMetric');
+      expect(newState.settings).to.have.property('isModified', true);
+    });
+
+    it('creates a modal if already editing another metric', () => {
+      const newState = reducer(
+        STATE_EDITING_METRIC1_MODIFIED,
+        addMetric(),
+      );
+      expect(newState).to.have.property('metrics').and.to.have.property('items')
+        .and.to.have.length(2);
+      expect(newState).to.have.property('modals').and.to.have.length(1);
+      expect(newState.modals[0]).to.have.property('actions').and.to.have.property('confirm');
+      expect(newState.modals[0].actions.confirm)
+        .to.have.property('label').and.to.include('Discard');
+      expect(newState.modals[0].actions.confirm)
+        .to.have.property('action').and.to.eql(addMetric(true));
+      expect(newState.modals[0].actions).to.have.property('cancel');
+      expect(newState.modals[0].actions.cancel)
+        .to.have.property('label').and.to.include('Continue');
+      expect(newState.modals[0].actions.cancel)
+        .to.have.property('action').and.to.eql({ type: 'default action' });
+      expect(newState.modals[0]).to.have.property('title').and.to.include('changes');
+      expect(newState.modals[0]).to.have.property('message').and.to.include('unsaved');
+    });
+
+    it('stops editing the other metric and creates a metric if discard=true', () => {
+      const newState = reducer(
+        STATE_EDITING_METRIC1_MODIFIED,
+        addMetric(true),
+      );
+      expect(newState).to.have.property('metrics').and.to.have.property('items')
+        .and.to.have.length(3);
+      expect(newState).to.have.property('settings').and.to.have.property('editedMetric')
+        .and.to.have.property('props').and.to.have.property('name', 'Untitled metric');
+      expect(newState.settings).to.have.property('isModified').and.to.be.ok;
     });
   });
 });
