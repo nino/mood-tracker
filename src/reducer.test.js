@@ -19,7 +19,9 @@ import {
   updateMetric,
   stopEditing,
   addMetric,
+  reorderMetrics,
 } from './actions';
+import { DEFAULT_METRIC_PROPS } from './constants';
 
 describe('reducer', () => {
   it('returns the state when receiving an unknown action', () => {
@@ -286,6 +288,120 @@ describe('reducer', () => {
       expect(newState).to.have.property('settings').and.to.have.property('editedMetric')
         .and.to.have.property('props').and.to.have.property('name', 'Untitled metric');
       expect(newState.settings).to.have.property('isModified').and.to.be.ok;
+    });
+  });
+
+  describe('reorder metrics', () => {
+    const givenMetrics = [
+      {
+        id: 1,
+        props: {
+          ...DEFAULT_METRIC_PROPS,
+          name: 'metric1',
+        },
+        lastModified: 798,
+        entries: [],
+      }, {
+        id: 2,
+        props: {
+          ...DEFAULT_METRIC_PROPS,
+          name: 'metric2',
+        },
+        lastModified: 234,
+        entries: [],
+      }, {
+        id: 3,
+        props: {
+          ...DEFAULT_METRIC_PROPS,
+          name: 'metric3',
+        },
+        lastModified: 9487,
+        entries: [],
+      }, {
+        id: 4,
+        props: {
+          ...DEFAULT_METRIC_PROPS,
+          name: 'metric4',
+        },
+        lastModified: 947,
+        entries: [],
+      },
+    ];
+    const givenState = {
+      ...STATE_WITH_SOME_METRICS,
+      metrics: {
+        ...STATE_WITH_SOME_METRICS.metrics,
+        items: givenMetrics,
+      },
+    };
+
+    it('does nothing when moving the topmost metric up', () => {
+      const newState = reducer(
+        givenState,
+        reorderMetrics(1, 'up'),
+      );
+
+      expect(newState.metrics.items.map(m => m.id)).to.eql([1, 2, 3, 4]);
+    });
+
+    it('does nothing when moving the bottommost metric down', () => {
+      const newState = reducer(
+        givenState,
+        reorderMetrics(4, 'down'),
+      );
+
+      expect(newState.metrics.items.map(m => m.id)).to.eql([1, 2, 3, 4]);
+    });
+
+    it('moves the chosen metric up', () => {
+      const newState = reducer(
+        givenState,
+        reorderMetrics(2, 'up'),
+      );
+
+      expect(newState.metrics.items.map(m => m.id)).to.eql([2, 1, 3, 4]);
+    });
+
+    it('moves the chosen metric down', () => {
+      const newState = reducer(
+        givenState,
+        reorderMetrics(2, 'down'),
+      );
+
+      expect(newState.metrics.items.map(m => m.id)).to.eql([1, 3, 2, 4]);
+    });
+
+    it('does nothing if the direction is neither up nor down', () => {
+      const newState = reducer(
+        givenState,
+        reorderMetrics(2, 'foo'),
+      );
+
+      expect(newState.metrics.items.map(m => m.id)).to.eql([1, 2, 3, 4]);
+    });
+
+    it('does nothing if the chosen metric does not exist', () => {
+      const newState = reducer(
+        givenState,
+        reorderMetrics(5, 'up'),
+      );
+
+      expect(newState.metrics.items.map(m => m.id)).to.eql([1, 2, 3, 4]);
+    });
+
+    it('does nothing if no metrics exist at all', () => {
+      const newState = reducer(
+        {
+          ...givenState,
+          metrics: {
+            ...givenState.metrics,
+            items: [],
+          },
+        },
+        reorderMetrics(5, 'up'),
+      );
+
+      expect(newState.metrics.items).to.eql([]);
     });
   });
 });

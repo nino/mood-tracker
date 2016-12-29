@@ -39,6 +39,8 @@ export function reducer(state=INITIAL_STATE, action) {
       return stopEditing(state, action);
     case 'add metric':
       return addMetric(state, action);
+    case 'reorder metrics':
+      return reorderMetrics(state, action);
     default:
       return state;
   }
@@ -256,4 +258,42 @@ function addMetric(state, action) {
       },
     };
   }
+}
+
+function reorderMetrics(state, action) {
+  const { metrics } = state;
+  const { metricId, direction } = action;
+  const { items } = metrics;
+  if (items === null || (direction !== 'up' && direction !== 'down')) {
+    return state;
+  } else {
+    const index = items.findIndex(m => (m.id === metricId));
+    if (index === -1) {
+      return state;
+    } else if (index === 0 && direction === 'up') {
+      return state;
+    } else if (index === items.length - 1 && direction === 'down') {
+      return state;
+    } else {
+      const before = items.slice(0, index - 1);
+      const after = items.slice(index + 2, items.length);
+      const left = items.slice(index - 1, index);
+      const right = items.slice(index + 1, index + 2);
+      const chosen = items.slice(index, index + 1);
+      const newItems = before.concat(
+        direction === 'up' ? chosen : left,
+        direction === 'up' ? left : right,
+        direction === 'up' ? right : chosen,
+        after
+      );
+      return {
+        ...state,
+        metrics: {
+          ...metrics,
+          items: newItems,
+        },
+      };
+    }
+  }
+  return state;
 }
