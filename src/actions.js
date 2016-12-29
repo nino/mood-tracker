@@ -15,11 +15,12 @@ export function startEditingMetric(metricId, discard=false) {
   };
 };
 
-export function updateMetric(metricId, props) {
+export function updateMetric(metricId, newProps, lastModified) {
   return {
     type: 'update metric',
     metricId,
-    props,
+    newProps,
+    lastModified,
   };
 };
 

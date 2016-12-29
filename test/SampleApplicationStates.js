@@ -52,6 +52,31 @@ export const STATE_WITH_SOME_METRICS = {
   },
 };
 
+export const STATE_WITH_LOTS_OF_METRICS = {
+  metrics: {
+    isSyncing: false,
+    isLoaded: true,
+    lastSynced: null,
+    items: [
+      MoodWithEntries,
+      BurnsWithEntries,
+    ],
+    hasError: false,
+  },
+  authentication: {
+    isAuthenticated: false,
+    hasError: false,
+    accessToken: null,
+    lastAuthenticated: null,
+    isAuthenticating: false,
+  },
+  modals: [],
+  settings: {
+    editedMetric: null,
+    isModified: false,
+  },
+};
+
 export const STATE_EDITING_METRIC1_MODIFIED = {
   metrics: {
     isSyncing: false,
@@ -82,7 +107,6 @@ export const STATE_EDITING_METRIC1_MODIFIED = {
     isModified: true,
   },
 };
-
 
 export const STATE_EDITING_METRIC1_NOT_MODIFIED = {
   metrics: {

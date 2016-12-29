@@ -5,6 +5,7 @@ import {
   STATE_WITH_SOME_METRICS,
   STATE_EDITING_METRIC1_MODIFIED,
   STATE_EDITING_METRIC1_NOT_MODIFIED,
+  STATE_WITH_LOTS_OF_METRICS,
 } from '../test/SampleApplicationStates';
 import {
   MoodWithEntries,
@@ -15,6 +16,7 @@ import {
 import {
   logMetric,
   startEditingMetric,
+  updateMetric,
 } from './actions';
 
 describe('reducer', () => {
@@ -136,4 +138,46 @@ describe('reducer', () => {
       expect(newState).to.deep.equal(STATE_WITH_SOME_METRICS);
     });
   });
+
+  describe('update metric', () => {
+    let newState;
+    beforeAll(() => {
+      newState = reducer(
+        STATE_WITH_LOTS_OF_METRICS,
+        updateMetric(2, {
+          ...BurnsWithoutEntries.props,
+          name: 'Burns2',
+        },
+          12957793,
+        ),
+      );
+    });
+
+    it('updates the props of the appropriate metrics item', () => {
+      expect(newState).to.have.property('metrics')
+        .and.to.have.property('items').and.to.have.length(2);
+      expect(newState.metrics.items[1]).to.have.property('props')
+        .and.to.eql({
+          ...BurnsWithoutEntries.props,
+          name: 'Burns2',
+        });
+      expect(newState.metrics.items[0]).to.have.property('props')
+        .and.to.eql(MoodWithEntries.props);
+      expect(newState).to.have.property('settings')
+        .and.to.have.property('editedMetric').and.to.not.be.ok;
+    });
+
+    it('preserves the entries of the metric', () => {
+      expect(newState).to.have.property('metrics')
+        .and.to.have.property('items').and.to.have.length(2);
+      expect(newState.metrics.items[1])
+        .to.have.property('entries').and.to.have.length(1);
+    });
+
+    it('sets `lastModified` to the provided value', () => {
+      expect(newState.metrics.items[1])
+        .to.have.property('lastModified', 12957793);
+    });
+  });
+
 });

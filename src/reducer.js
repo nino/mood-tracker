@@ -31,6 +31,8 @@ export function reducer(state=INITIAL_STATE, action) {
       return logMetric(state, action);
     case 'start editing':
       return startEditingMetric(state, action);
+    case 'update metric':
+      return updateMetric(state, action);
     default:
       return state;
   }
@@ -85,6 +87,36 @@ function startEditingMetric(state, action) {
       };
     }
   }
+}
+
+function updateMetric(state, action) {
+  const { metricId, newProps, lastModified } = action;
+  const { metrics } = state;
+  const { items } = metrics;
+  if (!items) {
+    return state;
+  }
+  const index = items.findIndex(m => (m.id === metricId));
+
+  return {
+    ...state,
+    settings: {
+      editedMetric: null,
+      isModified: false,
+    },
+    metrics: {
+      ...metrics,
+      items: items.slice(0, index).concat(
+        {
+          id: metricId,
+          props: newProps,
+          lastModified,
+          entries: items[index].entries,
+        },
+        items.slice(index + 1, items.length),
+      ),
+    },
+  };
 }
 
 function logMetric(state, action) {
