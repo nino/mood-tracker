@@ -33,6 +33,8 @@ export function reducer(state=INITIAL_STATE, action) {
       return startEditingMetric(state, action);
     case 'update metric':
       return updateMetric(state, action);
+    case 'stop editing':
+      return stopEditing(state, action);
     default:
       return state;
   }
@@ -147,4 +149,44 @@ function logMetric(state, action) {
       }
     }
   }
+}
+
+function stopEditing(state, action) {
+  const { settings, modals } = state;
+  const { editedMetric, isModified } = settings;
+  const { discard } = action;
+  if (!editedMetric) {
+    return state;
+  } else if (!isModified || discard) {
+    return {
+      ...state,
+      settings: {
+        editedMetric: null,
+        isModified: false,
+      },
+    };
+  } else {
+    const newModal = {
+    };
+    return {
+      ...state,
+      modals: modals.concat({
+        title: 'Discard changes?',
+        message: ('There are unsaved changes in "' +
+          editedMetric.props.name + '". ' +
+          'Do you wish to discard them?'),
+        actions: {
+          confirm: {
+            action: Actions.stopEditing(true),
+            label: 'Discard changes',
+          },
+          cancel: {
+            action: { type: 'default action' },
+            label: 'Continue editing',
+          },
+        },
+      }),
+    };
+  }
+  return state;
 }

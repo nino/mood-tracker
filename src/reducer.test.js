@@ -17,6 +17,7 @@ import {
   logMetric,
   startEditingMetric,
   updateMetric,
+  stopEditing,
 } from './actions';
 
 describe('reducer', () => {
@@ -180,4 +181,46 @@ describe('reducer', () => {
     });
   });
 
+  describe('stop editing', () => {
+    it('sets editedMetric to null if isModified is false', () => {
+      const newState = reducer(
+        STATE_EDITING_METRIC1_NOT_MODIFIED,
+        stopEditing(),
+      );
+      expect(newState).to.have.property('settings')
+        .and.to.have.property('editedMetric').and.to.not.be.ok;
+      expect(newState.settings).to.have.property('isModified').and.to.not.be.ok;
+    });
+
+    it('creates a modal if isModified is true', () => {
+      const newState = reducer(
+        STATE_EDITING_METRIC1_MODIFIED,
+        stopEditing(),
+      );
+      expect(newState).to.have.property('settings')
+        .and.to.eql(STATE_EDITING_METRIC1_MODIFIED.settings);
+      expect(newState).to.have.property('modals').and.to.have.length(1);
+      expect(newState.modals[0]).to.have.property('title').and.to.be.a('string');
+      expect(newState.modals[0]).to.have.property('message').and.to.include('discard');
+      expect(newState.modals[0]).to.have.property('actions');
+      const { actions } = newState.modals[0];
+      expect(actions.confirm).to.have.property('action').and.to.eql(stopEditing(true));
+      expect(actions.cancel).to.have.property('action').and.to.eql({ type: 'default action' });
+    });
+
+    it('discards changes if discard=true', () => {
+      const newState = reducer(
+        STATE_EDITING_METRIC1_MODIFIED,
+        stopEditing(true),
+      );
+      expect(newState).to.have.property('settings')
+        .and.to.eql({
+          editedMetric: null,
+          isModified: false,
+        });
+      expect(newState).to.have.property('modals').and.to.have.length(0);
+      expect(newState).to.have.property('metrics')
+        .and.to.eql(STATE_EDITING_METRIC1_MODIFIED.metrics);
+    });
+  });
 });
