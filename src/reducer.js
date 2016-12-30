@@ -43,6 +43,8 @@ export function reducer(state=INITIAL_STATE, action) {
       return reorderMetrics(state, action);
     case 'delete metric':
       return deleteMetric(state, action);
+    case 'update edited metric':
+      return updateEditedMetric(state, action);
     default:
       return state;
   }
@@ -345,5 +347,58 @@ function deleteMetric(state, action) {
         },
       };
     }
+  }
+}
+
+function updateEditedMetric(state, action) {
+  const { settings } = state;
+  const { editedMetric, isModified } = settings;
+  if (!editedMetric) {
+    return state;
+  } else {
+    const { props } = editedMetric;
+    const { updatedProps } = action;
+    const name = updatedProps.name || props.name;
+    let colorGroups;
+    if (updatedProps.colorGroups instanceof Array) {
+      colorGroups = updatedProps.colorGroups.map((colorGroup) => ({
+        minValue: parseInt(colorGroup.minValue) || null,
+        maxValue: parseInt(colorGroup.maxValue) || null,
+        color: colorGroup.color,
+      }));
+    } else {
+      colorGroups = props.colorGroups;
+    }
+
+    let minValue;
+    if (updatedProps.minValue !== undefined) {
+      minValue = parseInt(updatedProps.minValue) || null;
+    } else {
+      minValue = props.minValue;
+    }
+
+    let maxValue;
+    if (updatedProps.maxValue !== undefined) {
+      maxValue = parseInt(updatedProps.maxValue) || null;
+    } else {
+      maxValue = props.maxValue;
+    }
+
+    return {
+      ...state,
+      settings: {
+        isModified: true,
+        editedMetric: {
+          id: editedMetric.id,
+          props: {
+            name,
+            colorGroups,
+            type: 'int',
+            minValue,
+            maxValue,
+          },
+        },
+      },
+    };
   }
 }

@@ -21,6 +21,7 @@ import {
   addMetric,
   reorderMetrics,
   deleteMetric,
+  updateEditedMetric,
 } from './actions';
 import { DEFAULT_METRIC_PROPS } from './constants';
 
@@ -535,6 +536,113 @@ describe('reducer', () => {
     it('does nothing if no metrics exist', () => {
       expect(reducer(INITIAL_STATE, deleteMetric(2, true))).to.eql(INITIAL_STATE);
       expect(reducer(INITIAL_STATE, deleteMetric(2))).to.eql(INITIAL_STATE);
+    });
+  });
+
+  describe('update edited metric', () => {
+    it('updates the name of the currently edited metric', () => {
+      const newState = reducer(
+        STATE_EDITING_METRIC1_NOT_MODIFIED,
+        updateEditedMetric({ name: 'mood55' }),
+      );
+
+      expect(newState).to.have.property('settings').and.to.have.property('editedMetric')
+        .and.to.have.property('props')
+        .and.to.have.property('name', 'mood55');
+      expect(newState.settings.editedMetric.props).to.have.property('minValue', 1);
+      expect(newState.settings.editedMetric.props).to.have.property('maxValue', 10);
+    });
+
+    it('updates the minValue of the currently edited metric', () => {
+      const newState = reducer(
+        STATE_EDITING_METRIC1_NOT_MODIFIED,
+        updateEditedMetric({ minValue: '2' }),
+      );
+
+      expect(newState).to.have.property('settings').and.to.have.property('editedMetric')
+        .and.to.have.property('props').and.to.have.property('name', 'Mood');
+      expect(newState.settings.editedMetric.props).to.have.property('minValue', 2);
+      expect(newState.settings.editedMetric.props).to.have.property('maxValue', 10);
+    });
+
+    it('updates the maxValue of the currently edited metric', () => {
+      const newState = reducer(
+        STATE_EDITING_METRIC1_NOT_MODIFIED,
+        updateEditedMetric({ maxValue: '2' }),
+      );
+
+      expect(newState).to.have.property('settings').and.to.have.property('editedMetric')
+        .and.to.have.property('props').and.to.have.property('name', 'Mood');
+      expect(newState.settings.editedMetric.props).to.have.property('minValue', 1);
+      expect(newState.settings.editedMetric.props).to.have.property('maxValue', 2);
+    });
+
+    it('only allows numbers or an empty string in min and max fields', () => {
+      const newState = reducer(
+        STATE_EDITING_METRIC1_NOT_MODIFIED,
+        updateEditedMetric({ minValue: '23 hello', maxValue: '2 blah' }),
+      );
+
+      expect(newState).to.have.property('settings')
+        .and.to.have.property('editedMetric')
+        .and.to.have.property('props')
+        .and.to.have.property('maxValue', 2);
+      expect(newState.settings.editedMetric.props).to.have.property('minValue', 23);
+    });
+
+    it('updates the colorGroups of the currently edited metric', () => {
+      const newState = reducer(
+        STATE_EDITING_METRIC1_NOT_MODIFIED,
+        updateEditedMetric({ colorGroups: [
+          {
+            minValue: 1,
+            maxValue: 2,
+            color: 'green',
+          },
+          {
+            minValue: 3,
+            maxValue: 4,
+            color: 'red',
+          },
+        ]}),
+      );
+
+      expect(newState).to.have.property('settings').and.to.have.property('editedMetric')
+        .and.to.have.property('props').and.to.have.property('name', 'Mood');
+      expect(newState.settings.editedMetric.props).to.have.property('minValue', 1);
+      expect(newState.settings.editedMetric.props).to.have.property('maxValue', 10);
+      expect(newState.settings.editedMetric.props).to.have.property('colorGroups')
+        .and.to.eql([
+          {
+            minValue: 1,
+            maxValue: 2,
+            color: 'green',
+          },
+          {
+            minValue: 3,
+            maxValue: 4,
+            color: 'red',
+          },
+        ]);
+    });
+
+    it('does nothing if no metric is being edited', () => {
+      const newState = reducer(
+        STATE_WITH_SOME_METRICS,
+        updateEditedMetric({ name: 'foobar' }),
+      );
+
+      expect(newState).to.eql(STATE_WITH_SOME_METRICS);
+    });
+
+    it('sets isModified=true', () => {
+      const newState = reducer(
+        STATE_EDITING_METRIC1_NOT_MODIFIED,
+        updateEditedMetric({ name: 'new mood' }),
+      );
+
+      expect(newState).to.have.property('settings')
+        .and.to.have.property('isModified', true);
     });
   });
 });

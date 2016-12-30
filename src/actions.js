@@ -54,12 +54,10 @@ export function deleteMetric(metricId, confirm=false) {
   };
 };
 
-export function updateFormElement(formId, name, value) {
+export function updateEditedMetric(updatedProps) {
   return {
-    type: 'update form element',
-    formId,
-    name,
-    value,
+    type: 'update edited metric',
+    updatedProps,
   };
 };
 
