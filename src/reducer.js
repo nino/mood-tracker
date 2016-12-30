@@ -41,6 +41,8 @@ export function reducer(state=INITIAL_STATE, action) {
       return addMetric(state, action);
     case 'reorder metrics':
       return reorderMetrics(state, action);
+    case 'delete metric':
+      return deleteMetric(state, action);
     default:
       return state;
   }
@@ -296,4 +298,52 @@ function reorderMetrics(state, action) {
     }
   }
   return state;
+}
+
+function deleteMetric(state, action) {
+  const { metricId, confirm } = action;
+  const { metrics, settings, modals } = state;
+  const { items } = metrics;
+  const { editedMetric, isModified } = settings;
+  if (items === null) {
+    return state;
+  } else {
+    const index = items.findIndex(m => (m.id === metricId));
+    if (index === -1) {
+      return state;
+    } else if (!confirm) {
+      const newModal = {
+        title: 'Delete metric?',
+        message: ('Are you sure you wish to delete "' +
+          items[index].props.name + '"?'),
+        actions: {
+          confirm: {
+            label: 'Delete "' + items[index].props.name + '"',
+            action: Actions.deleteMetric(metricId, true),
+          },
+          cancel: {
+            label: 'Do not delete',
+            action: { type: 'default action' },
+          },
+        },
+      };
+      return {
+        ...state,
+        modals: modals.concat(newModal),
+      };
+    } else {
+      return {
+        ...state,
+        metrics: {
+          ...metrics,
+          items: (items.slice(0, index)
+            .concat(items.slice(index + 1, items.length))),
+        },
+        settings: {
+          editedMetric: null,
+          isModified: false,
+        },
+      };
+    }
+  }
 }

@@ -20,6 +20,7 @@ import {
   stopEditing,
   addMetric,
   reorderMetrics,
+  deleteMetric,
 } from './actions';
 import { DEFAULT_METRIC_PROPS } from './constants';
 
@@ -402,6 +403,138 @@ describe('reducer', () => {
       );
 
       expect(newState.metrics.items).to.eql([]);
+    });
+  });
+
+  describe('delete metric', () => {
+    const givenMetrics = [
+      {
+        id: 1,
+        props: {
+          ...DEFAULT_METRIC_PROPS,
+          name: 'metric1',
+        },
+        entries: [],
+        lastModified: 398,
+      },
+      {
+        id: 2,
+        props: {
+          ...DEFAULT_METRIC_PROPS,
+          name: 'metric2',
+        },
+        entries: [],
+        lastModified: 398,
+      },
+      {
+        id: 3,
+        props: {
+          ...DEFAULT_METRIC_PROPS,
+          name: 'metric3',
+        },
+        entries: [],
+        lastModified: 398,
+      },
+      {
+        id: 4,
+        props: {
+          ...DEFAULT_METRIC_PROPS,
+          name: 'metric4',
+        },
+        entries: [],
+        lastModified: 398,
+      },
+      {
+        id: 5,
+        props: {
+          ...DEFAULT_METRIC_PROPS,
+          name: 'metric5',
+        },
+        entries: [],
+        lastModified: 398,
+      },
+    ];
+    const stateWithEditing = {
+      ...STATE_WITH_SOME_METRICS,
+      metrics: {
+        ...STATE_WITH_SOME_METRICS.metrics,
+        items: givenMetrics,
+      },
+      settings: {
+        editedMetric: {
+          id: 2,
+          props: givenMetrics[1].props,
+        },
+      },
+    };
+
+    it('stops editing if confirm=true', () => {
+      const newState = reducer(
+        stateWithEditing,
+        deleteMetric(2, true),
+      );
+
+      expect(newState).to.have.property('settings').and.to.have.property('editedMetric', null);
+      expect(newState).to.have.property('settings').and.to.have.property('isModified', false);
+    });
+
+    it('removes the chosen metric if confirm=true', () => {
+      const newState = reducer(
+        stateWithEditing,
+        deleteMetric(2, true),
+      );
+
+      expect(newState).to.have.property('modals').and.to.have.length(0);
+      expect(newState).to.have.property('metrics').and.to.have.property('items')
+        .and.to.have.length(4);
+      expect(newState.metrics.items.map(i => i.id)).to.eql([1, 3, 4, 5]);
+    });
+
+    it('does nothing if metric not found', () => {
+      const newState1 = reducer(
+        stateWithEditing,
+        deleteMetric(23, true),
+      );
+      const newState2 = reducer(
+        stateWithEditing,
+        deleteMetric(23),
+      );
+
+      expect(newState1, 'should do nothing with confirm=true').to.eql(stateWithEditing);
+      expect(newState2, 'should do nothing with confirm=false').to.eql(stateWithEditing);
+    });
+
+    it('creates modal if confirm=false', () => {
+      const newState = reducer(
+        stateWithEditing,
+        deleteMetric(2),
+      );
+
+      expect(newState).to.have.property('metrics').and.to.have.property('items')
+        .and.to.have.length(5);
+      expect(newState).to.have.property('modals').and.to.have.length(1);
+      expect(newState).to.have.property('settings').and.to.have.property('editedMetric')
+        .and.to.eql({
+          id: 2,
+          props: givenMetrics[1].props,
+        });
+      expect(newState.modals[0]).to.have.property('title').and.to.include('Delete');
+      expect(newState.modals[0]).to.have.property('message').and.to.include('delete');
+      expect(newState.modals[0]).to.have.property('actions');
+      const { actions } = newState.modals[0];
+      expect(actions).to.have.property('confirm');
+      expect(actions.confirm).to.have.property('label').and.to.include('Delete');
+      expect(actions.confirm).to.have.property('action')
+        .and.to.eql(deleteMetric(2, true));
+      expect(actions).to.have.property('cancel');
+      expect(actions.cancel).to.have.property('label').and.to.include('not');
+      expect(actions.cancel).to.have.property('action')
+        .and.to.eql({ type: 'default action' });
+    });
+
+    it('does nothing if no metrics exist', () => {
+      expect(reducer(INITIAL_STATE, deleteMetric(2, true))).to.eql(INITIAL_STATE);
+      expect(reducer(INITIAL_STATE, deleteMetric(2))).to.eql(INITIAL_STATE);
     });
   });
 });

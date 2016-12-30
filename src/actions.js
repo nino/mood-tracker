@@ -46,11 +46,11 @@ export function reorderMetrics(metricId, direction) {
   };
 };
 
-export function deleteMetric(metricId, discard=false) {
+export function deleteMetric(metricId, confirm=false) {
   return {
     type: 'delete metric',
     metricId,
-    discard,
+    confirm,
   };
 };
 
