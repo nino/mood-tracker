@@ -82,6 +82,7 @@ function startEditingMetric(state, action) {
         + editedMetric.props.name
         + '. Do you wish to discard them and start editing '
         + items[index].props.name + '?',
+        userResponse: null,
         actions: {
           confirm: {
             label: 'Discard changes',
@@ -185,6 +186,7 @@ function stopEditing(state, action) {
         message: ('There are unsaved changes in "' +
           editedMetric.props.name + '". ' +
           'Do you wish to discard them?'),
+        userResponse: null,
         actions: {
           confirm: {
             action: Actions.stopEditing(true),
@@ -221,20 +223,21 @@ function addMetric(state, action) {
     };
   } else if (editedMetric && isModified && !discard) {
     const newModal = {
-        title: 'Discard changes?',
-        message: ('There are unsaved changes in "' +
-          editedMetric.props.name + '". ' +
-          'Do you wish to discard them and create a new metric?'),
-        actions: {
-          confirm: {
-            action: Actions.addMetric(true),
-            label: 'Discard changes',
-          },
-          cancel: {
-            action: { type: 'default action' },
-            label: 'Continue editing',
-          },
+      title: 'Discard changes?',
+      message: ('There are unsaved changes in "' +
+        editedMetric.props.name + '". ' +
+        'Do you wish to discard them and create a new metric?'),
+      userResponse: null,
+      actions: {
+        confirm: {
+          action: Actions.addMetric(true),
+          label: 'Discard changes',
         },
+        cancel: {
+          action: { type: 'default action' },
+          label: 'Continue editing',
+        },
+      },
     };
     return {
       ...state,
@@ -318,6 +321,7 @@ function deleteMetric(state, action) {
         title: 'Delete metric?',
         message: ('Are you sure you wish to delete "' +
           items[index].props.name + '"?'),
+        userResponse: null,
         actions: {
           confirm: {
             label: 'Delete "' + items[index].props.name + '"',

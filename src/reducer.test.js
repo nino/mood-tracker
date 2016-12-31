@@ -104,6 +104,7 @@ describe('reducer', () => {
       expect(newState.modals[0].actions.cancel.action)
       .to.eql({type: 'default action'});
       expect(newState.modals[0].actions.cancel).to.have.property('label');
+      expect(newState.modals[0]).to.have.property('userResponse', null);
     });
 
     it('sets editedMetric if editing but not modified another metric', () => {
@@ -211,6 +212,7 @@ describe('reducer', () => {
       const { actions } = newState.modals[0];
       expect(actions.confirm).to.have.property('action').and.to.eql(stopEditing(true));
       expect(actions.cancel).to.have.property('action').and.to.eql({ type: 'default action' });
+      expect(newState.modals[0]).to.have.property('userResponse', null);
     });
 
     it('discards changes if discard=true', () => {
@@ -531,6 +533,7 @@ describe('reducer', () => {
       expect(actions.cancel).to.have.property('label').and.to.include('not');
       expect(actions.cancel).to.have.property('action')
         .and.to.eql({ type: 'default action' });
+      expect(newState.modals[0]).to.have.property('userResponse', null);
     });
 
     it('does nothing if no metrics exist', () => {
