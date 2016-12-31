@@ -23,6 +23,7 @@ import {
   deleteMetric,
   updateEditedMetric,
   confirmModal,
+  cancelModal,
 } from './actions';
 import { DEFAULT_METRIC_PROPS } from './constants';
 
@@ -719,6 +720,78 @@ describe('reducer', () => {
       expect(newState).to.have.property('modals').and.to.have.length(3);
       expect(newState.modals[0]).to.have.property('userResponse', 'cancel');
       expect(newState.modals[1]).to.have.property('userResponse', 'confirm');
+      expect(newState.modals[2]).to.have.property('userResponse', null);
+    });
+  });
+
+  describe('cancel modal', () => {
+    it('does nothing if no modal exists', () => {
+      const newState = reducer(
+        STATE_WITH_SOME_METRICS,
+        cancelModal(),
+      );
+
+      expect(newState).to.eql(STATE_WITH_SOME_METRICS);
+    });
+
+    it('sets userResponse in the first unanswered modal', () => {
+      const newState = reducer(
+        {
+          ...STATE_WITH_SOME_METRICS,
+          modals: [
+            {
+              title: 'first modal',
+              message: 'foo',
+              actions: {
+                confirm: {
+                  label: 'yes',
+                  action: { type: 'something' },
+                },
+                cancel: {
+                  label: 'no',
+                  action: { type: 'sthg else' },
+                },
+              },
+              userResponse: 'confirm',
+            },
+            {
+              title: 'second modal',
+              message: 'bar',
+              actions: {
+                confirm: {
+                  label: 'yes',
+                  action: { type: 'something' },
+                },
+                cancel: {
+                  label: 'no',
+                  action: { type: 'sthg else' },
+                },
+              },
+              userResponse: null,
+            },
+            {
+              title: 'third modal',
+              message: 'foof',
+              actions: {
+                confirm: {
+                  label: 'yes',
+                  action: { type: 'something' },
+                },
+                cancel: {
+                  label: 'no',
+                  action: { type: 'sthg else' },
+                },
+              },
+              userResponse: null,
+            },
+          ],
+        },
+        cancelModal(),
+      );
+
+      expect(newState).to.have.property('modals').and.to.have.length(3);
+      expect(newState.modals[0]).to.have.property('userResponse', 'confirm');
+      expect(newState.modals[1]).to.have.property('userResponse', 'cancel');
       expect(newState.modals[2]).to.have.property('userResponse', null);
     });
   });

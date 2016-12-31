@@ -47,6 +47,8 @@ export function reducer(state=INITIAL_STATE, action) {
       return updateEditedMetric(state, action);
     case 'confirm modal':
       return confirmModal(state, action);
+    case 'cancel modal':
+      return cancelModal(state, action);
     default:
       return state;
   }
@@ -419,6 +421,22 @@ function confirmModal(state, action) {
       ...state,
       modals: modals.slice(0, index).concat(
         { ...modals[index], userResponse: 'confirm' },
+        modals.slice(index + 1, modals.length),
+      ),
+    };
+  }
+}
+
+function cancelModal(state, action) {
+  const { modals } = state;
+  if (modals.length === 0) {
+    return state;
+  } else {
+    const index = modals.findIndex(m => (m.userResponse === null));
+    return {
+      ...state,
+      modals: modals.slice(0, index).concat(
+        { ...modals[index], userResponse: 'cancel' },
         modals.slice(index + 1, modals.length),
       ),
     };
