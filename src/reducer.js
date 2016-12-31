@@ -29,6 +29,23 @@ export function reducer(state=INITIAL_STATE, action) {
     return state;
   }
   switch(action.type) {
+    case 'begin check login':
+      return beginCheckLogin(state, action);
+    case 'success check login':
+      return successCheckLogin(state, action);
+    case 'error check login':
+      return errorCheckLogin(state, action);
+    case 'login clicked':
+      return loginClicked();
+    case 'logout':
+      return {
+        ...state,
+        authentication: {
+          isAuthenticated: false,
+          isAuthenticating: false,
+          accessToken: null,
+        }
+      };
     case 'log metric':
       return logMetric(state, action);
     case 'start editing':
@@ -53,6 +70,8 @@ export function reducer(state=INITIAL_STATE, action) {
       return beginSyncData(state, action);
     case 'success sync data':
       return successSyncData(state, action);
+    case 'error sync data':
+      return errorSyncData(state, action);
     default:
       return state;
   }
@@ -469,6 +488,18 @@ function successSyncData(state, action) {
       isSynced: true,
       hasError: false,
       lastSynced: action.lastSynced,
+    },
+  };
+}
+
+function errorSyncData(state, action) {
+  const { metrics } = state;
+  return {
+    ...state,
+    metrics: {
+      ...metrics,
+      hasError: action.error,
+      isSyncing: false,
     },
   };
 }

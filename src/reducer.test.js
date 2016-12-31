@@ -26,6 +26,7 @@ import {
   cancelModal,
   beginSyncData,
   successSyncData,
+  errorSyncData,
 } from './actions';
 import { DEFAULT_METRIC_PROPS } from './constants';
 
@@ -838,6 +839,37 @@ describe('reducer', () => {
 
     it('sets metrics.hasError to false', () => {
       expect(newState.metrics).to.have.property('hasError', false);
+    });
+  });
+
+  describe('error sync data', () => {
+    let newState;
+    beforeAll(() => {
+      newState = reducer(
+        STATE_WITH_SOME_METRICS,
+        errorSyncData({ error: 'File not found' }),
+      );
+    });
+
+    it('sets isSyncing to false', () => {
+      expect(newState).to.have.property('metrics')
+        .and.to.have.property('isSyncing', false);
+    });
+
+    it('leaves isSynced as it is', () => {
+      expect(newState).to.have.property('metrics')
+        .and.to.have.property('isSynced', true);
+    });
+
+    it('sets hasError to the error', () => {
+      expect(newState).to.have.property('metrics')
+        .and.to.have.property('hasError')
+        .and.to.eql({ error: 'File not found' });
+    });
+
+    it('leaves lastSynced as it is', () => {
+      expect(newState).to.have.property('metrics')
+        .and.to.have.property('lastSynced', null);
     });
   });
 });
