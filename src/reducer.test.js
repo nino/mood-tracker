@@ -280,6 +280,7 @@ describe('reducer', () => {
         .to.have.property('action').and.to.eql({ type: 'default action' });
       expect(newState.modals[0]).to.have.property('title').and.to.include('changes');
       expect(newState.modals[0]).to.have.property('message').and.to.include('unsaved');
+      expect(newState.modals[0]).to.have.property('userResponse', null);
     });
 
     it('stops editing the other metric and creates a metric if discard=true', () => {
