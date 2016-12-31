@@ -109,10 +109,10 @@ export function mergeMetrics(metrics) {
 }
 
 function concatMergedMetrics(outputMetrics, inputMetrics) {
-  if (!inputMetrics || inputMetrics.length == 0) {
+  if (!inputMetrics || inputMetrics.length === 0) {
     return outputMetrics;
   }
-  else if (!outputMetrics || outputMetrics.length == 0) {
+  else if (!outputMetrics || outputMetrics.length === 0) {
     return concatMergedMetrics([inputMetrics[0]], inputMetrics.slice(1, inputMetrics.length));
   }
   else {
