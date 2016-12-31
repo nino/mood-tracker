@@ -49,6 +49,8 @@ export function reducer(state=INITIAL_STATE, action) {
       return confirmModal(state, action);
     case 'cancel modal':
       return cancelModal(state, action);
+    case 'begin sync data':
+      return beginSyncData(state, action);
     default:
       return state;
   }
@@ -441,4 +443,14 @@ function cancelModal(state, action) {
       ),
     };
   }
+}
+
+function beginSyncData(state, action) {
+  return { 
+    ...state,
+    metrics: {
+      ...state.metrics,
+      isSyncing: true,
+    },
+  };
 }

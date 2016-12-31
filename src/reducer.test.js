@@ -24,6 +24,7 @@ import {
   updateEditedMetric,
   confirmModal,
   cancelModal,
+  beginSyncData,
 } from './actions';
 import { DEFAULT_METRIC_PROPS } from './constants';
 
@@ -793,6 +794,13 @@ describe('reducer', () => {
       expect(newState.modals[0]).to.have.property('userResponse', 'confirm');
       expect(newState.modals[1]).to.have.property('userResponse', 'cancel');
       expect(newState.modals[2]).to.have.property('userResponse', null);
+    });
+  });
+
+  describe('begin sync data', () => {
+    it('sets state.metrics.isSyncing to true', () => {
+      expect(reducer(STATE_WITH_SOME_METRICS, beginSyncData()))
+        .to.have.property('metrics').and.to.have.property('isSyncing', true);
     });
   });
 });
