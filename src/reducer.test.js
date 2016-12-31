@@ -27,6 +27,7 @@ import {
   beginSyncData,
   successSyncData,
   errorSyncData,
+  beginCheckLogin,
 } from './actions';
 import { DEFAULT_METRIC_PROPS } from './constants';
 
@@ -870,6 +871,14 @@ describe('reducer', () => {
     it('leaves lastSynced as it is', () => {
       expect(newState).to.have.property('metrics')
         .and.to.have.property('lastSynced', null);
+    });
+  });
+
+  describe('begin check login', () => {
+    it('sets isAuthenticating to true', () => {
+      const newState = reducer(INITIAL_STATE, beginCheckLogin());
+      expect(newState).to.have.property('authentication');
+      expect(newState.authentication.isAuthenticating).to.be.ok;
     });
   });
 });

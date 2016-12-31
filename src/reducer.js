@@ -77,6 +77,16 @@ export function reducer(state=INITIAL_STATE, action) {
   }
 };
 
+
+function beginCheckLogin(state, action) {
+  return {
+    ...state,
+    authentication: {
+      isAuthenticating: true,
+      hasError: false,
+    },
+  };
+}
 function startEditingMetric(state, action) {
   const { metrics, settings } = state;
   const { editedMetric, isModified } = settings;
