@@ -35,7 +35,8 @@ import { DEFAULT_METRIC_PROPS } from './constants';
 
 describe('reducer', () => {
   it('returns the state when receiving an unknown action', () => {
-    expect(reducer(INITIAL_STATE, { type: 'default action' })).to.deep.equal(INITIAL_STATE);
+    expect(reducer(INITIAL_STATE, { type: 'default action' }))
+      .to.deep.equal(INITIAL_STATE);
   });
 
   describe('log metric', () => {
@@ -45,12 +46,18 @@ describe('reducer', () => {
         STATE_WITH_SOME_METRICS,
         logMetric(1, 6, dateString),
       );
-      expect(newState).to.have.property('metrics').and.to.have.property('items').and.to.have.length(2);
-      expect(newState.metrics.items[0]).to.have.property('props').and.to.have.property('name', 'Mood');
-      expect(newState.metrics.items[0]).to.have.property('entries').and.to.have.length(11);
-      expect(newState.metrics.items[0].entries[10]).to.have.property('date', dateString);
-      expect(newState.metrics.items[0].entries[10]).to.have.property('value', 6);
-      expect(newState.metrics.items[1]).to.have.property('entries').and.to.eql([]);
+      expect(newState).to.have.property('metrics')
+        .and.to.have.property('items').and.to.have.length(2);
+      expect(newState.metrics.items[0])
+        .to.have.property('props').and.to.have.property('name', 'Mood');
+      expect(newState.metrics.items[0])
+        .to.have.property('entries').and.to.have.length(11);
+      expect(newState.metrics.items[0].entries[10])
+        .to.have.property('date', dateString);
+      expect(newState.metrics.items[0].entries[10])
+        .to.have.property('value', 6);
+      expect(newState.metrics.items[1])
+        .to.have.property('entries').and.to.eql([]);
     });
 
     it('does nothing if no metric with this id is found', () => {
@@ -79,14 +86,14 @@ describe('reducer', () => {
         startEditingMetric(1),
       );
       expect(newState).to.have.property('metrics')
-      .and.to.eql(STATE_WITH_SOME_METRICS.metrics);
+        .and.to.eql(STATE_WITH_SOME_METRICS.metrics);
       expect(newState).to.have.property('settings')
-      .and.to.have.property('editedMetric').and.to.have.property('id', 1);
+        .and.to.have.property('editedMetric').and.to.have.property('id', 1);
       expect(newState.settings.editedMetric)
-      .to.eql({
-        id: STATE_WITH_SOME_METRICS.metrics.items[0].id,
-        props: STATE_WITH_SOME_METRICS.metrics.items[0].props,
-      });
+        .to.eql({
+          id: STATE_WITH_SOME_METRICS.metrics.items[0].id,
+          props: STATE_WITH_SOME_METRICS.metrics.items[0].props,
+        });
       expect(newState.settings).to.have.property('isModified', false);
     });
 
@@ -96,21 +103,21 @@ describe('reducer', () => {
         startEditingMetric(2),
       );
       expect(newState).to.have.property('settings')
-      .and.to.eql(STATE_EDITING_METRIC1_MODIFIED.settings);
+        .and.to.eql(STATE_EDITING_METRIC1_MODIFIED.settings);
       expect(newState).to.have.property('modals').and.to.have.length(1);
       expect(newState.modals[0]).to.have.property('title', 'Discard changes?');
       expect(newState.modals[0]).to.have.property('message')
-      .and.to.include('unsaved');
+        .and.to.include('unsaved');
       expect(newState.modals[0]).to.have.property('actions');
       expect(newState.modals[0].actions).to.have.property('confirm');
       expect(newState.modals[0].actions.confirm).to.have.property('action');
       expect(newState.modals[0].actions.confirm.action)
-      .to.eql(startEditingMetric(2, true));
+        .to.eql(startEditingMetric(2, true));
       expect(newState.modals[0].actions.confirm).to.have.property('label');
       expect(newState.modals[0].actions).to.have.property('cancel');
       expect(newState.modals[0].actions.cancel).to.have.property('action');
       expect(newState.modals[0].actions.cancel.action)
-      .to.eql({type: 'default action'});
+        .to.eql({type: 'default action'});
       expect(newState.modals[0].actions.cancel).to.have.property('label');
       expect(newState.modals[0]).to.have.property('userResponse', null);
     });

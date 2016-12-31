@@ -77,7 +77,6 @@ export function reducer(state=INITIAL_STATE, action) {
   }
 };
 
-
 function beginCheckLogin(state, action) {
   return {
     ...state,
@@ -185,8 +184,8 @@ function updateMetric(state, action) {
         {
           id: metricId,
           props: newProps,
-          lastModified,
           entries: items[index].entries,
+          lastModified,
         },
         items.slice(index + 1, items.length),
       ),
