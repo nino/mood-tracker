@@ -29,6 +29,7 @@ import {
   errorSyncData,
   beginCheckLogin,
   successCheckLogin,
+  errorCheckLogin,
 } from './actions';
 import { DEFAULT_METRIC_PROPS } from './constants';
 
@@ -909,6 +910,32 @@ describe('reducer', () => {
     it('sets lastAuthenticated', () => {
       expect(newState.authentication)
         .to.have.property('lastAuthenticated', 12345678900);
+    });
+  });
+
+  describe('error check login', () => {
+    let newState;
+    beforeAll(() => {
+      newState = reducer(
+        STATE_WITH_SOME_METRICS,
+        errorCheckLogin({ error: 'No network connection' }),
+      );
+    });
+
+    it('sets authentication.isAuthenticated to false', () => {
+      expect(newState).to.have.property('authentication')
+        .and.to.have.property('isAuthenticated', false);
+    });
+
+    it('sets authentication.isAuthenticating to false', () => {
+      expect(newState).to.have.property('authentication')
+        .and.to.have.property('isAuthenticating', false);
+    });
+
+    it('sets authentication.hasError to the error', () => {
+      expect(newState).to.have.property('authentication')
+        .and.to.have.property('hasError')
+        .and.to.eql({ error: 'No network connection' });
     });
   });
 });

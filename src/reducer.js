@@ -100,6 +100,18 @@ function successCheckLogin(state, action) {
     },
   };
 }
+
+function errorCheckLogin(state, action) {
+  return {
+    ...state,
+    authentication: {
+      isAuthenticating: false,
+      hasError: action.error,
+      isAuthenticated: false,
+    },
+  };
+}
+
 function startEditingMetric(state, action) {
   const { metrics, settings } = state;
   const { editedMetric, isModified } = settings;
