@@ -51,6 +51,8 @@ export function reducer(state=INITIAL_STATE, action) {
       return cancelModal(state, action);
     case 'begin sync data':
       return beginSyncData(state, action);
+    case 'success sync data':
+      return successSyncData(state, action);
     default:
       return state;
   }
@@ -451,6 +453,22 @@ function beginSyncData(state, action) {
     metrics: {
       ...state.metrics,
       isSyncing: true,
+    },
+  };
+}
+
+function successSyncData(state, action) {
+  const { metrics } = state;
+  const { items } = metrics;
+  return {
+    ...state,
+    metrics: {
+      ...metrics,
+      items: action.data,
+      isSyncing: false,
+      isSynced: true,
+      hasError: false,
+      lastSynced: action.lastSynced,
     },
   };
 }

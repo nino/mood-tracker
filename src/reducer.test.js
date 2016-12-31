@@ -25,6 +25,7 @@ import {
   confirmModal,
   cancelModal,
   beginSyncData,
+  successSyncData,
 } from './actions';
 import { DEFAULT_METRIC_PROPS } from './constants';
 
@@ -801,6 +802,42 @@ describe('reducer', () => {
     it('sets state.metrics.isSyncing to true', () => {
       expect(reducer(STATE_WITH_SOME_METRICS, beginSyncData()))
         .to.have.property('metrics').and.to.have.property('isSyncing', true);
+    });
+  });
+
+  describe('success sync data', () => {
+    let data = [
+      { id: 1, props: DEFAULT_METRIC_PROPS, lastModified: 12, entries: [] },
+      { id: 2, props: DEFAULT_METRIC_PROPS, lastModified: 132, entries: [] },
+      { id: 3, props: DEFAULT_METRIC_PROPS, lastModified: 102, entries: [] },
+    ];
+    let newState;
+    beforeAll(() => {
+      newState = reducer(
+        STATE_WITH_SOME_METRICS,
+        successSyncData(data, 1000),
+      );
+    });
+
+    it('sets metrics.items to data', () => {
+      expect(newState).to.have.property('metrics')
+        .and.to.have.property('items').and.to.eql(data);
+    });
+
+    it('sets metrics.lastSynced to lastSynced', () => {
+      expect(newState.metrics).to.have.property('lastSynced', 1000);
+    });
+
+    it('sets metrics.isSyncing to false', () => {
+      expect(newState.metrics).to.have.property('isSyncing', false);
+    });
+
+    it('sets metrics.isSynced to true', () => {
+      expect(newState.metrics).to.have.property('isSynced', true);
+    });
+
+    it('sets metrics.hasError to false', () => {
+      expect(newState.metrics).to.have.property('hasError', false);
     });
   });
 });
