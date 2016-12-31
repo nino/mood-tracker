@@ -28,6 +28,7 @@ import {
   successSyncData,
   errorSyncData,
   beginCheckLogin,
+  successCheckLogin,
 } from './actions';
 import { DEFAULT_METRIC_PROPS } from './constants';
 
@@ -879,6 +880,35 @@ describe('reducer', () => {
       const newState = reducer(INITIAL_STATE, beginCheckLogin());
       expect(newState).to.have.property('authentication');
       expect(newState.authentication.isAuthenticating).to.be.ok;
+    });
+  });
+
+  describe('success check login', () => {
+    let newState;
+    beforeEach(() => {
+      newState = reducer(
+        INITIAL_STATE,
+        successCheckLogin('abcdefg', 12345678900),
+      );
+    });
+
+    it('sets isAuthenticating to false', () => {
+      expect(newState).to.have.property('authentication');
+      expect(newState.authentication.isAuthenticating).to.not.be.ok;
+    });
+
+    it('sets isAuthenticated to true', () => {
+      expect(newState.authentication.isAuthenticated).to.be.ok;
+    });
+
+    it('sets the accessToken', () => {
+      expect(newState.authentication).to.have.property('accessToken')
+        .and.to.equal('abcdefg');
+    });
+
+    it('sets lastAuthenticated', () => {
+      expect(newState.authentication)
+        .to.have.property('lastAuthenticated', 12345678900);
     });
   });
 });

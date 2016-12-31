@@ -87,6 +87,19 @@ function beginCheckLogin(state, action) {
     },
   };
 }
+
+function successCheckLogin(state, action) {
+  return {
+    ...state,
+    authentication: {
+      isAuthenticating: false,
+      isAuthenticated: true,
+      lastAuthenticated: action.lastAuthenticated,
+      accessToken: action.accessToken,
+      hasError: false,
+    },
+  };
+}
 function startEditingMetric(state, action) {
   const { metrics, settings } = state;
   const { editedMetric, isModified } = settings;
