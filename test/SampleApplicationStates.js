@@ -8,7 +8,7 @@ import {
 export const INITIAL_STATE = {
   metrics: {
     isSyncing: false,
-    isLoaded: true,
+    isSynced: true,
     lastSynced: null,
     items: [],
     hasError: false,
@@ -30,7 +30,7 @@ export const INITIAL_STATE = {
 export const STATE_WITH_SOME_METRICS = {
   metrics: {
     isSyncing: false,
-    isLoaded: true,
+    isSynced: true,
     lastSynced: null,
     items: [
       MoodWithEntries,
@@ -55,7 +55,7 @@ export const STATE_WITH_SOME_METRICS = {
 export const STATE_WITH_LOTS_OF_METRICS = {
   metrics: {
     isSyncing: false,
-    isLoaded: true,
+    isSynced: true,
     lastSynced: null,
     items: [
       MoodWithEntries,
@@ -80,7 +80,7 @@ export const STATE_WITH_LOTS_OF_METRICS = {
 export const STATE_EDITING_METRIC1_MODIFIED = {
   metrics: {
     isSyncing: false,
-    isLoaded: true,
+    isSynced: true,
     lastSynced: null,
     items: [
       MoodWithEntries,
@@ -111,7 +111,7 @@ export const STATE_EDITING_METRIC1_MODIFIED = {
 export const STATE_EDITING_METRIC1_NOT_MODIFIED = {
   metrics: {
     isSyncing: false,
-    isLoaded: true,
+    isSynced: true,
     lastSynced: null,
     items: [
       MoodWithEntries,
