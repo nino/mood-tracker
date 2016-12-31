@@ -1,5 +1,3 @@
-import { DATA_FILE_PATH } from './constants';
-
 function readFileBlobAsJSON(fileBlob) {
   let blobReader = new FileReader();
   return new Promise((resolve, reject) => {

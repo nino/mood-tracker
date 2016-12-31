@@ -1,7 +1,7 @@
 import { put, select, call } from 'redux-saga/effects';
 import { takeLatest } from 'redux-saga';
 import Dropbox from 'dropbox';
-import { CLIENT_ID, DATA_FILE_PATH } from './constants';
+import { DATA_FILE_PATH } from './constants';
 import queryString from 'query-string';
 import { successCheckLogin, errorCheckLogin, successSyncData, errorSyncData } from './actions';
 import { getAuthentication, getMetricsItems } from './selectors';
