@@ -70,6 +70,12 @@ export function reducer(state=INITIAL_STATE, action) {
       return successSyncData(state, action);
     case 'error sync data':
       return errorSyncData(state, action);
+    case 'request login':
+      return state;
+    case 'request logout':
+      return state;
+    case 'request sync':
+      return state;
     default:
       return state;
   }

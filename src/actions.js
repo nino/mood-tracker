@@ -114,3 +114,21 @@ export function errorCheckLogin(error) {
     error,
   };
 };
+
+export function requestLogin() {
+  return {
+    type: 'request login',
+  };
+}
+
+export function requestLogout() {
+  return {
+    type: 'request logout',
+  };
+}
+
+export function requestSync() {
+  return {
+    type: 'request sync',
+  };
+}
