@@ -35,8 +35,6 @@ export function reducer(state=INITIAL_STATE, action) {
       return successCheckLogin(state, action);
     case 'error check login':
       return errorCheckLogin(state, action);
-    case 'login clicked':
-      return loginClicked();
     case 'logout':
       return {
         ...state,
