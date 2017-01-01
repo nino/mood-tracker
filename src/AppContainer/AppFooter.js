@@ -1,31 +1,27 @@
-import React, {Component} from 'react';
-import {Button} from 'semantic-ui-react';
+import React from 'react';
+import { connect } from 'react-redux';
+import Button from '../components/Button';
+import { requestLogout } from '../actions';
 
-class Footer extends Component {
-  render() {
-    let logoutButton;
-    if (this.props.loggedIn && this.props.onAction) {
-      logoutButton = (
-        <Button
-          basic
-          onClick={() => this.props.onAction('logoutClicked')}
-          floated='right'>
-          Log out
-        </Button>
-      );
-    }
-    return (
-      <div className='ui container'>
-      <small>© 2016, Nino Annighöfer</small>
-      {logoutButton}
-      </div>
-    );
-  }
-}
+const LogoutButton = ({ logoutClick }) => (
+  <button onClick={logoutClick} className='logout-button'>
+    Log out
+  </button>
+);
 
-Footer.propTypes = {
-  onAction: React.PropTypes.func,
-  loggedIn: React.PropTypes.bool
-};
+export const AppFooter = ({ loggedIn, logoutClick }) => (
+  <div className='app-footer'>
+    <small>© 2016, Nino Annighöfer</small>
+    {loggedIn ? <LogoutButton logoutClick={logoutClick} /> : <span />}
+  </div>
+);
 
-export default Footer;
+const stateToProps = (state) => ({
+  loggedIn: state.authentication.isAuthenticated,
+});
+
+const dispatchToProps = (dispatch) => ({
+  logoutClick: () => dispatch(requestLogout()),
+});
+
+export default connect(stateToProps, dispatchToProps)(AppFooter);
