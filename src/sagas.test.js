@@ -2,6 +2,8 @@ import { expect } from 'chai';
 import {
   syncData,
   checkLogin,
+  executeCancelModal,
+  executeConfirmModal,
   executeLogout,
 } from './sagas';
 import {
@@ -708,6 +710,130 @@ describe('sync data saga', () => {
         .and.to.have.property('PUT').and.to.have.property('action')
         .and.to.have.property('type', 'error sync data');
     });
+  });
+});
+
+describe('executeConfirmModal', () => {
+  let generator;
+  let next;
+  const modals = [
+    {
+      title: 'the first modal',
+      message: '...',
+      actions: {
+        confirm: {
+          action: { type: 'execute me' },
+          label: 'you clicked me',
+        },
+        cancel: {
+          action: { type: 'not this one' },
+          label: 'u did not click here',
+        },
+      },
+    },
+    {
+      title: 'the second modal',
+      message: 'this one dosent matter',
+      actions: {
+        confirm: { 
+          action: { type: 'some evil action' },
+          label: 'don\'t do this one',
+        },
+        cancel: {
+          action: { type: 'other evil action' },
+          label: 'also not this one',
+        },
+      },
+    },
+  ];
+
+  beforeAll(() => {
+    generator = executeConfirmModal();
+    next = generator.next();
+  });
+
+  it('fetches the modals from the store', () => {
+    expect(next).to.have.property('value')
+      .and.to.have.property('SELECT');
+    next = generator.next(modals);
+  });
+
+  it('dispatches the confirm action stored in the modal', () => {
+    expect(next).to.have.property('value')
+      .and.to.have.property('PUT')
+      .and.to.have.property('action')
+      .and.to.eql(modals[0].actions.confirm.action);
+    next = generator.next();
+  });
+
+  it('dispatches successConfirmModal', () => {
+    expect(next).to.have.property('value')
+      .and.to.have.property('PUT')
+      .and.to.have.property('action')
+      .and.to.eql({ type: 'success confirm modal' });
+    next = generator.next();
+  });
+});
+
+describe('executeCancelModal', () => {
+  let generator;
+  let next;
+  const modals = [
+    {
+      title: 'the first modal',
+      message: '...',
+      actions: {
+        confirm: {
+          action: { type: 'not this one' },
+          label: 'u did not click here',
+        },
+        cancel: {
+          action: { type: 'execute me' },
+          label: 'you clicked me',
+        },
+      },
+    },
+    {
+      title: 'the second modal',
+      message: 'this one dosent matter',
+      actions: {
+        confirm: { 
+          action: { type: 'some evil action' },
+          label: 'don\'t do this one',
+        },
+        cancel: {
+          action: { type: 'other evil action' },
+          label: 'also not this one',
+        },
+      },
+    },
+  ];
+
+  beforeAll(() => {
+    generator = executeCancelModal();
+    next = generator.next();
+  });
+
+  it('fetches the modals from the store', () => {
+    expect(next).to.have.property('value')
+      .and.to.have.property('SELECT');
+    next = generator.next(modals);
+  });
+
+  it('dispatches the cancel action stored in the modal', () => {
+    expect(next).to.have.property('value')
+      .and.to.have.property('PUT')
+      .and.to.have.property('action')
+      .and.to.eql(modals[0].actions.cancel.action);
+    next = generator.next();
+  });
+
+  it('dispatches successCancelModal', () => {
+    expect(next).to.have.property('value')
+      .and.to.have.property('PUT')
+      .and.to.have.property('action')
+      .and.to.eql({ type: 'success cancel modal' });
+    next = generator.next();
   });
 });
 

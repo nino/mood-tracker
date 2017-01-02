@@ -61,17 +61,41 @@ export function updateEditedMetric(updatedProps) {
   };
 };
 
-export function confirmModal() {
+export function requestConfirmModal() {
   return {
-    type: 'confirm modal',
+    type: 'request confirm modal',
   };
 };
 
-export function cancelModal() {
+export function requestCancelModal() {
   return {
-    type: 'cancel modal',
+    type: 'request cancel modal',
   };
 };
+
+export function successConfirmModal() {
+  return {
+    type: 'success confirm modal',
+  };
+}
+
+export function errorConfirmModal() {
+  return {
+    type: 'error confirm modal',
+  };
+}
+
+export function successCancelModal() {
+  return {
+    type: 'success cancel modal',
+  };
+}
+
+export function errorCancelModal() {
+  return {
+    type: 'error cancel modal',
+  };
+}
 
 export function beginSyncData() {
   return {

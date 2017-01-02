@@ -9,8 +9,16 @@ import {
   successSyncData,
   errorSyncData,
   successLogout,
+  successConfirmModal,
+  errorConfirmModal,
+  successCancelModal,
+  errorCancelModal,
 } from './actions';
-import { getAuthentication, getMetricsItems } from './selectors';
+import {
+  getAuthentication,
+  getMetricsItems,
+  getModals,
+} from './selectors';
 import { downloadFileAsJSON, mergeMetrics } from './lib';
 
 export function* syncData() {
@@ -76,6 +84,26 @@ export function* checkLogin() {
   }
 }
 
+export function* executeConfirmModal() {
+  const modals = yield select(getModals);
+  if (modals.length < 1) {
+    yield put(errorConfirmModal());
+  } else {
+    yield put(modals[0].actions.confirm.action);
+    yield put(successConfirmModal());
+  }
+}
+
+export function* executeCancelModal() {
+  const modals = yield select(getModals);
+  if (modals.length < 1) {
+    yield put(errorCancelModal());
+  } else {
+    yield put(modals[0].actions.cancel.action);
+    yield put(successCancelModal());
+  }
+}
+
 export function* executeLogout() {
   delete localStorage.accessToken;
   yield put(successLogout());
@@ -84,5 +112,7 @@ export function* executeLogout() {
 export function* watcherSaga() {
   yield takeLatest('begin check login', checkLogin);
   yield takeLatest('begin sync data', syncData);
+  yield takeEvery('request confirm modal', executeConfirmModal);
+  yield takeEvery('request cancel modal', executeCancelModal);
   yield takeEvery('request logout', executeLogout);
 }
