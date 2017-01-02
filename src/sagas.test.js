@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import {
   syncData,
   checkLogin,
+  executeLogout,
 } from './sagas';
 import {
   INITIAL_STATE,
@@ -707,5 +708,26 @@ describe('sync data saga', () => {
         .and.to.have.property('PUT').and.to.have.property('action')
         .and.to.have.property('type', 'error sync data');
     });
+  });
+});
+
+describe('executeLogout', () => {
+  it('deletes the accessToken from localStorage', () => {
+    const generator = executeLogout();
+    let next = generator.next();
+
+    expect(global.localStorage).not.to.have.property('accessToken');
+    expect(generator.next()).to.have.property('done', true);
+  });
+
+  it('PUTs success logout action', () => {
+    const generator = executeLogout();
+    let next = generator.next();
+
+    expect(next).to.have.property('value')
+      .and.to.have.property('PUT')
+      .and.to.have.property('action')
+      .and.to.have.property('type', 'success logout');
+    expect(generator.next()).to.have.property('done', true);
   });
 });

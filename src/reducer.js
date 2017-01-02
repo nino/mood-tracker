@@ -74,6 +74,16 @@ export function reducer(state=INITIAL_STATE, action) {
       return state;
     case 'request logout':
       return state;
+    case 'success logout':
+      return {
+        ...state,
+        authentication: {
+          isAuthenticated: false,
+          isAuthenticating: false,
+          accessToken: null,
+          hasError: false,
+        },
+      };
     case 'request sync':
       return state;
     default:

@@ -1,9 +1,15 @@
 import { put, select, call } from 'redux-saga/effects';
-import { takeLatest } from 'redux-saga';
+import { takeLatest, takeEvery } from 'redux-saga';
 import Dropbox from 'dropbox';
 import { DATA_FILE_PATH } from './constants';
 import queryString from 'query-string';
-import { successCheckLogin, errorCheckLogin, successSyncData, errorSyncData } from './actions';
+import {
+  successCheckLogin,
+  errorCheckLogin,
+  successSyncData,
+  errorSyncData,
+  successLogout,
+} from './actions';
 import { getAuthentication, getMetricsItems } from './selectors';
 import { downloadFileAsJSON, mergeMetrics } from './lib';
 
@@ -70,7 +76,13 @@ export function* checkLogin() {
   }
 }
 
+export function* executeLogout() {
+  delete localStorage.accessToken;
+  yield put(successLogout());
+}
+
 export function* watcherSaga() {
   yield takeLatest('begin check login', checkLogin);
   yield takeLatest('begin sync data', syncData);
+  yield takeEvery('request logout', executeLogout);
 }
