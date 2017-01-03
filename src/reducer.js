@@ -60,10 +60,14 @@ export function reducer(state=INITIAL_STATE, action) {
       return deleteMetric(state, action);
     case 'update edited metric':
       return updateEditedMetric(state, action);
-    case 'confirm modal':
-      return confirmModal(state, action);
-    case 'cancel modal':
-      return cancelModal(state, action);
+    case 'request confirm modal':
+      return requestConfirmModal(state, action);
+    case 'request cancel modal':
+      return requestCancelModal(state, action);
+    case 'success confirm modal':
+      return successConfirmModal(state, action);
+    case 'success cancel modal':
+      return successCancelModal(state, action);
     case 'begin sync data':
       return beginSyncData(state, action);
     case 'success sync data':
@@ -482,7 +486,7 @@ function updateEditedMetric(state, action) {
   }
 }
 
-function confirmModal(state, action) {
+function requestConfirmModal(state, action) {
   const { modals } = state;
   if (modals.length === 0) {
     return state;
@@ -498,7 +502,7 @@ function confirmModal(state, action) {
   }
 }
 
-function cancelModal(state, action) {
+function requestCancelModal(state, action) {
   const { modals } = state;
   if (modals.length === 0) {
     return state;
@@ -512,6 +516,20 @@ function cancelModal(state, action) {
       ),
     };
   }
+}
+
+function successConfirmModal(state, action) {
+  return {
+    ...state,
+    modals: state.modals.slice(1, state.modals.length),
+  };
+}
+
+function successCancelModal(state, action) {
+  return {
+    ...state,
+    modals: state.modals.slice(1, state.modals.length),
+  };
 }
 
 function beginSyncData(state, action) {

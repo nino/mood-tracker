@@ -22,8 +22,10 @@ import {
   reorderMetrics,
   deleteMetric,
   updateEditedMetric,
-  confirmModal,
-  cancelModal,
+  requestConfirmModal,
+  requestCancelModal,
+  successConfirmModal,
+  successCancelModal,
   beginSyncData,
   successSyncData,
   errorSyncData,
@@ -665,11 +667,11 @@ describe('reducer', () => {
     });
   });
 
-  describe('confirm modal', () => {
+  describe('request confirm modal', () => {
     it('does nothing if no modal exists', () => {
       const newState = reducer(
         STATE_WITH_SOME_METRICS,
-        confirmModal(),
+        requestConfirmModal(),
       );
 
       expect(newState).to.eql(STATE_WITH_SOME_METRICS);
@@ -727,7 +729,7 @@ describe('reducer', () => {
             },
           ],
         },
-        confirmModal(),
+        requestConfirmModal(),
       );
 
       expect(newState).to.have.property('modals').and.to.have.length(3);
@@ -737,11 +739,11 @@ describe('reducer', () => {
     });
   });
 
-  describe('cancel modal', () => {
+  describe('request cancel modal', () => {
     it('does nothing if no modal exists', () => {
       const newState = reducer(
         STATE_WITH_SOME_METRICS,
-        cancelModal(),
+        requestCancelModal(),
       );
 
       expect(newState).to.eql(STATE_WITH_SOME_METRICS);
@@ -799,13 +801,73 @@ describe('reducer', () => {
             },
           ],
         },
-        cancelModal(),
+        requestCancelModal(),
       );
 
       expect(newState).to.have.property('modals').and.to.have.length(3);
       expect(newState.modals[0]).to.have.property('userResponse', 'confirm');
       expect(newState.modals[1]).to.have.property('userResponse', 'cancel');
       expect(newState.modals[2]).to.have.property('userResponse', null);
+    });
+  });
+
+  describe('success confirm modal', () => {
+    const givenState = {
+      modals: [{
+        title: 'Test modal',
+        message: 'Test message',
+        userResponse: 'confirm',
+        actions: {
+          confirm: {
+            label: 'Yes',
+            action: { type: 'some action' },
+          },
+          cancel: {
+            label: 'No',
+            action: { type: 'some other action' },
+          },
+        },
+      }],
+    };
+
+    it('deletes the first answered modal', () => {
+      expect(reducer(givenState, successConfirmModal()))
+      .to.have.property('modals').and.to.eql([]);
+    });
+
+    it('does nothing if no modals exist', () => {
+      const emptyState = { modals: [] };
+      expect(reducer(emptyState, successConfirmModal())).to.eql(emptyState);
+    });
+  });
+
+  describe('success cancel modal', () => {
+    const givenState = {
+      modals: [{
+        title: 'Test modal',
+        message: 'Test message',
+        userResponse: 'cancel',
+        actions: {
+          confirm: {
+            label: 'Yes',
+            action: { type: 'some action' },
+          },
+          cancel: {
+            label: 'No',
+            action: { type: 'some other action' },
+          },
+        },
+      }],
+    };
+
+    it('deletes the first answered modal', () => {
+      expect(reducer(givenState, successCancelModal()))
+      .to.have.property('modals').and.to.eql([]);
+    });
+
+    it('does nothing if no modals exist', () => {
+      const emptyState = { modals: [] };
+      expect(reducer(emptyState, successCancelModal())).to.eql(emptyState);
     });
   });
 
