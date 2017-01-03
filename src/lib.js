@@ -183,3 +183,18 @@ export function downloadFileAsJSON(dbx, path) {
     })
   );
 }
+
+export function uploadAsJSON(dbx, fileName, content) {
+  const path = '/' + fileName;
+  const stringifiedMetrics = JSON.stringify(content, null, 2);
+  const uploadArgs = {
+    path,
+    mode: { '.tag': 'overwrite' },
+    'contents': stringifiedMetrics,
+    'mute': true,
+  };
+  console.log('getting ready to upload');
+  return dbx.filesUpload(uploadArgs)
+    .then((response) => ({ ok: true }))
+    .catch((error) => ({ ok: false, error }));
+}

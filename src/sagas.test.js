@@ -27,12 +27,6 @@ const authAuthenticated = {
   accessToken: 'yup',
 };
 
-const dropboxError = {
-  status: 400,
-  error: 'There is an error',
-  response: {},
-};
-
 describe('check login saga', () => {
   it('uses the accessToken from localStorage to authenticate', () => {
     global.localStorage = { accessToken: 'abc' };
@@ -127,19 +121,16 @@ describe('sync data saga', () => {
     };
     next = generator.next(responseMock);
 
-    // This should have been a call to dbx.filesUpload:
     expect(next, 'must request data file upload').to.have.property('value')
       .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(1);
-    expect(next.value.CALL.args[0]).to.have.property('path')
-      .and.to.include(DATA_FILE_PATH);
-    expect(next.value.CALL.args[0]).to.have.property('mode')
-      .and.to.have.property('.tag', 'overwrite');
+      .and.to.have.property('args').and.to.have.length(3);
+    expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH);
+    expect(next.value.CALL.args[2]).to.be.a('array');
     expect(
-      isValidMetricsArray(JSON.parse(next.value.CALL.args[0].contents)),
+      isValidMetricsArray(next.value.CALL.args[2]),
       'uploaded metric needs to be valid',
     ).to.be.ok
-    next = generator.next({ server_modified: 124, id: 23 });
+    next = generator.next({ ok: true });
 
     expect(global.localStorage, 'localStorage must have metrics')
       .to.have.property('metrics');
@@ -201,15 +192,10 @@ describe('sync data saga', () => {
     // Call for upload of local data
     expect(next, 'must send upload request').to.have.property('value')
       .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(1);
-    expect(next.value.CALL.args[0])
-      .to.have.property('contents').and.to.be.a('string');
-    const uploadResponseMock = {
-      '.tag': 'file',
-      id: 'a file id',
-      name: DATA_FILE_PATH,
-      server_modified: 1482133305530,
-    };
+      .and.to.have.property('args').and.to.have.length(3);
+    expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH);
+    expect(next.value.CALL.args[2]).to.be.a('array');
+    const uploadResponseMock = { ok: true };
     next = generator.next(uploadResponseMock);
 
     // Check local storage up to date
@@ -277,11 +263,10 @@ describe('sync data saga', () => {
     // upload updated metrics
     expect(next, 'must request upload').to.have.property('value')
       .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(1);
-    expect(next.value.CALL.args[0])
-      .to.have.property('path', '/' + DATA_FILE_PATH);
-    expect(next.value.CALL.args[0]).to.have.property('contents');
-    next = generator.next({ 'id': 'yup yup', server_modified: 38, 'name': 'huuh' });
+      .and.to.have.property('args').and.to.have.length(3);
+    expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH);
+    expect(next.value.CALL.args[2]).to.be.a('array');
+    next = generator.next({ ok: true });
 
     // PUT success with remote metrics
     expect(next, 'must PUT success sync data action').to.have.property('value')
@@ -358,8 +343,12 @@ describe('sync data saga', () => {
       .to.have.property('metrics').and.to.eql(mergedMetrics);
 
     // upload the merged metrics
-    expect(next, 'must request data file upload').to.have.property('value').and.to.have.property('CALL').and.to.have.property('args').and.to.have.length(1);
-    next = generator.next({ server_modified: 12324, name: 'abc', id: '24' });
+    expect(next, 'must request data file upload')
+      .to.have.property('value')
+      .and.to.have.property('CALL')
+      .and.to.have.property('args')
+      .and.to.have.length(3);
+    next = generator.next({ ok: true });
 
     // put success with remote metrics
     expect(next).to.have.property('value').and.to.have.property('PUT')
@@ -440,11 +429,10 @@ describe('sync data saga', () => {
     // upload updated metrics
     expect(next, 'must request upload').to.have.property('value')
       .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(1);
-    expect(next.value.CALL.args[0])
-      .to.have.property('path', '/' + DATA_FILE_PATH);
-    expect(next.value.CALL.args[0]).to.have.property('contents');
-    next = generator.next({ server_modified: 23408, 'id': 'yup yup' });
+      .and.to.have.property('args').and.to.have.length(3);
+    expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH)
+    expect(next.value.CALL.args[2]).to.be.a('array');
+    next = generator.next({ ok: true });
 
     // put success with remote metrics
     expect(next, 'must put success sync data').to.have.property('value')
@@ -526,11 +514,10 @@ describe('sync data saga', () => {
     // upload updated metrics
     expect(next, 'must request upload').to.have.property('value')
       .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(1);
-    expect(next.value.CALL.args[0])
-      .to.have.property('path', '/' + DATA_FILE_PATH);
-    expect(next.value.CALL.args[0]).to.have.property('contents');
-    next = generator.next({ server_modified: 23, name: '2398', 'id': 'yup yup' });
+      .and.to.have.property('args').and.to.have.length(3);
+    expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH);
+    expect(next.value.CALL.args[2]).to.be.a('array');
+    next = generator.next({ ok: true });
 
     // put success with remote metrics
     expect(next, 'must put success sync data').to.have.property('value')
@@ -615,11 +602,10 @@ describe('sync data saga', () => {
     // upload updated metrics
     expect(next, 'must request upload').to.have.property('value')
       .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(1);
-    expect(next.value.CALL.args[0])
-      .to.have.property('path', '/' + DATA_FILE_PATH);
-    expect(next.value.CALL.args[0]).to.have.property('contents');
-    next = generator.next({ 'id': 'yup yup', server_modified: 38, 'name': 'huuh' });
+      .and.to.have.property('args').and.to.have.length(3);
+    expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH);
+    expect(next.value.CALL.args[2]).to.be.a('array')
+    next = generator.next({ ok: true });
 
     // put success with remote metrics
     expect(next, 'must put success sync data').to.have.property('value')
@@ -695,10 +681,9 @@ describe('sync data saga', () => {
       // upload data -- ERROR
       expect(next, 'must request upload').to.have.property('value')
         .and.to.have.property('CALL')
-        .and.to.have.property('args').and.to.have.length(1);
-      expect(next.value.CALL.args[0])
-        .to.have.property('path', '/' + DATA_FILE_PATH);
-      next = generator.next(dropboxError);
+        .and.to.have.property('args').and.to.have.length(3);
+      expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH)
+      next = generator.next({ ok: false, error: 'Upload error' });
 
       // check that local storage is updated
       expect(global.localStorage, 'must still keep localStorage up-to-date')

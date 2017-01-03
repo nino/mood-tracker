@@ -19,7 +19,11 @@ import {
   getMetricsItems,
   getModals,
 } from './selectors';
-import { downloadFileAsJSON, mergeMetrics } from './lib';
+import {
+  downloadFileAsJSON,
+  mergeMetrics,
+  uploadAsJSON,
+} from './lib';
 
 export function* syncData() {
   const authentication = yield select(getAuthentication);
@@ -47,15 +51,13 @@ export function* syncData() {
       const remoteMetrics = apiResponse.data ? apiResponse.data : [];
       const mergedMetrics = mergeMetrics(localMetrics.concat(remoteMetrics));
       localStorage.metrics = mergedMetrics;
-      const stringifiedMetrics = JSON.stringify(mergedMetrics, null, 2);
-      const uploadArgs = {
-        mode: { '.tag': 'overwrite' },
-        'path': '/' + DATA_FILE_PATH,
-        'contents': stringifiedMetrics,
-        'mute': true,
-      };
-      const uploadResponse = yield call(dbx.filesUpload, uploadArgs);
-      if (!uploadResponse || !uploadResponse.server_modified) {
+      const uploadResponse = yield call(
+        uploadAsJSON,
+        dbx,
+        DATA_FILE_PATH,
+        mergedMetrics
+      );
+      if (!uploadResponse.ok) {
         yield put(errorSyncData('Upload error'));
         return;
       }

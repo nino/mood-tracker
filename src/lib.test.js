@@ -4,11 +4,14 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 import OldMetrics from '../test/SampleMetricsWithEntries';
 
+import { MoodWithEntries, BurnsWithEntries } from '../test/SampleMetrics';
+
 import {
   upgradeDataFormat,
   downloadFileAsJSON,
   isValidMetricsArray,
   mergeMetrics,
+  uploadAsJSON,
 } from './lib';
 
 describe('lib', () => {
@@ -300,6 +303,40 @@ describe('lib', () => {
       return Promise.all([
         expect(response).to.eventually.be.resolved,
         expect(response).to.eventually.eql({ ok: false, error: 'Error: Download error' }),
+      ]);
+    });
+  });
+
+  describe('uploadAsJSON()', () => {
+    const dbxMock = {
+      filesUpload: jest.fn(),
+    };
+    const dataMock = [MoodWithEntries, BurnsWithEntries];
+
+    it('returns ok: true on success', () => {
+      dbxMock.filesUpload.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolve({ server_modified: 2395, id: 'yes' });
+        })
+      );
+      const response = uploadAsJSON(dbxMock, '/path', dataMock);
+      return Promise.all([
+        expect(response).to.eventually.be.resolved,
+        expect(response).to.eventually.eql({ ok: true }),
+      ]);
+    });
+
+    it('returns ok: false on failure', () => {
+      dbxMock.filesUpload.mockReturnValueOnce(
+        new Promise((resolve, reject) => {
+          reject({ error: 'something went wrong' });
+        })
+      );
+      const response = uploadAsJSON(dbxMock, '/path', dataMock);
+      return Promise.all([
+        expect(response).to.eventually.be.resolved,
+        expect(response).to.eventually.have.property('ok', false),
+        expect(response).to.eventually.have.property('error'),
       ]);
     });
   });
