@@ -82,7 +82,7 @@ export function* checkLogin() {
   }
   // 3.2. If we don't have a token, fail.
   else {
-    yield put(errorCheckLogin('No token found'))
+    yield put(errorCheckLogin('No token found'));
   }
 }
 
