@@ -168,7 +168,7 @@ export function downloadFileAsJSON(dbx, path) {
         throw Error('File not found');
       }
     }).then(() => {
-      return dbx.filesDownload({ 'path': path }).catch((error) => {
+      return dbx.filesDownload({ 'path': '/' + path }).catch((error) => {
         throw Error('Download error');
       });
     }).then((response) => {
