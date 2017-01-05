@@ -1,10 +1,134 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import { Provider } from 'react-redux';
+import configureMockStore from 'redux-mock-store';
+import { expect } from 'chai';
+import { shallow, mount } from 'enzyme';
+import {
+  INITIAL_STATE,
+  authSubStates,
+  metricsSubStates,
+  modalsSubStates,
+  settingsSubStates,
+} from '../../test/SampleApplicationStates';
+
+import ConnectedApp, { App } from './App';
+import LoginScreen from '../LoginScreen';
+
+const mockStore = configureMockStore();
 
 describe('App', () => {
   it('renders without crashing', () => {
-    const div = document.createElement('div');
-    ReactDOM.render(<App />, div);
+    const dispatch = jest.fn();
+    const { metrics, authentication } = INITIAL_STATE;
+    const component = shallow(
+      <App dispatch={dispatch} metrics={metrics} authentication={authentication} />
+    );
+    expect(component).to.be.ok;
+  });
+
+  it('dispatches "begin sync data" action if authenticated and not syncing', () => {
+    const metricsOptions = [
+      metricsSubStates.notSyncingNoData,
+      metricsSubStates.notSyncingWithData,
+    ];
+    metricsOptions.forEach((metricsOption) => {
+      const store = mockStore({
+        metrics: metricsOption,
+        settings: settingsSubStates.notEditing,
+        authentication: authSubStates.authenticated,
+        modals: [],
+      });
+      store.dispatch = jest.fn();
+
+      const component = mount(
+        <Provider store={store}>
+          <ConnectedApp />
+        </Provider>
+      );
+
+      expect(store.dispatch.mock.calls).to.have.length(1);
+      expect(store.dispatch.mock.calls[0]).to.have.length(1);
+      expect(store.dispatch.mock.calls[0][0]).to.have.property('type', 'begin sync data');
+    });
+  });
+
+  it('dispatches "begin check login" if not authenticated and not error', () => {
+    const store = mockStore({
+      metrics: metricsSubStates.notSyncingNoData,
+      authentication: authSubStates.notAuthenicatedNotAuthenticating,
+      modals: [],
+      settings: settingsSubStates.notEditing,
+    });
+    store.dispatch = jest.fn();
+
+    const component = mount(
+      <Provider store={store}>
+        <ConnectedApp />
+      </Provider>
+    );
+    expect(store.dispatch.mock.calls).to.have.length(1);
+    expect(store.dispatch.mock.calls[0]).to.have.length(1);
+    expect(store.dispatch.mock.calls[0][0]).to.have.property('type', 'begin check login');
+  });
+
+  it('renders loading screen if authenticated and no data', () => {
+    const metricsOptions = [
+      metricsSubStates.notSyncingNoData,
+      metricsSubStates.syncingNoData,
+    ];
+    metricsOptions.forEach((metricsOption) => {
+      const component = shallow(
+        <App
+          metrics={metricsOption}
+          authentication={authSubStates.authenticated} />
+      );
+      expect(component.find('LoadingScreen')).to.have.length(1);
+    });
+  });
+
+  it('renders loading screen if authenticating', () => {
+    const metricsOptions = [
+      metricsSubStates.notSyncingNoData,
+      metricsSubStates.syncingNoData,
+    ];
+    metricsOptions.forEach((metricsOption) => {
+      const component = shallow(
+        <App
+          metrics={metricsOption}
+          authentication={authSubStates.authenticated} />
+      );
+      expect(component.find('LoadingScreen')).to.have.length(1);
+    });
+  });
+
+  it('renders loading screen if not authenticated and not authenticating', () => {
+    const component = shallow(
+      <App
+        metrics={metricsSubStates.syncedMetricsWithEntries}
+        authentication={authSubStates.notAuthenicatedNotAuthenticating}
+        dispatch={() => null} />
+    );
+    expect(component.find('LoadingScreen')).to.have.length(1);
+  });
+
+  it('renders login screen if not authenticated and auth error', () => {
+    const component = shallow(
+      <App
+        metrics={metricsSubStates.syncedMetricsWithEntries}
+        authentication={authSubStates.withError}
+        dispatch={() => null} />
+    );
+    expect(component.find(LoginScreen)).to.have.length(1);
+  });
+
+  it('renders MainUI if authenticated and has data', () => {
+    const component = shallow(
+      <App
+        metrics={metricsSubStates.syncedMetricsWithEntries}
+        authentication={authSubStates.authenticated} />
+    );
+
+    expect(component.find('MainUI')).to.have.length(1);
   });
 });
