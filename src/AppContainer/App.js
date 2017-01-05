@@ -5,7 +5,7 @@ import AppHeader from './AppHeader';
 import AppFooter from './AppFooter';
 import LoadingScreen from '../components/LoadingScreen';
 import ErrorMessage from '../components/ErrorMessage';
-import LoginScreen from '../LoginScreen';
+import LoginScreen from '../components/LoginScreen';
 import { beginSyncData, beginCheckLogin } from '../actions';
 import { connect } from 'react-redux';
 import Modal from '../Modal';

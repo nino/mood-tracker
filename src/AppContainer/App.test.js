@@ -13,7 +13,7 @@ import {
 } from '../../test/SampleApplicationStates';
 
 import ConnectedApp, { App } from './App';
-import LoginScreen from '../LoginScreen';
+import LoginScreen from '../components/LoginScreen';
 
 const mockStore = configureMockStore();
 
