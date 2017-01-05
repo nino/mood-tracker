@@ -135,3 +135,180 @@ export const STATE_EDITING_METRIC1_NOT_MODIFIED = {
     isModified: false,
   },
 };
+
+export const authSubStates = {
+  authenticated: {
+    isAuthenticated: true,
+    isAuthenticating: false,
+    accessToken: 'abc',
+    hasError: false,
+    lastAuthenticated: 123,
+  },
+  authenticating: {
+    isAuthenticating: true,
+    isAuthenticated: false,
+    accessToken: null,
+    hasError: false,
+    lastAuthenticated: 123,
+  },
+  notAuthenicatedNotAuthenticating: {
+    isAuthenticating: false,
+    isAuthenticated: false,
+    accessToken: null,
+    hasError: false,
+    lastAuthenticated: 0,
+  },
+  withError: {
+    isAuthenticating: false,
+    isAuthenticated: false,
+    lastAuthenticated: null,
+    accessToken: null,
+    hasError: { error: 'Could not authenticate' },
+  },
+};
+
+export const metricsSubStates = {
+  notSyncingWithData: {
+    isSynced: false,
+    isSyncing: false,
+    hasError: false,
+    items: [MoodWithEntries, BurnsWithoutEntries],
+    lastSynced: 0,
+  },
+  notSyncingNoData: {
+    isSynced: false,
+    isSyncing: false,
+    hasError: false,
+    lastSynced: null,
+    items: null,
+  },
+  syncingNoData: {
+    isSynced: false,
+    isSyncing: true,
+    lastSynced: null,
+    items: null,
+    hasError: false,
+  },
+  syncingWithData: {
+    isSynced: false,
+    isSyncing: true,
+    lastSynced: 123,
+    items: [MoodWithEntries, BurnsWithoutEntries],
+    hasError: false,
+  },
+  syncedMetricsWithEntries: {
+    isSynced: true,
+    isSyncing: false,
+    lastSynced: 123,
+    items: [MoodWithEntries, BurnsWithEntries],
+    hasError: false,
+  },
+  syncedMetricsWithoutEntries: {
+    isSynced: true,
+    isSyncing: false,
+    lastSynced: 123,
+    items: [MoodWithoutEntries, BurnsWithoutEntries],
+    hasError: false,
+  },
+  withErrorWithData: {
+    isSynced: false,
+    isSyncing: false,
+    lastSynced: 123,
+    items: [MoodWithoutEntries, BurnsWithoutEntries],
+    hasError: { error: 'Sync error' },
+  },
+  withErrorNoData: {
+    isSynced: false,
+    isSyncing: false,
+    lastSynced: null,
+    items: null,
+    hasError: { error: 'Sync error' },
+  },
+};
+
+export const modalsSubStates = {
+  noModals: [],
+  oneModal: [{
+    title: 'Test modal',
+    message: '...',
+    userResponse: null,
+    actions: {
+      confirm: {
+        label: 'Yes',
+        action: { type: 'test confirm ' },
+      },
+      cancel: {
+        label: 'No',
+        action: { type: 'test cancel' },
+      },
+    },
+  }],
+  answeredYesNoNull: [
+    {
+      title: 'Test modal 1',
+      message: '...',
+      userResponse: 'confirm',
+      actions: {
+        confirm: {
+          label: 'Yes',
+          action: { type: 'test confirm ' },
+        },
+        cancel: {
+          label: 'No',
+          action: { type: 'test cancel' },
+        },
+      },
+    },
+    {
+      title: 'Test modal 2',
+      message: '...',
+      userResponse: 'cancel',
+      actions: {
+        confirm: {
+          label: 'Yes',
+          action: { type: 'test confirm ' },
+        },
+        cancel: {
+          label: 'No',
+          action: { type: 'test cancel' },
+        },
+      },
+    },
+    {
+      title: 'Test modal 3',
+      message: '...',
+      userResponse: null,
+      actions: {
+        confirm: {
+          label: 'Yes',
+          action: { type: 'test confirm ' },
+        },
+        cancel: {
+          label: 'No',
+          action: { type: 'test cancel' },
+        },
+      },
+    },
+  ],
+};
+
+export const settingsSubStates = {
+  notEditing: {
+    editedMetric: null,
+    isModified: false,
+  },
+  editingNotModified: {
+    editedMetric: {
+      id: 1,
+      props: MoodWithEntries.props,
+    },
+    isModified: false,
+  },
+  editingAndModified: {
+    editedMetric: {
+      id: 1,
+      props: MoodWithEntries.props,
+    },
+    isModified: true,
+  },
+};
