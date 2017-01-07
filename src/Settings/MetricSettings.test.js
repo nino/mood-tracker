@@ -1,210 +1,160 @@
+/* eslint-env jest */
+/* eslint-disable no-unused-expressions */
 import React from 'react';
-import ReactDOM from 'react-dom';
-import {shallow, mount} from 'enzyme';
-import {expect} from 'chai';
-import MetricSettings from './MetricSettings';
-import SampleMetricsWithEntries from '../../test/SampleMetricsWithEntries';
-import SampleMetricsCorruptData from '../../test/SampleMetricsCorruptData';
-import {cloneDeep} from 'lodash';
+import { shallow, mount } from 'enzyme';
+import { expect } from 'chai';
+import { MoodWithEntries } from '../../test/SampleMetrics';
 
+import { MetricSettings } from './MetricSettings';
+import ColorGroupsSettings from './ColorGroupsSettings';
 
 describe('MetricSettings', () => {
-  it('mounts without crashing', () => {
-    expect(mount(
-      <MetricSettings metric={SampleMetricsWithEntries[0]}
-        onAction={()=>null}/>
-    )).to.be.ok;
-  });
+  describe('sub-components', () => {
+    it('renders sub-components if editing', () => {
+      const component = shallow(
+        <MetricSettings metric={MoodWithEntries} dispatch={() => null} editing />);
 
-  describe('subcomponents when not editing', () => {
-    let component;
-    beforeAll(() => {
-      component = shallow(
-        <MetricSettings
-          metric={SampleMetricsWithEntries[0]}
-          editing={false} onAction={()=>null}/>
-      );
-    });
+      const nameField = component.find('.name-field');
+      expect(nameField, 'must render name field').to.have.length(1);
+      expect(nameField.first().props().disabled).to.not.be.ok;
 
-    it('contains a name field', () => {
-      expect(component.find('Input.name-field')).to.have.length(1);
-    });
-    it('contains a type field', () => {
-      expect(component.find('.type-field')).to.have.length(1);
-    });
-    it('contains a min field', () => {
-      expect(component.find('Input.minValue-field')).to.have.length(1);
-    });
-    it('contains a max field', () => {
-      expect(component.find('Input.maxValue-field')).to.have.length(1);
-    });
-    it('has a ColorGroupsSettings subcomponent', () => {
-      expect(component.find('ColorGroupsSettings')).to.have.length(1);
-    });
-    it('has a html form', () => {
-      expect(component.find('Form')).to.have.length(1);
-    });
-    it("doesn't have save button", () => {
-      expect(component.find('Button.save-button')).to.have.length(0);
-    });
-    it('renders all input fields as disabled if not editing', () => {
-      component.find('Input').forEach(inputField => {
-        expect(inputField)
-          .to.have.property('node')
-          .and.to.have.property('props')
-          .and.to.have.property('disabled', true);
-      });
-    });
-  });
+      const minValueField = component.find('.minValue-field');
+      expect(minValueField, 'must render minValue field').to.have.length(1);
+      expect(minValueField.first().props().disabled).to.not.be.ok;
 
-  describe('subcomponents when editing', () => {
-    let component;
-    let inputFields;
-    beforeAll(() => {
-      component = shallow(
-        <MetricSettings
-          metric={SampleMetricsWithEntries[0]}
-          editing={true} onAction={() => null}/>
-      );
-      inputFields = component.find('Input');
+      const maxValueField = component.find('.maxValue-field');
+      expect(maxValueField, 'must render maxValue field').to.have.length(1);
+      expect(maxValueField.first().props().disabled).to.not.be.ok;
+
+      const colorGroupsComponent = component.find(ColorGroupsSettings);
+      expect(colorGroupsComponent, 'must render ColorGroupsSettings').to.have.length(1);
+      expect(colorGroupsComponent.first().props().editing).to.be.ok;
+
+      expect(component.find('.move-metric-up-button'), 'must render move up button')
+        .to.have.length(1);
+      expect(component.find('.move-metric-down-button'), 'must render move down button')
+        .to.have.length(1);
+      expect(component.find('.update-metric-button'), 'must render save button')
+        .to.have.length(1);
+      expect(component.find('.stop-editing-button'), 'must render cancel button')
+        .to.have.length(1);
+      expect(component.find('.delete-metric-button'), 'must render delete metric button')
+        .to.have.length(1);
+      expect(component.find('.start-editing-button'), 'must not render edit metric button')
+        .to.have.length(0);
     });
 
-    it('renders all input fields as enabled', () => {
-      component.find('Input').forEach(inputField => {
-        expect(inputField)
-          .to.have.property('node')
-          .and.to.have.property('props')
-          .and.to.have.property('disabled', false);
-      });
-    });
+    it('renders subcomponents if not editing', () => {
+      const component = shallow(
+        <MetricSettings metric={MoodWithEntries} dispatch={() => null} />);
 
-    it('renders a Save button', () => {
-      expect(component.find('Button.save-button')).to.have.length(1);
-    });
+      const nameField = component.find('.name-field');
+      expect(nameField, 'must render name field').to.have.length(1);
+      expect(nameField.first().props().disabled).to.be.ok;
 
-    it('renders a Cancel button', () => {
-      expect(component.find('Button.cancel-button')).to.have.length(1);
-    });
+      const minValueField = component.find('.minValue-field');
+      expect(minValueField, 'must render minValue field').to.have.length(1);
+      expect(minValueField.first().props().disabled).to.be.ok;
 
-    it('renders a Delete button', () => {
-      expect(component.find('Button.delete-button')).to.have.length(1);
-    });
+      const maxValueField = component.find('.maxValue-field');
+      expect(maxValueField, 'must render maxValue field').to.have.length(1);
+      expect(maxValueField.first().props().disabled).to.be.ok;
 
-    it('renders Move Up and Move Down buttons', () => {
-      expect(component.find('Button.moveUp-button')).to.have.length(1);
-      expect(component.find('Button.moveDown-button')).to.have.length(1);
+      const colorGroupsComponent = component.find(ColorGroupsSettings);
+      expect(colorGroupsComponent, 'must render ColorGroupsSettings').to.have.length(1);
+      expect(colorGroupsComponent.first().props().editing).to.not.be.ok;
+
+      expect(component.find('.move-metric-up-button'), 'must not render move up button')
+        .to.have.length(0);
+      expect(component.find('.move-metric-down-button'), 'must not render move down button')
+        .to.have.length(0);
+      expect(component.find('.update-metric-button'), 'must not render save button')
+        .to.have.length(0);
+      expect(component.find('.stop-editing-button'), 'must not render cancel button')
+        .to.have.length(0);
+      expect(component.find('.delete-metric-button'), 'must not render delete metric button')
+        .to.have.length(0);
+      expect(component.find('.start-editing-button'), 'must render edit metric button')
+        .to.have.length(1);
     });
   });
 
   describe('actions', () => {
-    let component;
-    let cbAction;
-    let cbParams;
-    let callback = (action, params) => {
-      cbAction = action;
-      cbParams = params;
-    };
+    const dispatch = jest.fn();
+    const component = mount(
+      <MetricSettings metric={MoodWithEntries} editing dispatch={dispatch} />);
 
-    beforeEach(() => {
-      cbAction = null;
-      cbParams = null;
-      component = mount(
-        <MetricSettings
-          metric={SampleMetricsWithEntries[0]}
-          editing={true} onAction={callback}
-        />
-      );
+    it('dispatches "update edited metric" action on form field change', () => {
+      const inputs = component.find('input');
+      inputs.forEach((input) => {
+        const callsSoFar = dispatch.mock.calls.length;
+        input.simulate('change');
+        expect(dispatch.mock.calls.length).to.equal(callsSoFar + 1);
+        expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
+          .to.have.property('type', 'update edited metric');
+      });
     });
 
-    it('sends an "update metric" action', () => {
-      component.find('form').simulate('submit');
-      expect(cbAction).to.equal('update metric');
-      expect(cbParams).to.have.property('id').and.to.equal(1);
-      expect(cbParams.newProps).to.have.property('name', 'Mood');
-      // TODO improve this test case
-      // to include changing the input fields before submitting
-      expect(cbParams.newProps).to.have.property('minValue', 1);
+    it('dispatches "update edited metric" with colorGroups when updating color groups', () => {
+      const callsSoFar = dispatch.mock.calls.length;
+      component.find('.color-group-minValue-field').first().simulate('change');
+      expect(dispatch.mock.calls.length).to.equal(callsSoFar + 1);
+      expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
+        .to.have.property('type', 'update edited metric');
+      expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
+        .to.have.property('updatedProps')
+        .and.to.have.property('colorGroups').and.to.have.length(4);
     });
 
-    it('sends an "reorder metrics" action', () => {
-      let upButton = component.find('button.moveUp-button');
-      upButton.simulate('click');
-      expect(cbAction).to.equal('reorder metrics');
-      expect(cbParams).to.have.property('id').and.to.equal(1);
-      expect(cbParams).to.have.property('direction').and.to.equal('up');
+    it('dispatches "reorder metrics" on click on up and down buttons', () => {
+      const moveUpButton = component.find('.move-metric-up-button').first();
+      const moveDownButton = component.find('.move-metric-down-button').first();
+      const callsSoFar = dispatch.mock.calls.length;
+      moveUpButton.simulate('click');
+      expect(dispatch.mock.calls.length).to.equal(callsSoFar + 1);
+      expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
+        .to.have.property('type', 'reorder metrics');
+      expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
+        .to.have.property('direction', 'up');
+      expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
+        .to.have.property('metricId', 1);
+      moveDownButton.simulate('click');
+      expect(dispatch.mock.calls.length).to.equal(callsSoFar + 2);
+      expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
+        .to.have.property('type', 'reorder metrics');
+      expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
+        .to.have.property('direction', 'down');
+      expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
+        .to.have.property('metricId', 1);
     });
 
-    it('sends a "delete metric" action', () => {
-      let deleteButton = component.find('button.delete-button');
+    it('dispatches "delete metric" on click on delete button', () => {
+      const deleteButton = component.find('.delete-metric-button').first();
+      const callsSoFar = dispatch.mock.calls.length;
       deleteButton.simulate('click');
-      expect(cbAction).to.equal('delete metric');
-      expect(cbParams).to.have.property('id').and.to.equal(1);
+      expect(dispatch.mock.calls.length).to.equal(callsSoFar + 1);
+      expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
+        .to.have.property('type', 'delete metric');
+      expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
+        .to.have.property('metricId', 1);
     });
 
-    it('sends a "start editing" action', () => {
-      let cbAction, cbParams;
-      let callback = (action, params) => {
-        cbAction = action;
-        cbParams = params;
-      };
-      const component = mount(
-        <MetricSettings
-          metric={SampleMetricsWithEntries[0]}
-          editing={false}
-          onAction={callback}
-        />
-      );
-      component.simulate('click');
-      expect(cbAction).to.equal('start editing');
-      expect(cbParams).to.have.property('id').and.to.equal(1);
+    it('dispatches "stop editing" on click cancel', () => {
+      const cancelButton = component.find('.stop-editing-button').first();
+      const callsSoFar = dispatch.mock.calls.length;
+      cancelButton.simulate('click');
+      expect(dispatch.mock.calls.length).to.equal(callsSoFar + 1);
+      expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
+        .to.have.property('type', 'stop editing');
     });
 
-    describe('"update form element" action', () => {
-      let component, cbAction, cbParams;
-      const callback = (action, params) => {
-        cbAction = action;
-        cbParams = params;
-      };
-      beforeEach(() => {
-        cbAction = null;
-        cbParams = null;
-        component = mount(
-          <MetricSettings metric={SampleMetricsWithEntries[0]}
-            editing={true} onAction={callback} />
-        );
-      });
-      it('updates the name field', () => {
-        component.find('.name-field > input').simulate('change');
-        expect(cbAction).to.equal('update form element');
-        expect(cbParams).to.have.property('formId')
-          .and.to.equal('metric-settings-form-1');
-        expect(cbParams).to.have.property('name')
-          .and.to.equal('name');
-      });
-      it('updates the type field', () => {
-        component.find('.type-field > select').simulate('change');
-        expect(cbAction).to.equal('update form element');
-        expect(cbParams).to.have.property('formId')
-          .and.to.equal('metric-settings-form-1');
-        expect(cbParams).to.have.property('name')
-          .and.to.equal('type');
-      });
-      it('updates the minValue field', () => {
-        component.find('.minValue-field > input').simulate('change');
-        expect(cbAction).to.equal('update form element');
-        expect(cbParams).to.have.property('formId')
-          .and.to.equal('metric-settings-form-1');
-        expect(cbParams).to.have.property('name')
-          .and.to.equal('minValue');
-      });
-      it('updates the maxValue field', () => {
-        component.find('.maxValue-field > input').simulate('change');
-        expect(cbAction).to.equal('update form element');
-        expect(cbParams).to.have.property('formId')
-          .and.to.equal('metric-settings-form-1');
-        expect(cbParams).to.have.property('name')
-          .and.to.equal('maxValue');
-      });
+    it('dispatches "update metric" on click save', () => {
+      const saveButton = component.find('.update-metric-button').first();
+      const callsSoFar = dispatch.mock.calls.length;
+      saveButton.simulate('click');
+      expect(dispatch.mock.calls.length).to.equal(callsSoFar + 1);
+      expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
+        .to.have.property('type', 'update metric');
     });
   });
 });
