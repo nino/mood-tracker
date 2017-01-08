@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { metricShape } from '../types';
+import { colorGroupShape } from '../types';
 import {
+  startEditingMetric,
   updateEditedMetric,
   updateMetric,
   reorderMetrics,
@@ -39,7 +40,7 @@ export const MetricSettings = ({ metric, editing, dispatch }) => {
         </Button>
         <Button
           className="update-metric-button"
-          onClick={() => dispatch(updateMetric(metric.id, metric.props))}
+          onClick={() => dispatch(updateMetric(metric.id, metric.props, (new Date()).getTime()))}
         >
           Save
         </Button>
@@ -53,14 +54,19 @@ export const MetricSettings = ({ metric, editing, dispatch }) => {
           className="delete-metric-button"
           onClick={() => dispatch(deleteMetric(metric.id))}
         >
-          ✖️
+          ×
         </Button>
       </div>
     );
   } else {
     ButtonRow = (
       <div className="metric-settings-button-row">
-        <Button className="start-editing-button">Edit</Button>
+        <Button
+          className="start-editing-button"
+          onClick={() => dispatch(startEditingMetric(metric.id))}
+        >
+          Edit
+        </Button>
       </div>
     );
   }
@@ -73,23 +79,26 @@ export const MetricSettings = ({ metric, editing, dispatch }) => {
           name="name"
           className="name-field"
           disabled={!editing}
-          onChange={event => dispatch(updateEditedMetric({ name: event.target }))}
+          value={metric.props.name || ''}
+          onChange={event => dispatch(updateEditedMetric({ name: event.target.value }))}
         />
         <br />
-        <label htmlFor="minValue">Name</label>
+        <label htmlFor="minValue">Min</label>
         <input
           name="minValue"
           className="minValue-field"
           disabled={!editing}
-          onChange={event => dispatch(updateEditedMetric({ minValue: event.target }))}
+          value={metric.props.minValue || ''}
+          onChange={event => dispatch(updateEditedMetric({ minValue: event.target.value }))}
         />
         <br />
-        <label htmlFor="maxValue">Name</label>
+        <label htmlFor="maxValue">Max</label>
         <input
           name="maxValue"
           className="maxValue-field"
           disabled={!editing}
-          onChange={event => dispatch(updateEditedMetric({ maxValue: event.target }))}
+          value={metric.props.maxValue || ''}
+          onChange={event => dispatch(updateEditedMetric({ maxValue: event.target.value }))}
         />
         <br />
         <ColorGroupsSettings
@@ -108,7 +117,16 @@ MetricSettings.propTypes = {
   /**
    * A tracking metric must be provided.
    */
-  metric: metricShape.isRequired,
+  metric: React.PropTypes.shape({
+    id: React.PropTypes.number.isRequired,
+    props: React.PropTypes.shape({
+      name: React.PropTypes.string,
+      minValue: React.PropTypes.number,
+      maxValue: React.PropTypes.number,
+      type: React.PropTypes.string,
+      colorGroups: React.PropTypes.arrayOf(colorGroupShape).isRequired,
+    }).isRequired,
+  }).isRequired,
 
   /**
    * Setting this to true will enable the form fields

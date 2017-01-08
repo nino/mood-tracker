@@ -157,4 +157,15 @@ describe('MetricSettings', () => {
         .to.have.property('type', 'update metric');
     });
   });
+
+  describe('actions when not editing', () => {
+    it('starts editing when clicking the Edit button', () => {
+      const dispatch = jest.fn();
+      const component = mount(<MetricSettings metric={MoodWithEntries} dispatch={dispatch} />);
+      component.find('button').simulate('click');
+      expect(dispatch.mock.calls).to.have.length(1);
+      expect(dispatch.mock.calls[0][0]).to.have.property('type', 'start editing');
+      expect(dispatch.mock.calls[0][0]).to.have.property('metricId', 1);
+    });
+  });
 });
