@@ -46,7 +46,7 @@ describe('reducer', () => {
       const dateString = (new Date(12439)).toJSON();
       const newState = reducer(
         STATE_WITH_SOME_METRICS,
-        logMetric(1, 6, dateString),
+        logMetric(1, dateString, 6),
       );
       expect(newState).to.have.property('metrics')
         .and.to.have.property('items').and.to.have.length(2);
