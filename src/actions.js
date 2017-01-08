@@ -7,7 +7,7 @@ export function logMetric(metricId, date, value) {
   };
 };
 
-export function startEditingMetric(metricId, discard=false) {
+export function startEditingMetric(metricId, discard = false) {
   return {
     type: 'start editing',
     metricId,

@@ -1,5 +1,7 @@
-import { reducer } from './reducer';
+/* eslint-env jest */
+/* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
+import { reducer } from './reducer';
 import {
   INITIAL_STATE,
   STATE_WITH_SOME_METRICS,
@@ -9,7 +11,6 @@ import {
 } from '../test/SampleApplicationStates';
 import {
   MoodWithEntries,
-  MoodWithoutEntries,
   BurnsWithEntries,
   BurnsWithoutEntries,
 } from '../test/SampleMetrics';
@@ -119,7 +120,7 @@ describe('reducer', () => {
       expect(newState.modals[0].actions).to.have.property('cancel');
       expect(newState.modals[0].actions.cancel).to.have.property('action');
       expect(newState.modals[0].actions.cancel.action)
-        .to.eql({type: 'default action'});
+        .to.eql({ type: 'default action' });
       expect(newState.modals[0].actions.cancel).to.have.property('label');
       expect(newState.modals[0]).to.have.property('userResponse', null);
     });
@@ -625,7 +626,7 @@ describe('reducer', () => {
             maxValue: 4,
             color: 'red',
           },
-        ]}),
+        ] }),
       );
 
       expect(newState).to.have.property('settings').and.to.have.property('editedMetric')
@@ -879,7 +880,7 @@ describe('reducer', () => {
   });
 
   describe('success sync data', () => {
-    let data = [
+    const data = [
       { id: 1, props: DEFAULT_METRIC_PROPS, lastModified: 12, entries: [] },
       { id: 2, props: DEFAULT_METRIC_PROPS, lastModified: 132, entries: [] },
       { id: 3, props: DEFAULT_METRIC_PROPS, lastModified: 102, entries: [] },
