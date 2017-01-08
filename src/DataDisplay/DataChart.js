@@ -1,13 +1,19 @@
 import React from 'react';
-import { VictoryChart, VictoryLine } from 'victory';
+import { VictoryChart, VictoryLine, VictoryTheme, VictoryZoom } from 'victory';
 
 import { metricShape } from '../types';
 
 const DataChart = ({ metric }) => (
   <div className="data-chart-container">
-    <VictoryChart>
-      <VictoryLine data={metric.entries} x="date" y="value" />
-    </VictoryChart>
+    <VictoryZoom>
+      <VictoryChart theme={VictoryTheme.material} height={300}>
+        <VictoryLine
+          data={metric.entries}
+          x={datum => new Date(datum.date)}
+          y="value"
+        />
+      </VictoryChart>
+    </VictoryZoom>
   </div>
 );
 
