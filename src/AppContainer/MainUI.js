@@ -1,30 +1,17 @@
 import React from 'react';
-import {Divider} from 'semantic-ui-react';
 import DataDisplayContainer from '../DataDisplay/DataDisplayContainer';
 import DataEntryContainer from '../DataEntry/DataEntryContainer';
 import Settings from '../Settings/Settings';
-import './MainUI.css';
+import Divider from '../components/Divider';
 
-const MainUI = ({appState, onAction}) => (
-  <div className='ui container'>
-    <DataEntryContainer
-      onAction={onAction}
-      metrics={appState.metrics}/>
+const MainUI = () => (
+  <div>
+    <DataEntryContainer />
     <Divider />
-    <DataDisplayContainer
-      metrics={appState.metrics}/>
+    <DataDisplayContainer />
     <Divider />
-    <Settings
-      onAction={onAction}
-      metrics={appState.metrics}
-      editing={appState.editing}/>
+    <Settings />
   </div>
 );
-
-
-MainUI.propTypes = {
-  appState: React.PropTypes.object.isRequired,
-  onAction: React.PropTypes.func.isRequired,
-};
 
 export default MainUI;
