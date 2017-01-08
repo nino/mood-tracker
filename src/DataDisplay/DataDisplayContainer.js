@@ -1,36 +1,23 @@
-import React, {Component} from 'react';
+import React from 'react';
+import { connect } from 'react-redux';
+import { metricShape } from '../types';
+
 import DataChart from './DataChart';
 
-class DataDisplayContainer extends Component {
-  createGraphs() {
-    const { metrics } = this.props;
-    const containers = metrics.map((metric) => (
-      <div key={metric.id}>
-        <DataChart metric={metric} />
-      </div>
-    ));
-    return (
-      <div>
-        {containers}
-      </div>
-    );
+export const DataDisplayContainer = ({ metrics }) => {
+  if (!metrics || metrics.length === 0) {
+    return <div>There are no metrics yet.</div>;
   }
 
-  render() {
-    if (this.props.metrics.length > 0) {
-      return this.createGraphs();
-    }
-    else {
-      return (
-        <div>No metrics found.</div>
-      );
-    }
-  }
-}
-
-
-DataDisplayContainer.propTypes = {
-  metrics: React.PropTypes.array.isRequired,
+  return (
+    <div className="data-display-container">
+      {metrics.map(metric => <DataChart metric={metric} key={metric.id} />)}
+    </div>
+  );
 };
 
-export default DataDisplayContainer;
+DataDisplayContainer.propTypes = { metrics: React.PropTypes.arrayOf(metricShape) };
+
+const stateToProps = state => ({ metrics: state.metrics.items });
+
+export default connect(stateToProps)(DataDisplayContainer);

@@ -1,25 +1,33 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import DataDisplayContainer from './DataDisplayContainer';
-import {expect} from 'chai';
-import {shallow} from 'enzyme';
-import SampleMetricsEmpty from '../../test/SampleMetricsEmpty';
-import SampleMetricsWithEntries from '../../test/SampleMetricsWithEntries';
-import SampleMetricsWithoutEntries from '../../test/SampleMetricsWithoutEntries';
-import SampleMetricsCorruptData from '../../test/SampleMetricsCorruptData';
+import { expect } from 'chai';
+import { shallow } from 'enzyme';
+import {
+  MoodWithEntries,
+  MoodWithoutEntries,
+  BurnsWithEntries,
+  BurnsWithoutEntries,
+} from '../../test/SampleMetrics.js'
+
+import { DataDisplayContainer } from './DataDisplayContainer';
+import DataChart from './DataChart';
 
 describe('DataDisplayContainer', () => {
   it('shows a message if no metrics exist yet', () => {
     const component = shallow(
-      <DataDisplayContainer metrics={SampleMetricsEmpty} />
+      <DataDisplayContainer metrics={[]} />
     );
-    expect(component.text()).to.equal('No metrics found.');
+    expect(component.text()).to.include('yet');
   });
 
   it('renders graphs if data is provided', () => {
     const component = shallow(
-      <DataDisplayContainer metrics={SampleMetricsWithEntries} />
+      <DataDisplayContainer metrics={[MoodWithEntries, BurnsWithoutEntries]} />
     );
-    expect(component.children().nodes).to.have.length(2);
+    expect(component.find(DataChart)).to.have.length(2);
+  });
+
+  it('shows a message if metrics is null', () => {
+    const component = shallow(<DataDisplayContainer />);
+    expect(component.text()).to.include('yet');
   });
 });

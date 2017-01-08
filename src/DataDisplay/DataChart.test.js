@@ -1,16 +1,16 @@
+/* eslint-env jest */
+/* eslint-disable no-unused-expressions */
 import React from 'react';
-import {shallow, render, mount} from 'enzyme';
-import {expect} from 'chai';
+import { shallow } from 'enzyme';
+import { expect } from 'chai';
+import { VictoryChart } from 'victory';
+import { MoodWithEntries } from '../../test/SampleMetrics';
+
 import DataChart from './DataChart';
-import SampleMetricsWithEntries from '../../test/SampleMetricsWithEntries';
-import SampleMetricsWithoutEntries from '../../test/SampleMetricsWithEntries';
-import SampleMetricsCorruptData from '../../test/SampleMetricsCorruptData';
 
 describe('DataChart', () => {
-  it('renders a canvas', () => {
-    const component = shallow(
-      <DataChart metric={SampleMetricsWithEntries[0]} />
-    );
-    expect(component.find('canvas')).to.have.length(1);
+  it('renders a VictoryChart', () => {
+    const component = shallow(<DataChart metric={MoodWithEntries} />);
+    expect(component.find(VictoryChart)).to.have.length(1);
   });
 });
