@@ -4,7 +4,11 @@ import Button from '../components/Button';
 const ButtonRow = ({ values, onClick }) => (
   <div className="metric-entry-button-row">
     {values.map(value => (
-      <Button key={value} onClick={() => onClick(value)}>
+      <Button
+        className="button-row-button"
+        key={value}
+        onClick={() => onClick(value)}
+      >
         {value}
       </Button>
     ))}

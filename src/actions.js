@@ -1,9 +1,9 @@
-export function logMetric(metricId, value, date) {
+export function logMetric(metricId, date, value) {
   return {
     type: 'log metric',
     metricId,
-    value,
     date,
+    value,
   };
 };
 

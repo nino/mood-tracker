@@ -12,7 +12,7 @@ const TextInput = ({ onSubmit }) => {
   return (
     <div className="metric-entry-text-input">
       <form onSubmit={handleSubmit}>
-        <input ref={(i) => { inputField = i; }} />
+        <input className="metric-entry-text-input" ref={(i) => { inputField = i; }} />
         <Button>Submit</Button>
       </form>
     </div>
