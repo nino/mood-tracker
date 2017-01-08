@@ -114,4 +114,8 @@ export function* watcherSaga() {
   yield takeEvery('request confirm modal', executeConfirmModal);
   yield takeEvery('request cancel modal', executeCancelModal);
   yield takeEvery('request logout', executeLogout);
+  yield takeEvery('log metric', syncData);
+  yield takeEvery('update metric', syncData);
+  yield takeEvery('delete metric', syncData);
+  yield takeEvery('reorder metrics', syncData);
 }
