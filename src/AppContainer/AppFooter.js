@@ -4,23 +4,30 @@ import Button from '../components/Button';
 import { requestLogout } from '../actions';
 
 const LogoutButton = ({ logoutClick }) => (
-  <button onClick={logoutClick} className='logout-button'>
+  <Button onClick={logoutClick} className="logout-button">
     Log out
-  </button>
+  </Button>
 );
 
+LogoutButton.propTypes = { logoutClick: React.PropTypes.func.isRequired };
+
 export const AppFooter = ({ loggedIn, logoutClick }) => (
-  <div className='app-footer'>
+  <div className="app-footer">
     <small>© 2016, Nino Annighöfer</small>
     {loggedIn ? <LogoutButton logoutClick={logoutClick} /> : <span />}
   </div>
 );
 
-const stateToProps = (state) => ({
+AppFooter.propTypes = {
+  logoutClick: React.PropTypes.func.isRequired,
+  loggedIn: React.PropTypes.bool.isRequired,
+};
+
+const stateToProps = state => ({
   loggedIn: state.authentication.isAuthenticated,
 });
 
-const dispatchToProps = (dispatch) => ({
+const dispatchToProps = dispatch => ({
   logoutClick: () => dispatch(requestLogout()),
 });
 

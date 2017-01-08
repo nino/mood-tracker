@@ -1,8 +1,9 @@
+/* global window localStorage */
 import { put, select, call } from 'redux-saga/effects';
 import { takeLatest, takeEvery } from 'redux-saga';
 import Dropbox from 'dropbox';
-import { DATA_FILE_PATH } from './constants';
 import queryString from 'query-string';
+import { DATA_FILE_PATH } from './constants';
 import {
   successCheckLogin,
   errorCheckLogin,
@@ -29,25 +30,22 @@ export function* syncData() {
   const authentication = yield select(getAuthentication);
   const accessToken = authentication.accessToken;
   /*
-  * We download the data from Dropbox,
-  * then we compare the metrics on the server with the metrics in the app state:
-  * - For metric props, we take the one with the newer `lastModified` entry.
-  * - For entries, we just merge the arrays, keeping them sorted by date.
-  */
+   * We download the data from Dropbox,
+   * then we compare the metrics on the server with the metrics in the app state:
+   * - For metric props, we take the one with the newer `lastModified` entry.
+   * - For entries, we just merge the arrays, keeping them sorted by date.
+   */
   if (!accessToken) {
     yield put(errorSyncData('Not authenticated'));
-    return;
-  }
-  else {
+  } else {
     const metricsFromStore = yield select(getMetricsItems);
-    const localMetrics = metricsFromStore ? metricsFromStore : [];
+    const localMetrics = metricsFromStore || [];
     const dbx = new Dropbox({ accessToken });
     const apiResponse = yield call(downloadFileAsJSON, dbx, DATA_FILE_PATH);
     if (!apiResponse.ok && apiResponse.error !== 'Error: File not found') {
       localStorage.metrics = localMetrics;
       yield put(errorSyncData(apiResponse.error));
-    }
-    else {
+    } else {
       const remoteMetrics = apiResponse.data ? apiResponse.data : [];
       const mergedMetrics = mergeMetrics(localMetrics.concat(remoteMetrics));
       localStorage.metrics = mergedMetrics;
@@ -55,12 +53,13 @@ export function* syncData() {
         uploadAsJSON,
         dbx,
         DATA_FILE_PATH,
-        mergedMetrics
+        mergedMetrics,
       );
       if (!uploadResponse.ok) {
         yield put(errorSyncData('Upload error'));
         return;
       }
+
       yield put(successSyncData(mergedMetrics, (new Date()).getTime()));
     }
   }
@@ -72,16 +71,14 @@ export function* checkLogin() {
   const localToken = localStorage.accessToken;
   // 2. Try URL hash -- URL hash overrules local storage.
   const hashToken = queryString.parse(window.location.hash).access_token;
-  const token = hashToken ? hashToken : localToken;
+  const token = hashToken || localToken;
   // 3.1. If we have a token, succeed.
   if (token) {
     localStorage.accessToken = token;
     window.location.hash = '';
     const lastAuthenticated = (new Date()).getTime();
     yield put(successCheckLogin(token, lastAuthenticated));
-  }
-  // 3.2. If we don't have a token, fail.
-  else {
+  } else { // 3.2. If we don't have a token, fail.
     yield put(errorCheckLogin('No token found'));
   }
 }
