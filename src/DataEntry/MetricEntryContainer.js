@@ -15,7 +15,7 @@ export const MetricEntryContainer = ({ metric, dispatch }) => {
 
   if (metric.props.maxValue - metric.props.minValue <= 12) {
     const values = [];
-    for (let i = metric.props.minValue; i < metric.props.maxValue; i += 1) {
+    for (let i = metric.props.minValue; i <= metric.props.maxValue; i += 1) {
       values.push(i);
     }
 

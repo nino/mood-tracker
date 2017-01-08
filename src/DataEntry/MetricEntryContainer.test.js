@@ -10,10 +10,12 @@ import ButtonRow from './ButtonRow';
 import TextInput from './TextInput';
 
 describe('MetricEntryContainer', () => {
-  it('renders a ButtonRow for 10 or less allowed values', () => {
+  it('renders a ButtonRow for 12 or less allowed values', () => {
     const component = shallow(
       <MetricEntryContainer metric={MoodWithEntries} dispatch={jest.fn()} />);
     expect(component.find(ButtonRow)).to.have.length(1);
+    expect(component.find(ButtonRow).first().props(), 'must give the ButtonRow exactly 10 values')
+      .to.have.property('values').and.to.have.length(10);
   });
 
   it('renders a TextInput for more than 10 allowed values', () => {
