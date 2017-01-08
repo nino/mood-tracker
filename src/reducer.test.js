@@ -909,8 +909,8 @@ describe('reducer', () => {
       expect(newState.metrics).to.have.property('isSynced', true);
     });
 
-    it('sets metrics.hasError to false', () => {
-      expect(newState.metrics).to.have.property('hasError', false);
+    it('sets metrics.error to null', () => {
+      expect(newState.metrics).to.have.property('error', null);
     });
   });
 
@@ -933,9 +933,9 @@ describe('reducer', () => {
         .and.to.have.property('isSynced', true);
     });
 
-    it('sets hasError to the error', () => {
+    it('sets error to the error', () => {
       expect(newState).to.have.property('metrics')
-        .and.to.have.property('hasError')
+        .and.to.have.property('error')
         .and.to.eql({ error: 'File not found' });
     });
 
@@ -1001,9 +1001,9 @@ describe('reducer', () => {
         .and.to.have.property('isAuthenticating', false);
     });
 
-    it('sets authentication.hasError to the error', () => {
+    it('sets authentication.error to the error', () => {
       expect(newState).to.have.property('authentication')
-        .and.to.have.property('hasError')
+        .and.to.have.property('error')
         .and.to.eql({ error: 'No network connection' });
     });
   });

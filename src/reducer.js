@@ -8,11 +8,11 @@ export const INITIAL_STATE = {
     isSynced: false,
     lastSynced: null,
     items: null,
-    hasError: false,
+    error: null,
   },
   authentication: {
     isAuthenticated: false,
-    hasError: false,
+    error: null,
     accessToken: null,
     lastAuthenticated: null,
     isAuthenticating: false,
@@ -85,7 +85,7 @@ export function reducer(state=INITIAL_STATE, action) {
           isAuthenticated: false,
           isAuthenticating: false,
           accessToken: null,
-          hasError: false,
+          error: null,
         },
       };
     case 'request sync':
@@ -100,7 +100,7 @@ function beginCheckLogin(state, action) {
     ...state,
     authentication: {
       isAuthenticating: true,
-      hasError: false,
+      error: null,
     },
   };
 }
@@ -113,7 +113,7 @@ function successCheckLogin(state, action) {
       isAuthenticated: true,
       lastAuthenticated: action.lastAuthenticated,
       accessToken: action.accessToken,
-      hasError: false,
+      error: null,
     },
   };
 }
@@ -123,7 +123,7 @@ function errorCheckLogin(state, action) {
     ...state,
     authentication: {
       isAuthenticating: false,
-      hasError: action.error,
+      error: action.error,
       isAuthenticated: false,
     },
   };
@@ -552,7 +552,7 @@ function successSyncData(state, action) {
       items: action.data,
       isSyncing: false,
       isSynced: true,
-      hasError: false,
+      error: null,
       lastSynced: action.lastSynced,
     },
   };
@@ -564,7 +564,7 @@ function errorSyncData(state, action) {
     ...state,
     metrics: {
       ...metrics,
-      hasError: action.error,
+      error: action.error,
       isSyncing: false,
     },
   };
