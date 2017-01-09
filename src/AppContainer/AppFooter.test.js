@@ -1,7 +1,10 @@
+/* eslint-env jest */
+/* eslint-disable no-unused-expressions */
+/* global wrapComponent */
 import React from 'react';
-import { AppFooter } from './AppFooter';
 import { expect } from 'chai';
-import { shallow, mount } from 'enzyme';
+import { mount } from 'enzyme';
+import { AppFooter } from './AppFooter';
 
 const ComponentWrapper = wrapComponent(AppFooter);
 
@@ -11,17 +14,17 @@ describe('AppFooter', () => {
       logoutClick: jest.fn(),
       loggedIn: true,
     };
-    const component = mount(
-      <ComponentWrapper {...props} />
-    );
+    const component = mount(<ComponentWrapper {...props} />);
     expect(component).to.be.ok;
   });
 
   it('renders a logout button if logged in', () => {
     const action = jest.fn();
     const component = mount(
-      <ComponentWrapper logoutClick={action} loggedIn={true} />
-    );
+      <ComponentWrapper
+        logoutClick={action}
+        loggedIn
+      />);
 
     const button = component.find('button.logout-button');
     expect(button).to.have.length(1);
@@ -32,8 +35,10 @@ describe('AppFooter', () => {
   it('does not render logout button if not logged in', () => {
     const action = jest.fn();
     const component = mount(
-      <ComponentWrapper logoutClick={action} loggedIn={false} />
-    );
+      <ComponentWrapper
+        logoutClick={action}
+        loggedIn={false}
+      />);
 
     const button = component.find('button.logout-button');
     expect(button).to.have.length(0);

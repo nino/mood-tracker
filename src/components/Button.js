@@ -23,17 +23,22 @@ const StyledButton = styled.button`
   }
 `;
 
-export default class Button extends React.Component {
-  handleClick(event) {
+const Button = (props) => {
+  function handleClick(event) {
     event.preventDefault();
-    this.props.onClick(event);
+    props.onClick(event);
   }
 
-  render() {
-    return (
-      <StyledButton {...this.props} onClick={this.handleClick.bind(this)}>
-        {this.props.children}
-      </StyledButton>
-    );
-  }
-}
+  return (
+    <StyledButton {...props} onClick={handleClick}>
+      {props.children}
+    </StyledButton>
+  );
+};
+
+Button.propTypes = {
+  onClick: React.PropTypes.func,
+  children: React.PropTypes.any, // eslint-disable-line react/forbid-prop-types
+};
+
+export default Button;

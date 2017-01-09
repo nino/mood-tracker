@@ -1,11 +1,11 @@
+/* eslint-env jest */
+/* eslint-disable no-unused-expressions */
+/* global Blob */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+
 import OldMetrics from '../test/SampleMetricsWithEntries';
-
 import { MoodWithEntries, BurnsWithEntries } from '../test/SampleMetrics';
-
 import {
   upgradeDataFormat,
   downloadFileAsJSON,
@@ -13,6 +13,9 @@ import {
   mergeMetrics,
   uploadAsJSON,
 } from './lib';
+
+chai.use(chaiAsPromised);
+const expect = chai.expect;
 
 describe('lib', () => {
   describe('upgradeDataFormat', () => {
@@ -220,28 +223,26 @@ describe('lib', () => {
   describe('downloadFileAsJSON()', () => {
     it('returns an object with {ok: true, data: {...}} if successful', () => {
       const dbxMock = {};
-      let filesListFolderCalled = false;
-      dbxMock.filesListFolder = (args) => {
-        filesListFolderCalled = true;
-        return new Promise((resolve, reject) => {
+      dbxMock.filesListFolder = () => (
+        new Promise((resolve) => {
           resolve({
             entries: [
               { name: 'file1' }, // we're looking for this one
               { name: 'file2' },
             ],
           });
-        });
-      };
-      dbxMock.filesDownload = (args) => {
-        return new Promise((resolve, reject) => {
+        })
+      );
+      dbxMock.filesDownload = () => (
+        new Promise((resolve) => {
           resolve({
             fileBlob: new Blob(
               ['[1, 2, 3]'],
-              {type : 'application/json'},
+              { type: 'application/json' },
             ),
           });
-        });
-      };
+        })
+      );
       const response = downloadFileAsJSON(dbxMock, 'file1');
       return Promise.all([
         expect(response).to.eventually.be.resolved,
@@ -251,28 +252,28 @@ describe('lib', () => {
 
     it('returns {ok: false, error: ...} if file not found', () => {
       const dbxMock = {};
-      let filesListFolderCalled = false;
-      dbxMock.filesListFolder = (args) => {
-        filesListFolderCalled = true;
-        return new Promise((resolve, reject) => {
+      dbxMock.filesListFolder = () => (
+        new Promise((resolve) => {
           resolve({
             entries: [
               { name: 'file1' },
               { name: 'file2' },
             ],
           });
-        });
-      };
-      dbxMock.filesDownload = (args) => {
-        return new Promise((resolve, reject) => {
+        })
+      );
+
+      dbxMock.filesDownload = () => (
+        new Promise((resolve) => {
           resolve({
             fileBlob: new Blob(
               ['[1, 2, 3]'],
-              {type : 'application/json'},
+              { type: 'application/json' },
             ),
           });
-        });
-      };
+        })
+      );
+
       const response = downloadFileAsJSON(dbxMock, 'file3');
       return Promise.all([
         expect(response).to.eventually.be.resolved,
@@ -282,23 +283,22 @@ describe('lib', () => {
 
     it('returns an object with {ok: false, error: ...} if download failed', () => {
       const dbxMock = {};
-      let filesListFolderCalled = false;
-      dbxMock.filesListFolder = (args) => {
-        filesListFolderCalled = true;
-        return new Promise((resolve, reject) => {
+      dbxMock.filesListFolder = () => (
+        new Promise((resolve) => {
           resolve({
             entries: [
               { name: 'file1' },
               { name: 'file2' },
             ],
           });
-        });
-      };
-      dbxMock.filesDownload = (args) => {
-        return new Promise((resolve, reject) => {
+        })
+      );
+
+      dbxMock.filesDownload = () => (
+        new Promise((resolve, reject) => {
           reject();
-        });
-      };
+        })
+      );
       const response = downloadFileAsJSON(dbxMock, 'file1');
       return Promise.all([
         expect(response).to.eventually.be.resolved,
@@ -308,16 +308,14 @@ describe('lib', () => {
   });
 
   describe('uploadAsJSON()', () => {
-    const dbxMock = {
-      filesUpload: jest.fn(),
-    };
+    const dbxMock = { filesUpload: jest.fn() };
     const dataMock = [MoodWithEntries, BurnsWithEntries];
 
     it('returns ok: true on success', () => {
       dbxMock.filesUpload.mockReturnValueOnce(
         new Promise((resolve) => {
           resolve({ server_modified: 2395, id: 'yes' });
-        })
+        }),
       );
       const response = uploadAsJSON(dbxMock, '/path', dataMock);
       return Promise.all([
@@ -330,7 +328,7 @@ describe('lib', () => {
       dbxMock.filesUpload.mockReturnValueOnce(
         new Promise((resolve, reject) => {
           reject({ error: 'something went wrong' });
-        })
+        }),
       );
       const response = uploadAsJSON(dbxMock, '/path', dataMock);
       return Promise.all([

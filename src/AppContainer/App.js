@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import './App.css';
 import MainUI from './MainUI';
 import AppHeader from './AppHeader';
@@ -7,7 +8,6 @@ import LoadingScreen from '../components/LoadingScreen';
 import ErrorMessage from '../components/ErrorMessage';
 import LoginScreen from '../components/LoginScreen';
 import { beginSyncData, beginCheckLogin } from '../actions';
-import { connect } from 'react-redux';
 import Modal from '../Modal';
 import ActivityIndicator from '../ActivityIndicator';
 import { stateShapes } from '../types';
