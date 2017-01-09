@@ -1,4 +1,6 @@
-let localStorageMock = {
+import React from 'react';
+
+const localStorageMock = {
   setItem: function(key, item) {
     this[key] = item;
   },
@@ -15,5 +17,16 @@ let localStorageMock = {
 let DropboxControllerMock = {
 };
 
+const wrapComponent = (Component) => (
+  class ComponentWrapper extends React.Component {
+    render() {
+      return (
+        <Component {...this.props}>{this.children}</Component>
+      );
+    }
+  }
+);
+
 global.localStorage = localStorageMock;
 global.DropboxController = DropboxControllerMock;
+global.wrapComponent = wrapComponent;

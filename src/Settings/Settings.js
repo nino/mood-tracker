@@ -1,41 +1,45 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import MetricSettings from './MetricSettings';
-import {Button} from 'semantic-ui-react';
+import Button from '../components/Button';
+import * as Actions from '../actions';
+import { metricShape, propsShape } from '../types';
 
 /**
  * Container for the settings UI elements.
  * The primary purpose of the settings is
  * to add, modify, and delete tracked metrics.
  */
-const Settings = ({metrics, editing, onAction}) => {
-  return (
-    <div className='ui settings'>
-      {metrics.map(metric => (editing && editing.id === metric.id ? (
-        <MetricSettings
-          key={metric.id}
-          metric={editing}
-          editing={true}
-          onAction={onAction}/>
-      ) : (
-        <MetricSettings
-          key={metric.id}
-          metric={metric}
-          editing={false}
-          onAction={onAction}/>
-      )))}
-      <Button
-        onClick={() => onAction('add metric')} 
-        id='add-metric-button' disabled={!!editing}>
-        Add metric
-      </Button>
-    </div>
-  );
-};
+export const Settings = ({ metrics, editedMetric, addMetric }) => (
+  <div className="settings">
+    {metrics.map((metric) => {
+      if (editedMetric && metric.id === editedMetric.id) {
+        return <MetricSettings key={metric.id} metric={editedMetric} editing />;
+      }
+      return <MetricSettings key={metric.id} metric={metric} />;
+    })}
+    <Button onClick={addMetric} id="add-metric-button" disabled={!!editedMetric}>
+      Add metric
+    </Button>
+  </div>
+);
 
 Settings.propTypes = {
-  metrics: React.PropTypes.array.isRequired,
-  editing: React.PropTypes.object,
-  onAction: React.PropTypes.func.isRequired,
+  metrics: React.PropTypes.arrayOf(metricShape),
+  editedMetric: React.PropTypes.shape({
+    id: React.PropTypes.number.isRequired,
+    props: propsShape,
+  }),
+  addMetric: React.PropTypes.func.isRequired,
 };
 
-export default Settings;
+const stateToProps = state => ({
+  metrics: state.metrics.items,
+  editedMetric: state.settings.editedMetric,
+});
+
+const dispatchToProps = dispatch => ({
+  addMetric: () => dispatch(Actions.addMetric()),
+});
+
+export default connect(stateToProps, dispatchToProps)(Settings);

@@ -1,26 +1,26 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { connect } from 'react-redux';
+import { metricShape } from '../types';
+
 import MetricEntryContainer from './MetricEntryContainer';
 
-class DataEntryContainer extends Component {
-  render() {
-    const { metrics } = this.props;
-    const entryComponents = metrics.map(metric => (
-      <MetricEntryContainer
-        onAction={this.props.onAction}
-        metric={metric}
-        key={metric.id} />
-    ));
-    return (
-      <div>
-        {entryComponents}
-      </div>
-    );
+export const DataEntryContainer = ({ metrics }) => {
+  if (!metrics || metrics.length === 0) {
+    return <div>There are no metrics yet.</div>;
   }
-}
-
-DataEntryContainer.propTypes = {
-  metrics: React.PropTypes.array.isRequired,
-  onAction: React.PropTypes.func.isRequired
+  return (
+    <div className="data-entry-container">
+      {metrics.map(metric => (
+        <MetricEntryContainer metric={metric} key={metric.id} />
+      ))}
+    </div>
+  );
 };
 
-export default DataEntryContainer;
+DataEntryContainer.propTypes = {
+  metrics: React.PropTypes.arrayOf(metricShape),
+};
+
+const stateToProps = state => ({ metrics: state.metrics.items });
+
+export default connect(stateToProps)(DataEntryContainer);

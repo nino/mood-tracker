@@ -1,7 +1,18 @@
-import React  from 'react';
-import { Input, Segment, Dropdown, Button, Form } from 'semantic-ui-react';
-import './MetricSettings.css';
+import React from 'react';
+import { connect } from 'react-redux';
+import { colorGroupShape } from '../types';
+import {
+  startEditingMetric,
+  updateEditedMetric,
+  updateMetric,
+  reorderMetrics,
+  stopEditing,
+  deleteMetric,
+} from '../actions';
+import Button from '../components/Button';
 import ColorGroupsSettings from './ColorGroupsSettings';
+
+import './MetricSettings.css';
 
 /**
  * Settings panel for a single metric, e.g. "Mood" or "Burns depression score".
@@ -10,110 +21,95 @@ import ColorGroupsSettings from './ColorGroupsSettings';
  * This can be changed by passing the prop editing=true.
  * Clicking the component should activate edit-mode.
  */
-const MetricSettings = ({metric, editing, onAction}) => {
-  const formId = 'metric-settings-form-' + metric.id;
-
-  const handleClickToEdit = (event) => {
-    if (!editing) {
-      event.preventDefault();
-      onAction('start editing', {id: metric.id});
-    }
-  };
-
-  const handleFormSubmit = (event) => {
-    event.preventDefault();
-    onAction('update metric', {
-      id: metric.id,
-      newProps: metric,
-    });
-  };
-
-  const handleChange = (event) => {
-    onAction('update form element', {
-      formId: formId,
-      name: event.target.name,
-      value: event.target.value,
-    });
-  };
+export const MetricSettings = ({ metric, editing, dispatch }) => {
+  let ButtonRow;
+  if (editing) {
+    ButtonRow = (
+      <div className="metric-settings-button-row">
+        <Button
+          className="move-metric-up-button"
+          onClick={() => dispatch(reorderMetrics(metric.id, 'up'))}
+        >
+          ▲
+        </Button>
+        <Button
+          className="move-metric-down-button"
+          onClick={() => dispatch(reorderMetrics(metric.id, 'down'))}
+        >
+          ▼
+        </Button>
+        <Button
+          className="update-metric-button"
+          onClick={() => dispatch(updateMetric(metric.id, metric.props, (new Date()).getTime()))}
+        >
+          Save
+        </Button>
+        <Button
+          className="stop-editing-button"
+          onClick={() => dispatch(stopEditing())}
+        >
+          Cancel
+        </Button>
+        <Button
+          className="delete-metric-button"
+          onClick={() => dispatch(deleteMetric(metric.id))}
+        >
+          ×
+        </Button>
+      </div>
+    );
+  } else {
+    ButtonRow = (
+      <div className="metric-settings-button-row">
+        <Button
+          className="start-editing-button"
+          onClick={() => dispatch(startEditingMetric(metric.id))}
+        >
+          Edit
+        </Button>
+      </div>
+    );
+  }
 
   return (
-    <Segment className='MetricSettings' onClick={handleClickToEdit}>
-      <Form
-        action='' onSubmit={handleFormSubmit}
-        className='metric-settings-form'
-        id={formId}>
-        <label htmlFor='name'>Name</label>
-        <Input  type='text' disabled={!editing}
-          name='name' className='name-field'
-          value={metric.name} onChange={handleChange}/>
-        <br/>
-
-        <label htmlFor='type'>Type</label>
-        <Dropdown selection  name='type'
-          className='type-field' placeholder='Choose a type'
+    <div className="metric-settings">
+      <form id={`metric-settings-form-${metric.id}`}>
+        <label htmlFor="name">Name</label>
+        <input
+          name="name"
+          className="name-field"
           disabled={!editing}
-          options={[{text: 'int',  value: 1}]}
-          onChange={handleChange}/>
+          value={metric.props.name || ''}
+          onChange={event => dispatch(updateEditedMetric({ name: event.target.value }))}
+        />
         <br />
-
-        <label htmlFor='minValue'>Range</label>
-        <Input  type='text' name='minValue'
-          value={metric.minValue} disabled={!editing}
-          className='minValue-field'
-          onChange={handleChange}/>
-        –
-        <Input  type='text' name='maxValue'
-          value={metric.maxValue} disabled={!editing}
-          className='maxValue-field'
-          onChange={handleChange}/>
-        <br/>
-
-        <ColorGroupsSettings onAction={onAction}
-          colorGroups={metric.colorGroups}
-          formId={formId}
-          editing={editing}/>
-        {editing ? (
-          <div>
-            <Button size='small' type='submit' className='save-button'>
-              Save
-            </Button>
-            <Button size='small' type='button' className='cancel-button'
-              onClick={() => onAction('stop editing')}>
-              Cancel
-            </Button>
-            <Button size='small' type='button' className='delete-button'
-              onClick={() => onAction('delete metric', {
-                id: metric.id
-              })}>
-              Delete
-            </Button>
-            <Button size='small' type='button' className='moveUp-button'
-              onClick={() => onAction('reorder metrics', {
-                id: metric.id,
-                direction: 'up'
-              })}>
-              ▲
-            </Button>
-            <Button size='small' type='button' className='moveDown-button'
-              onClick={() => onAction('reorder metrics', {
-                id: metric.id,
-                direction: 'down'
-              })}>
-              ▼
-            </Button>
-          </div>
-        ) : (
-          <div>
-            <Button size='small' type='button' className='edit-metric-button'
-              onClick={() => onAction('start editing', {
-                id: metric.id
-              })}>
-              Edit
-            </Button>
-          </div>
-        )}
-      </Form>
-    </Segment>
+        <label htmlFor="minValue">Min</label>
+        <input
+          name="minValue"
+          className="minValue-field"
+          disabled={!editing}
+          value={metric.props.minValue || ''}
+          onChange={event => dispatch(updateEditedMetric({ minValue: event.target.value }))}
+        />
+        <br />
+        <label htmlFor="maxValue">Max</label>
+        <input
+          name="maxValue"
+          className="maxValue-field"
+          disabled={!editing}
+          value={metric.props.maxValue || ''}
+          onChange={event => dispatch(updateEditedMetric({ maxValue: event.target.value }))}
+        />
+        <br />
+        <ColorGroupsSettings
+          colorGroups={metric.props.colorGroups}
+          editing={editing}
+          onUpdate={newProps => dispatch(updateEditedMetric(newProps))}
+        />
+        <br />
+        {ButtonRow}
+      </form>
+    </div>
   );
 };
 
@@ -121,7 +117,16 @@ MetricSettings.propTypes = {
   /**
    * A tracking metric must be provided.
    */
-  metric: React.PropTypes.object.isRequired,
+  metric: React.PropTypes.shape({
+    id: React.PropTypes.number.isRequired,
+    props: React.PropTypes.shape({
+      name: React.PropTypes.string,
+      minValue: React.PropTypes.number,
+      maxValue: React.PropTypes.number,
+      type: React.PropTypes.string,
+      colorGroups: React.PropTypes.arrayOf(colorGroupShape).isRequired,
+    }).isRequired,
+  }).isRequired,
 
   /**
    * Setting this to true will enable the form fields
@@ -133,8 +138,7 @@ MetricSettings.propTypes = {
   /**
    * Send action to parent.
    */
-  onAction: React.PropTypes.func.isRequired,
+  dispatch: React.PropTypes.func.isRequired,
 };
 
-export default MetricSettings;
-
+export default connect()(MetricSettings);

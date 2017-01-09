@@ -1,33 +1,41 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import AppFooter from './AppFooter';
-import {expect} from 'chai';
-import {shallow,mount} from 'enzyme';
+import { AppFooter } from './AppFooter';
+import { expect } from 'chai';
+import { shallow, mount } from 'enzyme';
+
+const ComponentWrapper = wrapComponent(AppFooter);
 
 describe('AppFooter', () => {
-  it('renders logout button if logged in', () => {
-    let callback = () => null;
-    const component = mount(
-      <AppFooter loggedIn={true} onAction={callback} />
-    );
-    expect(component.text()).to.include('Log out');
-  });
-
-  it('doesn\'t render a logout button if not logged in', () => {
-    const component = mount(<AppFooter />);
-    expect(component.text()).to.not.include('Log out');
-  });
-
-  it('calls the onAction function when logoutButton is clicked', () => {
-    let callbackCalled = false;
-    let callback = (action) => {
-      callbackCalled = true;
-      expect(action).to.equal('logoutClicked');
+  it('mounts without crashing', () => {
+    const props = {
+      logoutClick: jest.fn(),
+      loggedIn: true,
     };
     const component = mount(
-      <AppFooter loggedIn={true} onAction={callback} />
+      <ComponentWrapper {...props} />
     );
-    component.find('button').simulate('click');
-    expect(callbackCalled).to.be.ok;
+    expect(component).to.be.ok;
+  });
+
+  it('renders a logout button if logged in', () => {
+    const action = jest.fn();
+    const component = mount(
+      <ComponentWrapper logoutClick={action} loggedIn={true} />
+    );
+
+    const button = component.find('button.logout-button');
+    expect(button).to.have.length(1);
+    button.first().simulate('click');
+    expect(action.mock.calls).to.have.length(1);
+  });
+
+  it('does not render logout button if not logged in', () => {
+    const action = jest.fn();
+    const component = mount(
+      <ComponentWrapper logoutClick={action} loggedIn={false} />
+    );
+
+    const button = component.find('button.logout-button');
+    expect(button).to.have.length(0);
   });
 });
