@@ -1,5 +1,6 @@
+/* eslint-env jest */
+/* eslint-disable no-unused-expressions */
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import { expect } from 'chai';
@@ -8,7 +9,6 @@ import {
   INITIAL_STATE,
   authSubStates,
   metricsSubStates,
-  modalsSubStates,
   settingsSubStates,
 } from '../../test/SampleApplicationStates';
 
@@ -22,8 +22,11 @@ describe('App', () => {
     const dispatch = jest.fn();
     const { metrics, authentication } = INITIAL_STATE;
     const component = shallow(
-      <App dispatch={dispatch} metrics={metrics} authentication={authentication} />
-    );
+      <App
+        dispatch={dispatch}
+        metrics={metrics}
+        authentication={authentication}
+      />);
     expect(component).to.be.ok;
   });
 
@@ -41,11 +44,7 @@ describe('App', () => {
       });
       store.dispatch = jest.fn();
 
-      const component = mount(
-        <Provider store={store}>
-          <ConnectedApp />
-        </Provider>
-      );
+      mount(<Provider store={store}><ConnectedApp /></Provider>);
 
       expect(store.dispatch.mock.calls).to.have.length(1);
       expect(store.dispatch.mock.calls[0]).to.have.length(1);
@@ -62,11 +61,7 @@ describe('App', () => {
     });
     store.dispatch = jest.fn();
 
-    const component = mount(
-      <Provider store={store}>
-        <ConnectedApp />
-      </Provider>
-    );
+    mount(<Provider store={store}><ConnectedApp /></Provider>);
     expect(store.dispatch.mock.calls).to.have.length(1);
     expect(store.dispatch.mock.calls[0]).to.have.length(1);
     expect(store.dispatch.mock.calls[0][0]).to.have.property('type', 'begin check login');
@@ -81,8 +76,8 @@ describe('App', () => {
       const component = shallow(
         <App
           metrics={metricsOption}
-          authentication={authSubStates.authenticated} />
-      );
+          authentication={authSubStates.authenticated}
+        />);
       expect(component.find('LoadingScreen')).to.have.length(1);
     });
   });
@@ -96,8 +91,8 @@ describe('App', () => {
       const component = shallow(
         <App
           metrics={metricsOption}
-          authentication={authSubStates.authenticated} />
-      );
+          authentication={authSubStates.authenticated}
+        />);
       expect(component.find('LoadingScreen')).to.have.length(1);
     });
   });
@@ -107,8 +102,8 @@ describe('App', () => {
       <App
         metrics={metricsSubStates.syncedMetricsWithEntries}
         authentication={authSubStates.notAuthenicatedNotAuthenticating}
-        dispatch={() => null} />
-    );
+        dispatch={() => null}
+      />);
     expect(component.find('LoadingScreen')).to.have.length(1);
   });
 
@@ -117,8 +112,8 @@ describe('App', () => {
       <App
         metrics={metricsSubStates.syncedMetricsWithEntries}
         authentication={authSubStates.withError}
-        dispatch={() => null} />
-    );
+        dispatch={() => null}
+      />);
     expect(component.find(LoginScreen)).to.have.length(1);
   });
 
@@ -126,8 +121,8 @@ describe('App', () => {
     const component = shallow(
       <App
         metrics={metricsSubStates.syncedMetricsWithEntries}
-        authentication={authSubStates.authenticated} />
-    );
+        authentication={authSubStates.authenticated}
+      />);
 
     expect(component.find('MainUI')).to.have.length(1);
   });

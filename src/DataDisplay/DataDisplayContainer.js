@@ -16,7 +16,9 @@ export const DataDisplayContainer = ({ metrics }) => {
   );
 };
 
-DataDisplayContainer.propTypes = { metrics: React.PropTypes.arrayOf(metricShape) };
+DataDisplayContainer.propTypes = {
+  metrics: React.PropTypes.arrayOf(metricShape),
+};
 
 const stateToProps = state => ({ metrics: state.metrics.items });
 

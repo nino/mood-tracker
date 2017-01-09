@@ -1,7 +1,10 @@
+/* eslint-env jest */
+/* eslint-disable no-unused-expressions */
 import React from 'react';
-import { ActivityIndicator } from '../ActivityIndicator';
 import { shallow } from 'enzyme';
 import { expect } from 'chai';
+
+import { ActivityIndicator } from '../ActivityIndicator';
 
 describe('ActivityIndicator', () => {
   it('renders a string if syncing', () => {

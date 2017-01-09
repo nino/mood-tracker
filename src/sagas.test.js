@@ -1,3 +1,5 @@
+/* eslint-env jest */
+/* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import {
   syncData,
@@ -7,19 +9,15 @@ import {
   executeLogout,
 } from './sagas';
 import {
-  INITIAL_STATE,
   STATE_WITH_SOME_METRICS,
 } from '../test/SampleApplicationStates';
 import {
   MoodWithEntries,
-  MoodWithoutEntries,
   BurnsWithoutEntries,
   BurnsWithEntries,
 } from '../test/SampleMetrics';
 import { DATA_FILE_PATH } from './constants';
-import { areMetricsUpgraded, isValidMetricsArray } from './lib';
-import Dropbox from 'dropbox';
-import { getAuthentication, getMetricsItems } from './selectors';
+import { isValidMetricsArray } from './lib';
 
 const authAuthenticated = {
   isAuthenticated: true,
@@ -31,7 +29,7 @@ describe('check login saga', () => {
   it('uses the accessToken from localStorage to authenticate', () => {
     global.localStorage = { accessToken: 'abc' };
     const generator = checkLogin();
-    let next = generator.next();
+    const next = generator.next();
     expect(next.value).to.have.property('PUT').and.to.have.property('action')
       .and.to.have.property('type', 'success check login');
     expect(next.value.PUT.action).to.have.property('accessToken', 'abc');
@@ -43,7 +41,7 @@ describe('check login saga', () => {
     global.localStorage = { };
     global.window.location.hash = '#access_token=abc2';
     const generator = checkLogin();
-    let next = generator.next();
+    const next = generator.next();
     expect(next.value).to.have.property('PUT').and.to.have.property('action')
       .and.to.have.property('type', 'success check login');
     expect(next.value.PUT.action).to.have.property('accessToken', 'abc2');
@@ -55,7 +53,7 @@ describe('check login saga', () => {
     global.localStorage = { accessToken: 'abcLocal' };
     global.window.location.hash = '#access_token=abcHash';
     const generator = checkLogin();
-    let next = generator.next();
+    const next = generator.next();
     expect(next.value).to.have.property('PUT').and.to.have.property('action')
       .and.to.have.property('type', 'success check login');
     expect(next.value.PUT.action).to.have.property('accessToken', 'abcHash');
@@ -67,7 +65,7 @@ describe('check login saga', () => {
     global.localStorage = {};
     global.window.location.hash = null;
     const generator = checkLogin();
-    let next = generator.next();
+    const next = generator.next();
     expect(next.value).to.have.property('PUT').and.to.have.property('action')
       .and.to.have.property('type', 'error check login');
     expect(generator.next()).to.have.property('done', true);
@@ -107,17 +105,17 @@ describe('sync data saga', () => {
     const responseMock = {
       ok: true,
       data: [
-      {
-        id: STATE_WITH_SOME_METRICS.metrics.items[0].id,
-        props: STATE_WITH_SOME_METRICS.metrics.items[0].props,
-        entries: STATE_WITH_SOME_METRICS.metrics.items[0].entries.slice(0,6),
-      },
-      {
-        id: STATE_WITH_SOME_METRICS.metrics.items[1].id,
-        props: STATE_WITH_SOME_METRICS.metrics.items[1].props,
-        entries: STATE_WITH_SOME_METRICS.metrics.items[1].entries,
-      },
-    ]
+        {
+          id: STATE_WITH_SOME_METRICS.metrics.items[0].id,
+          props: STATE_WITH_SOME_METRICS.metrics.items[0].props,
+          entries: STATE_WITH_SOME_METRICS.metrics.items[0].entries.slice(0, 6),
+        },
+        {
+          id: STATE_WITH_SOME_METRICS.metrics.items[1].id,
+          props: STATE_WITH_SOME_METRICS.metrics.items[1].props,
+          entries: STATE_WITH_SOME_METRICS.metrics.items[1].entries,
+        },
+      ],
     };
     next = generator.next(responseMock);
 
@@ -129,7 +127,7 @@ describe('sync data saga', () => {
     expect(
       isValidMetricsArray(next.value.CALL.args[2]),
       'uploaded metric needs to be valid',
-    ).to.be.ok
+    ).to.be.ok;
     next = generator.next({ ok: true });
 
     expect(global.localStorage, 'localStorage must have metrics')
@@ -218,19 +216,19 @@ describe('sync data saga', () => {
     };
     const localMetricsMock = null;
     const remoteMetricsMock = [
-        {
-          id: 233,
-          props: {
-            name: 'A cool metric',
-            minValue: 1,
-            maxValue: 10,
-            type: 'int',
-            colorGroups: [],
-          },
-          lastModified: 1482133305530,
-          entries: [],
+      {
+        id: 233,
+        props: {
+          name: 'A cool metric',
+          minValue: 1,
+          maxValue: 10,
+          type: 'int',
+          colorGroups: [],
         },
-      ]
+        lastModified: 1482133305530,
+        entries: [],
+      },
+    ];
     const downloadMock = {
       ok: true,
       data: remoteMetricsMock,
@@ -334,7 +332,7 @@ describe('sync data saga', () => {
           ],
         },
         BurnsWithEntries,
-      ]};
+      ] };
     next = generator.next(downloadMock);
 
     // update localstorage with merged metrics
@@ -407,7 +405,7 @@ describe('sync data saga', () => {
           },
           entries: [],
         },
-      ]};
+      ] };
 
     // fetch local metrics items -- metrics present
     expect(next, 'must fetch metrics items from store')
@@ -430,7 +428,7 @@ describe('sync data saga', () => {
     expect(next, 'must request upload').to.have.property('value')
       .and.to.have.property('CALL')
       .and.to.have.property('args').and.to.have.length(3);
-    expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH)
+    expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH);
     expect(next.value.CALL.args[2]).to.be.a('array');
     next = generator.next({ ok: true });
 
@@ -472,7 +470,7 @@ describe('sync data saga', () => {
           },
           entries: [],
         },
-      ]};
+      ] };
     const localMetricsMock = [
       {
         id: 123,
@@ -554,28 +552,8 @@ describe('sync data saga', () => {
             },
           ],
         },
-      ]};
+      ] };
 
-    const upgradedMetrics = [
-      {
-        id: 123,
-        lastModified: 1234,
-        props: {
-          name: 'Metric!',
-          minValue: 1,
-          maxValue: 10,
-          type: 'int',
-          colorGroups: [
-            {
-              minValue: 1,
-              maxValue: 3,
-              color: 'green',
-            },
-          ],
-        },
-        entries: [],
-      },
-    ];
     const localMetricsMock = null;
 
     // fetch local metrics items -- no metrics
@@ -604,7 +582,7 @@ describe('sync data saga', () => {
       .and.to.have.property('CALL')
       .and.to.have.property('args').and.to.have.length(3);
     expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH);
-    expect(next.value.CALL.args[2]).to.be.a('array')
+    expect(next.value.CALL.args[2]).to.be.a('array');
     next = generator.next({ ok: true });
 
     // put success with remote metrics
@@ -682,7 +660,7 @@ describe('sync data saga', () => {
       expect(next, 'must request upload').to.have.property('value')
         .and.to.have.property('CALL')
         .and.to.have.property('args').and.to.have.length(3);
-      expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH)
+      expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH);
       next = generator.next({ ok: false, error: 'Upload error' });
 
       // check that local storage is updated
@@ -720,7 +698,7 @@ describe('executeConfirmModal', () => {
       title: 'the second modal',
       message: 'this one dosent matter',
       actions: {
-        confirm: { 
+        confirm: {
           action: { type: 'some evil action' },
           label: 'don\'t do this one',
         },
@@ -782,7 +760,7 @@ describe('executeCancelModal', () => {
       title: 'the second modal',
       message: 'this one dosent matter',
       actions: {
-        confirm: { 
+        confirm: {
           action: { type: 'some evil action' },
           label: 'don\'t do this one',
         },
@@ -825,7 +803,7 @@ describe('executeCancelModal', () => {
 describe('executeLogout', () => {
   it('deletes the accessToken from localStorage', () => {
     const generator = executeLogout();
-    let next = generator.next();
+    generator.next();
 
     expect(global.localStorage).not.to.have.property('accessToken');
     expect(generator.next()).to.have.property('done', true);
@@ -833,7 +811,7 @@ describe('executeLogout', () => {
 
   it('PUTs success logout action', () => {
     const generator = executeLogout();
-    let next = generator.next();
+    const next = generator.next();
 
     expect(next).to.have.property('value')
       .and.to.have.property('PUT')

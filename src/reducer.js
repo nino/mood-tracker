@@ -87,10 +87,8 @@ function startEditingMetric(state, action) {
 
   const newModal = {
     title: 'Discard changes?',
-    message: 'There are unsaved changes in the metric '
-    + editedMetric.props.name
-    + '. Do you wish to discard them and start editing '
-    + items[index].props.name + '?',
+    message: (`There are unsaved changes in the metric ${editedMetric.props.name}`
+      + `. Do you wish to discard them and start editing ${items[index].props.name}?`),
     userResponse: null,
     actions: {
       confirm: {
@@ -98,7 +96,7 @@ function startEditingMetric(state, action) {
         action: Actions.startEditingMetric(metricId, true),
       },
       cancel: {
-        label: 'Continue editing ' + editedMetric.props.name,
+        label: `Continue editing ${editedMetric.props.name}`,
         action: { type: 'default action' },
       },
     },
@@ -188,9 +186,8 @@ function stopEditing(state, action) {
     ...state,
     modals: modals.concat({
       title: 'Discard changes?',
-      message: ('There are unsaved changes in "' +
-        editedMetric.props.name + '". ' +
-        'Do you wish to discard them?'),
+      message: (`There are unsaved changes in "${editedMetric.props.name}".`
+        + 'Do you wish to discard them?'),
       userResponse: null,
       actions: {
         confirm: {
@@ -227,9 +224,8 @@ function addMetric(state, action) {
   } else if (editedMetric && isModified && !discard) {
     const newModal = {
       title: 'Discard changes?',
-      message: ('There are unsaved changes in "' +
-        editedMetric.props.name + '". ' +
-        'Do you wish to discard them and create a new metric?'),
+      message: (`There are unsaved changes in "${editedMetric.props.name}". `
+        + 'Do you wish to discard them and create a new metric?'),
       userResponse: null,
       actions: {
         confirm: {
@@ -321,12 +317,11 @@ function deleteMetric(state, action) {
   } else if (!confirm) {
     const newModal = {
       title: 'Delete metric?',
-      message: ('Are you sure you wish to delete "' +
-        items[index].props.name + '"?'),
+      message: `Are you sure you wish to delete "${items[index].props.name}"?`,
       userResponse: null,
       actions: {
         confirm: {
-          label: 'Delete "' + items[index].props.name + '"',
+          label: `Delete "${items[index].props.name}"`,
           action: Actions.deleteMetric(metricId, true),
         },
         cancel: {

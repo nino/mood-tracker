@@ -5,7 +5,7 @@ export function logMetric(metricId, date, value) {
     date,
     value,
   };
-};
+}
 
 export function startEditingMetric(metricId, discard = false) {
   return {
@@ -13,7 +13,7 @@ export function startEditingMetric(metricId, discard = false) {
     metricId,
     discard,
   };
-};
+}
 
 export function updateMetric(metricId, newProps, lastModified) {
   return {
@@ -22,21 +22,21 @@ export function updateMetric(metricId, newProps, lastModified) {
     newProps,
     lastModified,
   };
-};
+}
 
-export function stopEditing(discard=false) {
+export function stopEditing(discard = false) {
   return {
     type: 'stop editing',
     discard,
   };
-};
+}
 
-export function addMetric(discard=false) {
+export function addMetric(discard = false) {
   return {
     type: 'add metric',
     discard,
   };
-};
+}
 
 export function reorderMetrics(metricId, direction) {
   return {
@@ -44,34 +44,34 @@ export function reorderMetrics(metricId, direction) {
     metricId,
     direction,
   };
-};
+}
 
-export function deleteMetric(metricId, confirm=false) {
+export function deleteMetric(metricId, confirm = false) {
   return {
     type: 'delete metric',
     metricId,
     confirm,
   };
-};
+}
 
 export function updateEditedMetric(updatedProps) {
   return {
     type: 'update edited metric',
     updatedProps,
   };
-};
+}
 
 export function requestConfirmModal() {
   return {
     type: 'request confirm modal',
   };
-};
+}
 
 export function requestCancelModal() {
   return {
     type: 'request cancel modal',
   };
-};
+}
 
 export function successConfirmModal() {
   return {
@@ -101,7 +101,7 @@ export function beginSyncData() {
   return {
     type: 'begin sync data',
   };
-};
+}
 
 export function successSyncData(data, lastSynced) {
   return {
@@ -109,20 +109,20 @@ export function successSyncData(data, lastSynced) {
     data,
     lastSynced,
   };
-};
+}
 
 export function errorSyncData(error) {
   return {
     type: 'error sync data',
     error,
   };
-};
+}
 
 export function beginCheckLogin() {
   return {
     type: 'begin check login',
   };
-};
+}
 
 export function successCheckLogin(accessToken, lastAuthenticated) {
   return {
@@ -130,14 +130,14 @@ export function successCheckLogin(accessToken, lastAuthenticated) {
     accessToken,
     lastAuthenticated,
   };
-};
+}
 
 export function errorCheckLogin(error) {
   return {
     type: 'error check login',
     error,
   };
-};
+}
 
 export function requestLogout() {
   return {

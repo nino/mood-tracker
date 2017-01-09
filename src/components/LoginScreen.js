@@ -1,7 +1,8 @@
+/* global window */
 import React from 'react';
+import Dropbox from 'dropbox';
 import Button from './Button';
 import Wrapper from './HeroWrapper';
-import Dropbox from 'dropbox';
 import { CLIENT_ID } from '../constants';
 
 function dropboxAuthRedirect() {
@@ -16,6 +17,6 @@ export const LoginScreen = () => (
       Log in using Dropbox
     </Button>
   </Wrapper>
-)
+);
 
 export default LoginScreen;
