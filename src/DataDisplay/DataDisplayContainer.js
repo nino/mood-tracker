@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { metricShape } from '../types';
+import './DataDisplayContainer.css';
 
 import DataChart from './DataChart';
 

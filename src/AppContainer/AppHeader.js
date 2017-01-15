@@ -1,6 +1,6 @@
 import React from 'react';
 import './AppHeader.css';
 
-const AppHeader = () => (<div id="app-header">Mood Tracking App</div>);
+const AppHeader = () => (<h3 id="app-header">Mood Tracking App</h3>);
 
 export default AppHeader;

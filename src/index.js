@@ -6,6 +6,8 @@ import { Provider } from 'react-redux';
 import createSagaMiddleware from 'redux-saga';
 import App from './AppContainer/App';
 import './index.css';
+import '../node_modules/normalize.css/normalize.css';
+import '../node_modules/@blueprintjs/core/dist/blueprint.css';
 import { watcherSaga } from './sagas';
 import { reducer } from './reducer';
 

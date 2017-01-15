@@ -1,0 +1,7 @@
+.data-display-container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  flex-shrink: 1;
+  justify-content: center;
+}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Button, Dialog, Intent } from '@blueprintjs/core';
 import { modalShape } from '../types';
-import Button from '../components/Button';
 import { requestConfirmModal, requestCancelModal } from '../actions';
 
 export const Modal = ({ modals, dispatch }) => {
@@ -11,20 +11,28 @@ export const Modal = ({ modals, dispatch }) => {
 
   const modal = modals[0];
   return (
-    <div className="modal-container">
-      <div className="modal-window">
-        <div className="modal-title">{modal.title}</div>
-        <div className="modal-message">{modal.message}</div>
-        <div className="modal-buttons">
-          <Button className="confirm-modal-button" onClick={() => dispatch(requestConfirmModal())}>
-            {modal.actions.confirm.label}
-          </Button>
-          <Button className="cancel-modal-button" onClick={() => dispatch(requestCancelModal())}>
+    <Dialog isOpen title={modal.title}>
+      <div className="pt-dialog-body">
+        {modal.message}
+      </div>
+      <div className="pt-dialog-footer">
+        <div className="pt-dialog-footer-actions">
+          <Button
+            className="cancel-modal-button"
+            onClick={() => dispatch(requestCancelModal())}
+          >
             {modal.actions.cancel.label}
+          </Button>
+          <Button
+            intent={Intent.PRIMARY}
+            className="confirm-modal-button"
+            onClick={() => dispatch(requestConfirmModal())}
+          >
+            {modal.actions.confirm.label}
           </Button>
         </div>
       </div>
-    </div>
+    </Dialog>
   );
 };
 
