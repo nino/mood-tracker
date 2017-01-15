@@ -5,7 +5,7 @@ import Settings from '../Settings/Settings';
 import Divider from '../components/Divider';
 
 const MainUI = () => (
-  <div>
+  <div style={{ padding: '10px' }}>
     <DataEntryContainer />
     <Divider />
     <DataDisplayContainer />

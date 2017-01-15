@@ -1,8 +1,3 @@
-import styled from 'styled-components';
+import React from 'react';
 
-const Divider = styled.hr`
-  width: 80%;
-  border-color: #ccc;
-`;
-
-export default Divider;
+export default () => <hr />;

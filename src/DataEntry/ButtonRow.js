@@ -1,12 +1,15 @@
 import React from 'react';
-import Button from '../components/Button';
+import { Button } from '@blueprintjs/core';
 
-const ButtonRow = ({ values, onClick }) => (
-  <div className="metric-entry-button-row">
-    {values.map(value => (
+const ButtonRow = ({ values, colors, onClick }) => (
+  <div className="pt-button-group pt-fill" style={{ position: 'relative', maxWidth: '100%' }}>
+    {values.map((value, idx) => (
       <Button
         className="button-row-button"
-        key={value}
+        key={idx}
+        style={{
+          color: colors[idx] || 'black',
+        }}
         onClick={() => onClick(value)}
       >
         {value}
@@ -17,6 +20,7 @@ const ButtonRow = ({ values, onClick }) => (
 
 ButtonRow.propTypes = {
   values: React.PropTypes.arrayOf(React.PropTypes.number).isRequired,
+  colors: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
   onClick: React.PropTypes.func.isRequired,
 };
 

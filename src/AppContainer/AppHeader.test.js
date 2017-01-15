@@ -7,6 +7,6 @@ import AppHeader from './AppHeader';
 
 describe('AppHeader', () => {
   it('renders a div#app-header', () => {
-    expect(shallow(<AppHeader />).find('div#app-header')).to.have.length(1);
+    expect(shallow(<AppHeader />).find('#app-header')).to.have.length(1);
   });
 });

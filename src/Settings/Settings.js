@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Button } from '@blueprintjs/core';
 import MetricSettings from './MetricSettings';
-import Button from '../components/Button';
 import * as Actions from '../actions';
 import { metricShape, propsShape } from '../types';
 
@@ -12,13 +12,19 @@ import { metricShape, propsShape } from '../types';
  */
 export const Settings = ({ metrics, editedMetric, addMetric }) => (
   <div className="settings">
+    <h4>Settings</h4>
     {metrics.map((metric) => {
       if (editedMetric && metric.id === editedMetric.id) {
         return <MetricSettings key={metric.id} metric={editedMetric} editing />;
       }
       return <MetricSettings key={metric.id} metric={metric} />;
     })}
-    <Button onClick={addMetric} id="add-metric-button" disabled={!!editedMetric}>
+    <Button
+      onClick={addMetric}
+      id="add-metric-button"
+      disabled={!!editedMetric}
+      className="pt-icon-add"
+    >
       Add metric
     </Button>
   </div>
