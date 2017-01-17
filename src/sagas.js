@@ -7,6 +7,7 @@ import { DATA_FILE_PATH } from './constants';
 import {
   successCheckLogin,
   errorCheckLogin,
+  beginSyncData,
   successSyncData,
   errorSyncData,
   successLogout,
@@ -108,14 +109,18 @@ export function* executeLogout() {
   yield put(successLogout());
 }
 
+export function* executeSyncData() {
+  yield put(beginSyncData());
+}
+
 export function* watcherSaga() {
+  yield takeEvery('log metric', executeSyncData);
+  yield takeEvery('update metric', executeSyncData);
+  yield takeEvery('delete metric', executeSyncData);
+  yield takeEvery('reorder metrics', executeSyncData);
   yield takeLatest('begin check login', checkLogin);
   yield takeLatest('begin sync data', syncData);
   yield takeEvery('request confirm modal', executeConfirmModal);
   yield takeEvery('request cancel modal', executeCancelModal);
   yield takeEvery('request logout', executeLogout);
-  yield takeEvery('log metric', syncData);
-  yield takeEvery('update metric', syncData);
-  yield takeEvery('delete metric', syncData);
-  yield takeEvery('reorder metrics', syncData);
 }
