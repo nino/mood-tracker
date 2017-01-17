@@ -6,11 +6,25 @@ export const colorGroupShape = PropTypes.shape({
   color: PropTypes.string.isRequired,
 });
 
+export const nullableColorGroupShape = PropTypes.shape({
+  minValue: PropTypes.number,
+  maxValue: PropTypes.number,
+  color: PropTypes.string.isRequired,
+});
+
 export const propsShape = PropTypes.shape({
   name: PropTypes.string.isRequired,
   maxValue: PropTypes.number.isRequired,
   minValue: PropTypes.number.isRequired,
   colorGroups: PropTypes.arrayOf(colorGroupShape).isRequired,
+  type: PropTypes.string.isRequired,
+});
+
+export const nullablePropsShape = PropTypes.shape({
+  name: PropTypes.string.isRequired,
+  maxValue: PropTypes.number,
+  minValue: PropTypes.number,
+  colorGroups: PropTypes.arrayOf(nullableColorGroupShape).isRequired,
   type: PropTypes.string.isRequired,
 });
 
@@ -24,6 +38,12 @@ export const metricShape = PropTypes.shape({
   props: propsShape.isRequired,
   lastModified: PropTypes.number,
   entries: PropTypes.arrayOf(entryShape).isRequired,
+});
+
+export const editedMetricShape = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  props: nullablePropsShape.isRequired,
+  lastModified: PropTypes.number,
 });
 
 export const modalActionShape = PropTypes.shape({
@@ -59,7 +79,7 @@ export const stateShapes = {
   settings: PropTypes.shape({
     editedMetric: PropTypes.shape({
       id: PropTypes.number.isRequired,
-      props: propsShape,
+      props: nullablePropsShape,
     }),
     isModified: PropTypes.bool.isRequired,
   }),
