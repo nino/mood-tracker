@@ -1,0 +1,13 @@
+{
+  "name": "Mood tracking app",
+  "short_name": "Mood",
+  "start_url": ".",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "icon.PNG",
+      "type": "image/png",
+      "sizes": "1024x1024"
+    }
+  ]
+}
