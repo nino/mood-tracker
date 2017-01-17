@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Button } from '@blueprintjs/core';
 import MetricSettings from './MetricSettings';
 import * as Actions from '../actions';
-import { metricShape, propsShape } from '../types';
+import { metricShape, editedMetricShape } from '../types';
 
 /**
  * Container for the settings UI elements.
@@ -32,10 +32,7 @@ export const Settings = ({ metrics, editedMetric, addMetric }) => (
 
 Settings.propTypes = {
   metrics: React.PropTypes.arrayOf(metricShape),
-  editedMetric: React.PropTypes.shape({
-    id: React.PropTypes.number.isRequired,
-    props: propsShape,
-  }),
+  editedMetric: editedMetricShape,
   addMetric: React.PropTypes.func.isRequired,
 };
 

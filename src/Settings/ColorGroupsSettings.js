@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@blueprintjs/core';
-import { colorGroupShape } from '../types';
+import { nullableColorGroupShape } from '../types';
 
 export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDelete }) => (
   <div className={`single-color-group-${editing ? 'editing' : 'not-editing'}`}>
@@ -11,7 +11,7 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
         name="minValue"
         className="color-group-minValue-field pt-input"
         disabled={!editing}
-        value={colorGroup.minValue}
+        value={colorGroup.minValue || ''}
       />
     </label>
     <label className="pt-label pt-inline" htmlFor="maxValue">
@@ -21,7 +21,7 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
         name="maxValue"
         className="color-group-maxValue-field pt-input"
         disabled={!editing}
-        value={colorGroup.maxValue}
+        value={colorGroup.maxValue || ''}
       />
     </label>
     <label className="pt-label pt-inline" htmlFor="color">
@@ -31,7 +31,7 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
         name="color"
         className="color-group-color-field pt-input"
         disabled={!editing}
-        value={colorGroup.color}
+        value={colorGroup.color || ''}
       />
     </label>
     { editing ? (
@@ -48,7 +48,7 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
 );
 
 SingleColorGroupSettings.propTypes = {
-  colorGroup: colorGroupShape.isRequired,
+  colorGroup: nullableColorGroupShape.isRequired,
   onUpdate: React.PropTypes.func.isRequired,
   editing: React.PropTypes.bool,
   onDelete: React.PropTypes.func.isRequired,
@@ -105,7 +105,7 @@ const ColorGroupsSettings = ({ colorGroups, onUpdate, editing }) => {
 };
 
 ColorGroupsSettings.propTypes = {
-  colorGroups: React.PropTypes.arrayOf(colorGroupShape).isRequired,
+  colorGroups: React.PropTypes.arrayOf(nullableColorGroupShape).isRequired,
   onUpdate: React.PropTypes.func.isRequired,
   editing: React.PropTypes.bool,
 };

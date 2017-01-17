@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Button } from '@blueprintjs/core';
-import { colorGroupShape } from '../types';
+import { editedMetricShape } from '../types';
 import {
   startEditingMetric,
   updateEditedMetric,
@@ -116,16 +116,7 @@ MetricSettings.propTypes = {
   /**
    * A tracking metric must be provided.
    */
-  metric: React.PropTypes.shape({
-    id: React.PropTypes.number.isRequired,
-    props: React.PropTypes.shape({
-      name: React.PropTypes.string,
-      minValue: React.PropTypes.number,
-      maxValue: React.PropTypes.number,
-      type: React.PropTypes.string,
-      colorGroups: React.PropTypes.arrayOf(colorGroupShape).isRequired,
-    }).isRequired,
-  }).isRequired,
+  metric: editedMetricShape.isRequired,
 
   /**
    * Setting this to true will enable the form fields
