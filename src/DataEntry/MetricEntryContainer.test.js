@@ -29,7 +29,7 @@ describe('MetricEntryContainer', () => {
     const component = mount(<MetricEntryContainer metric={MoodWithEntries} dispatch={dispatch} />);
     component.find('.button-row-button').first().simulate('click');
     expect(dispatch.mock.calls).to.have.length(1);
-    expect(dispatch.mock.calls[0][0]).to.have.property('type', 'log metric');
+    expect(dispatch.mock.calls[0][0]).to.have.property('type', 'LOG_METRIC');
     expect(dispatch.mock.calls[0][0]).to.have.property('metricId', 1);
     expect(dispatch.mock.calls[0][0]).to.have.property('value', 1);
     expect(dispatch.mock.calls[0][0]).to.have.property('date').and.to.be.a('string');
@@ -45,7 +45,7 @@ describe('MetricEntryContainer', () => {
     component.find('input.metric-entry-text-input').first().simulate('change');
     component.find('form').first().simulate('submit');
     expect(dispatch.mock.calls).to.have.length(1);
-    expect(dispatch.mock.calls[0][0]).to.have.property('type', 'log metric');
+    expect(dispatch.mock.calls[0][0]).to.have.property('type', 'LOG_METRIC');
     expect(dispatch.mock.calls[0][0]).to.have.property('metricId', 2);
     expect(dispatch.mock.calls[0][0]).to.have.property('value', '12');
     expect(dispatch.mock.calls[0][0]).to.have.property('date').and.to.be.a('string');

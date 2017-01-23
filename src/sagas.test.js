@@ -3,12 +3,14 @@
 import { expect } from 'chai';
 import {
   syncData,
+  restoreCache,
   checkLogin,
   executeCancelModal,
   executeConfirmModal,
   executeLogout,
 } from './sagas';
 import {
+  INITIAL_STATE,
   STATE_WITH_SOME_METRICS,
 } from '../test/SampleApplicationStates';
 import {
@@ -31,7 +33,7 @@ describe('check login saga', () => {
     const generator = checkLogin();
     const next = generator.next();
     expect(next.value).to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success check login');
+      .and.to.have.property('type', 'SUCCESS_CHECK_LOGIN');
     expect(next.value.PUT.action).to.have.property('accessToken', 'abc');
     expect(next.value.PUT.action).to.have.property('lastAuthenticated').and.to.be.a('number');
     expect(generator.next()).to.have.property('done', true);
@@ -43,7 +45,7 @@ describe('check login saga', () => {
     const generator = checkLogin();
     const next = generator.next();
     expect(next.value).to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success check login');
+      .and.to.have.property('type', 'SUCCESS_CHECK_LOGIN');
     expect(next.value.PUT.action).to.have.property('accessToken', 'abc2');
     expect(next.value.PUT.action).to.have.property('lastAuthenticated').and.to.be.a('number');
     expect(generator.next()).to.have.property('done', true);
@@ -55,7 +57,7 @@ describe('check login saga', () => {
     const generator = checkLogin();
     const next = generator.next();
     expect(next.value).to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success check login');
+      .and.to.have.property('type', 'SUCCESS_CHECK_LOGIN');
     expect(next.value.PUT.action).to.have.property('accessToken', 'abcHash');
     expect(next.value.PUT.action).to.have.property('lastAuthenticated').and.to.be.a('number');
     expect(generator.next()).to.have.property('done', true);
@@ -67,7 +69,7 @@ describe('check login saga', () => {
     const generator = checkLogin();
     const next = generator.next();
     expect(next.value).to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'error check login');
+      .and.to.have.property('type', 'ERROR_CHECK_LOGIN');
     expect(generator.next()).to.have.property('done', true);
   });
 });
@@ -80,7 +82,7 @@ describe('sync data saga', () => {
     next = generator.next(authenticationMock);
     expect(next).to.have.property('value').and.to.have.property('PUT')
       .and.to.have.property('action')
-      .and.to.have.property('type', 'error sync data');
+      .and.to.have.property('type', 'ERROR_SYNC_DATA');
     expect(generator.next()).to.have.property('done', true);
   });
 
@@ -91,9 +93,13 @@ describe('sync data saga', () => {
     // Fetch authentication state from store
     next = generator.next({ accessToken: 'abc' });
 
+    // We're authenticated, so let's PUT the restore cache action
+    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
+      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+    next = generator.next();
+
     // Fetch metrics items from store
-    expect(next, 'must SELECT metrics items').to.have.property('value')
-      .and.to.have.property('SELECT');
+    expect(next, 'must SELECT metrics items').to.have.property('value').and.to.have.property('SELECT');
     const metricsMock = STATE_WITH_SOME_METRICS.metrics.items;
     next = generator.next(metricsMock);
 
@@ -132,19 +138,20 @@ describe('sync data saga', () => {
 
     expect(global.localStorage, 'localStorage must have metrics')
       .to.have.property('metrics');
+    const localStorageMetrics = JSON.parse(global.localStorage.metrics);
     expect(
-      global.localStorage.metrics,
+      localStorageMetrics,
       'should still be exactly 2 metrics in localStorage',
     ).to.have.length(2);
     expect(
-      global.localStorage.metrics[0],
+      localStorageMetrics[0],
       'should still be 10 entries in Mood metric in localStorage',
     ).to.have.property('entries').and.to.have.length(10);
 
     // PUT action to finish the saga
     expect(next, 'must PUT success sync data').to.have.property('value')
       .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success sync data');
+      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
     expect(next.value.PUT.action.data[0], 'metrics must be unchanged')
       .to.have.property('props').and.to.eql(metricsMock[0].props);
     expect(next.value.PUT.action.data[1]).to.have.property('props')
@@ -173,9 +180,14 @@ describe('sync data saga', () => {
     next = generator.next(authenticationMock);
     expect(next.done).to.not.be.ok;
 
+    // We're authenticated, so let's PUT the restore cache action
+    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
+      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+    next = generator.next();
+
+
     // Fetch metrics state
-    expect(next, 'must fetch metrics items state').to.have.property('value')
-      .and.to.have.property('SELECT')
+    expect(next, 'must fetch metrics items state').to.have.property('value').and.to.have.property('SELECT')
       .and.to.have.property('selector');
     const localMetricsMock = [MoodWithEntries, BurnsWithoutEntries];
     next = generator.next(localMetricsMock);
@@ -197,13 +209,13 @@ describe('sync data saga', () => {
     next = generator.next(uploadResponseMock);
 
     // Check local storage up to date
-    expect(global.localStorage).to.have.property('metrics')
-      .and.to.deep.equal(localMetricsMock);
+    expect(global.localStorage).to.have.property('metrics');
+    expect(JSON.parse(global.localStorage.metrics)).to.eql(localMetricsMock);
 
     // PUT finish
     expect(next).to.have.property('value')
       .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success sync data');
+      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
     next = generator.next();
     expect(next.done, 'generator should be done').to.equal(true);
   });
@@ -242,6 +254,12 @@ describe('sync data saga', () => {
       .and.to.have.property('SELECT');
     next = generator.next(authenticationMock);
 
+    // We're authenticated, so let's PUT the restore cache action
+    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
+      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+    next = generator.next();
+
+
     // get metrics items -- no metrics
     expect(next, 'must SELECT metricsItems state').to.have.property('value')
       .and.to.have.property('SELECT');
@@ -255,8 +273,8 @@ describe('sync data saga', () => {
     next = generator.next(downloadMock);
 
     // set local storage
-    expect(global.localStorage).to.have.property('metrics')
-      .and.to.deep.equal(remoteMetricsMock);
+    expect(global.localStorage).to.have.property('metrics');
+    expect(JSON.parse(global.localStorage.metrics)).to.eql(remoteMetricsMock);
 
     // upload updated metrics
     expect(next, 'must request upload').to.have.property('value')
@@ -269,7 +287,7 @@ describe('sync data saga', () => {
     // PUT success with remote metrics
     expect(next, 'must PUT success sync data action').to.have.property('value')
       .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success sync data');
+      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
     expect(next.value.PUT.action).to.have.property('data')
       .and.to.deep.equal(remoteMetricsMock);
     expect(next.value.PUT.action).to.have.property('lastSynced').and.to.be.a('number');
@@ -289,6 +307,12 @@ describe('sync data saga', () => {
       accessToken: 'abcabc',
     };
     next = generator.next(authenticationMock);
+
+    // We're authenticated, so let's PUT the restore cache action
+    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
+      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+    next = generator.next();
+
 
     // fetch local metrics items -- metrics present, have some entries
     const localMetricsMock = [
@@ -337,8 +361,8 @@ describe('sync data saga', () => {
 
     // update localstorage with merged metrics
     const mergedMetrics = [MoodWithEntries, BurnsWithEntries];
-    expect(global.localStorage)
-      .to.have.property('metrics').and.to.eql(mergedMetrics);
+    expect(global.localStorage).to.have.property('metrics');
+    expect(JSON.parse(global.localStorage.metrics)).to.eql(mergedMetrics);
 
     // upload the merged metrics
     expect(next, 'must request data file upload')
@@ -351,7 +375,7 @@ describe('sync data saga', () => {
     // put success with remote metrics
     expect(next).to.have.property('value').and.to.have.property('PUT')
       .and.to.have.property('action')
-      .and.to.have.property('type', 'success sync data');
+      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
     expect(next.value.PUT.action.data).to.eql(mergedMetrics);
     expect(next.value.PUT.action.lastSynced).to.be.a('number');
     expect(generator.next()).to.have.property('done', true);
@@ -407,6 +431,11 @@ describe('sync data saga', () => {
         },
       ] };
 
+    // We're authenticated, so let's PUT the restore cache action
+    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
+      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+    next = generator.next();
+
     // fetch local metrics items -- metrics present
     expect(next, 'must fetch metrics items from store')
       .to.have.property('value')
@@ -421,8 +450,8 @@ describe('sync data saga', () => {
     next = generator.next(downloadMock);
 
     // update localstorage with metrics with local props
-    expect(global.localStorage)
-      .to.have.property('metrics').and.to.eql(localMetricsMock);
+    expect(global.localStorage).to.have.property('metrics');
+    expect(JSON.parse(global.localStorage.metrics)).to.eql(localMetricsMock);
 
     // upload updated metrics
     expect(next, 'must request upload').to.have.property('value')
@@ -435,7 +464,7 @@ describe('sync data saga', () => {
     // put success with remote metrics
     expect(next, 'must put success sync data').to.have.property('value')
       .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success sync data');
+      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
     expect(next.value.PUT.action)
       .to.have.property('data').and.to.eql(localMetricsMock);
     expect(next.value.PUT.action).to.have.property('lastSynced').and.to.be.a('number');
@@ -492,6 +521,11 @@ describe('sync data saga', () => {
       },
     ];
 
+    // We're authenticated, so let's PUT the restore cache action
+    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
+      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+    next = generator.next();
+
     // fetch local metrics items -- metrics present
     expect(next, 'must fetch metrics items from store')
       .to.have.property('value')
@@ -506,8 +540,8 @@ describe('sync data saga', () => {
     next = generator.next(downloadMock);
 
     // update localstorage with metrics with downloaded props
-    expect(global.localStorage).to.have.property('metrics')
-      .and.to.eql(downloadMock.data);
+    expect(global.localStorage).to.have.property('metrics');
+    expect(JSON.parse(global.localStorage.metrics)).to.eql(downloadMock.data);
 
     // upload updated metrics
     expect(next, 'must request upload').to.have.property('value')
@@ -520,7 +554,7 @@ describe('sync data saga', () => {
     // put success with remote metrics
     expect(next, 'must put success sync data').to.have.property('value')
       .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success sync data');
+      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
     expect(next.value.PUT.action)
       .to.have.property('data').and.to.eql(downloadMock.data);
     expect(next.value.PUT.action).to.have.property('lastSynced').and.to.be.a('number');
@@ -556,6 +590,11 @@ describe('sync data saga', () => {
 
     const localMetricsMock = null;
 
+    // We're authenticated, so let's PUT the restore cache action
+    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
+      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+    next = generator.next();
+
     // fetch local metrics items -- no metrics
     expect(next, 'must fetch metrics items from store')
       .to.have.property('value')
@@ -570,12 +609,12 @@ describe('sync data saga', () => {
     next = generator.next(downloadMock);
 
     // update localstorage with metrics with local props
-    expect(global.localStorage, 'must set metrics in localStorage')
-      .to.have.property('metrics').and.to.have.length(1);
-    expect(global.localStorage.metrics[0])
+    expect(global.localStorage, 'must set metrics in localStorage').to.have.property('metrics');
+    expect(JSON.parse(global.localStorage.metrics)).to.have.length(1);
+    expect(JSON.parse(global.localStorage.metrics)[0])
       .to.have.property('props').and.to.have.property('name', 'Metric!');
-    expect(global.localStorage.metrics).to.have.length(1);
-    expect(global.localStorage.metrics[0]).to.have.property('lastModified').and.to.be.a('number');
+    expect(JSON.parse(global.localStorage.metrics)).to.have.length(1);
+    expect(JSON.parse(global.localStorage.metrics)[0]).to.have.property('lastModified').and.to.be.a('number');
 
     // upload updated metrics
     expect(next, 'must request upload').to.have.property('value')
@@ -588,7 +627,7 @@ describe('sync data saga', () => {
     // put success with remote metrics
     expect(next, 'must put success sync data').to.have.property('value')
       .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success sync data');
+      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
     expect(next.value.PUT.action)
       .to.have.property('data').and.to.have.length(1);
     expect(next.value.PUT.action.data[0]).to.have.property('props');
@@ -610,6 +649,12 @@ describe('sync data saga', () => {
         .and.to.have.property('SELECT');
       next = generator.next(authAuthenticated);
 
+    // We're authenticated, so let's PUT the restore cache action
+      expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
+      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+      next = generator.next();
+
+
       // fetch metrics items -- has some metrics
       expect(next, 'must SELECT metrics items').to.have.property('value')
         .and.to.have.property('SELECT');
@@ -623,13 +668,13 @@ describe('sync data saga', () => {
 
       // check that local storage is updated
       expect(global.localStorage, 'must still keep localStorage up-to-date')
-        .to.have.property('metrics')
-        .and.to.eql(STATE_WITH_SOME_METRICS.metrics.items);
+        .to.have.property('metrics');
+      expect(JSON.parse(global.localStorage.metrics)).to.eql(STATE_WITH_SOME_METRICS.metrics.items);
 
       // PUT error
       expect(next, 'must PUT error sync data').to.have.property('value')
         .and.to.have.property('PUT').and.to.have.property('action')
-        .and.to.have.property('type', 'error sync data');
+        .and.to.have.property('type', 'ERROR_SYNC_DATA');
     });
 
     it('cancels on filesUpload error, but updates localStorage', () => {
@@ -640,6 +685,12 @@ describe('sync data saga', () => {
       expect(next, 'must SELECT authentication').to.have.property('value')
         .and.to.have.property('SELECT');
       next = generator.next(authAuthenticated);
+
+      // We're authenticated, so let's PUT the restore cache action
+      expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
+      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+      next = generator.next();
+
 
       // fetch metrics items -- has some metrics
       expect(next, 'must SELECT metrics items').to.have.property('value')
@@ -665,14 +716,64 @@ describe('sync data saga', () => {
 
       // check that local storage is updated
       expect(global.localStorage, 'must still keep localStorage up-to-date')
-        .to.have.property('metrics')
-        .and.to.eql(STATE_WITH_SOME_METRICS.metrics.items);
+        .to.have.property('metrics');
+      expect(JSON.parse(global.localStorage.metrics)).to.eql(STATE_WITH_SOME_METRICS.metrics.items);
 
       // PUT error
       expect(next, 'must PUT error sync data').to.have.property('value')
         .and.to.have.property('PUT').and.to.have.property('action')
-        .and.to.have.property('type', 'error sync data');
+        .and.to.have.property('type', 'ERROR_SYNC_DATA');
     });
+  });
+});
+
+describe('restore cache saga', () => {
+  it('PUTs error if app state already has data', () => {
+    const metricsState = STATE_WITH_SOME_METRICS.metrics;
+    const generator = restoreCache();
+    let next = generator.next();
+
+    expect(next, 'must fetch metrics state').to.have.property('value').and.to.have.property('SELECT');
+    next = generator.next(metricsState);
+
+    expect(next, 'must PUT errorRestoreCache').to.have.property('value').and.to.have.property('PUT').and.to.have.property('action').and.to.have.property('type', 'ERROR_RESTORE_CACHE');
+    next = generator.next();
+
+    expect(next, 'saga must be finished').to.have.property('done', true);
+  });
+
+  it('loads localStorage data into store if store has no data but cache does', () => {
+    const metrics = null;
+    global.localStorage = { metrics: JSON.stringify(STATE_WITH_SOME_METRICS.metrics.items) };
+    const generator = restoreCache();
+    let next = generator.next();
+
+    expect(next, 'must fetch metrics state').to.have.property('value').and.to.have.property('SELECT');
+    next = generator.next(metrics);
+
+    expect(next, 'must PUT successRestoreCache').to.have.property('value').to.have.property('PUT')
+      .and.to.have.property('action').and.to.have.property('type', 'SUCCESS_RESTORE_CACHE');
+    expect(next.value.PUT.action, 'must pass cached metrics in action')
+      .to.have.property('data').and.to.have.length(2);
+    next = generator.next();
+
+    expect(next, 'saga must be complete').to.have.property('done', true);
+  });
+
+  it('PUTs error if no data cached', () => {
+    const metricsState = INITIAL_STATE.metrics.items;
+    global.localStorage = {};
+    const generator = restoreCache();
+    let next = generator.next();
+
+    expect(next, 'must fetch metrics state').to.have.property('value').and.to.have.property('SELECT');
+    next = generator.next(metricsState);
+
+    expect(next, 'must PUT errorRestoreCache').to.have.property('value').to.have.property('PUT')
+      .and.to.have.property('action').and.to.have.property('type', 'ERROR_RESTORE_CACHE');
+    next = generator.next();
+
+    expect(next, 'saga must be complete').to.have.property('done', true);
   });
 });
 
@@ -733,7 +834,7 @@ describe('executeConfirmModal', () => {
     expect(next).to.have.property('value')
       .and.to.have.property('PUT')
       .and.to.have.property('action')
-      .and.to.eql({ type: 'success confirm modal' });
+      .and.to.eql({ type: 'SUCCESS_CONFIRM_MODAL' });
     next = generator.next();
   });
 });
@@ -795,7 +896,7 @@ describe('executeCancelModal', () => {
     expect(next).to.have.property('value')
       .and.to.have.property('PUT')
       .and.to.have.property('action')
-      .and.to.eql({ type: 'success cancel modal' });
+      .and.to.eql({ type: 'SUCCESS_CANCEL_MODAL' });
     next = generator.next();
   });
 });
@@ -816,7 +917,7 @@ describe('executeLogout', () => {
     expect(next).to.have.property('value')
       .and.to.have.property('PUT')
       .and.to.have.property('action')
-      .and.to.have.property('type', 'success logout');
+      .and.to.have.property('type', 'SUCCESS_LOGOUT');
     expect(generator.next()).to.have.property('done', true);
   });
 });

@@ -10,6 +10,9 @@ import {
   beginSyncData,
   successSyncData,
   errorSyncData,
+  requestRestoreCache,
+  successRestoreCache,
+  errorRestoreCache,
   successLogout,
   successConfirmModal,
   errorConfirmModal,
@@ -25,6 +28,7 @@ import {
   downloadFileAsJSON,
   mergeMetrics,
   uploadAsJSON,
+  isValidMetricsArray,
 } from './lib';
 
 export function* syncData() {
@@ -39,17 +43,18 @@ export function* syncData() {
   if (!accessToken) {
     yield put(errorSyncData('Not authenticated'));
   } else {
+    yield put(requestRestoreCache());
     const metricsFromStore = yield select(getMetricsItems);
     const localMetrics = metricsFromStore || [];
     const dbx = new Dropbox({ accessToken });
     const apiResponse = yield call(downloadFileAsJSON, dbx, DATA_FILE_PATH);
     if (!apiResponse.ok && apiResponse.error !== 'Error: File not found') {
-      localStorage.metrics = localMetrics;
+      localStorage.metrics = JSON.stringify(localMetrics);
       yield put(errorSyncData(apiResponse.error));
     } else {
       const remoteMetrics = apiResponse.data ? apiResponse.data : [];
       const mergedMetrics = mergeMetrics(localMetrics.concat(remoteMetrics));
-      localStorage.metrics = mergedMetrics;
+      localStorage.metrics = JSON.stringify(mergedMetrics);
       const uploadResponse = yield call(
         uploadAsJSON,
         dbx,
@@ -64,6 +69,19 @@ export function* syncData() {
       yield put(successSyncData(mergedMetrics, (new Date()).getTime()));
     }
   }
+}
+
+export function* restoreCache() {
+  const metricsItems = yield select(getMetricsItems);
+  if (metricsItems === null && typeof localStorage.metrics === 'string') {
+    const restoredMetrics = JSON.parse(localStorage.metrics);
+    if (restoredMetrics instanceof Array && isValidMetricsArray(restoredMetrics)) {
+      yield put(successRestoreCache(restoredMetrics));
+      return;
+    }
+  }
+
+  yield put(errorRestoreCache('Either no cached data present or data already loaded'));
 }
 
 export function* checkLogin() {
@@ -114,13 +132,14 @@ export function* executeSyncData() {
 }
 
 export function* watcherSaga() {
-  yield takeEvery('log metric', executeSyncData);
-  yield takeEvery('update metric', executeSyncData);
-  yield takeEvery('delete metric', executeSyncData);
-  yield takeEvery('reorder metrics', executeSyncData);
-  yield takeLatest('begin check login', checkLogin);
-  yield takeLatest('begin sync data', syncData);
-  yield takeEvery('request confirm modal', executeConfirmModal);
-  yield takeEvery('request cancel modal', executeCancelModal);
-  yield takeEvery('request logout', executeLogout);
+  yield takeEvery('LOG_METRIC', executeSyncData);
+  yield takeEvery('UPDATE_METRIC', executeSyncData);
+  yield takeEvery('DELETE_METRIC', executeSyncData);
+  yield takeEvery('REORDER_METRICS', executeSyncData);
+  yield takeLatest('BEGIN_CHECK_LOGIN', checkLogin);
+  yield takeLatest('BEGIN_SYNC_DATA', syncData);
+  yield takeEvery('REQUEST_CONFIRM_MODAL', executeConfirmModal);
+  yield takeEvery('REQUEST_CANCEL_MODAL', executeCancelModal);
+  yield takeEvery('REQUEST_LOGOUT', executeLogout);
+  yield takeEvery('REQUEST_RESTORE_CACHE', restoreCache);
 }

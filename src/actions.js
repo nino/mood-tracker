@@ -1,6 +1,6 @@
 export function logMetric(metricId, date, value) {
   return {
-    type: 'log metric',
+    type: 'LOG_METRIC',
     metricId,
     date,
     value,
@@ -9,7 +9,7 @@ export function logMetric(metricId, date, value) {
 
 export function startEditingMetric(metricId, discard = false) {
   return {
-    type: 'start editing',
+    type: 'START_EDITING',
     metricId,
     discard,
   };
@@ -17,7 +17,7 @@ export function startEditingMetric(metricId, discard = false) {
 
 export function updateMetric(metricId, newProps, lastModified) {
   return {
-    type: 'update metric',
+    type: 'UPDATE_METRIC',
     metricId,
     newProps,
     lastModified,
@@ -26,21 +26,21 @@ export function updateMetric(metricId, newProps, lastModified) {
 
 export function stopEditing(discard = false) {
   return {
-    type: 'stop editing',
+    type: 'STOP_EDITING',
     discard,
   };
 }
 
 export function addMetric(discard = false) {
   return {
-    type: 'add metric',
+    type: 'ADD_METRIC',
     discard,
   };
 }
 
 export function reorderMetrics(metricId, direction) {
   return {
-    type: 'reorder metrics',
+    type: 'REORDER_METRICS',
     metricId,
     direction,
   };
@@ -48,7 +48,7 @@ export function reorderMetrics(metricId, direction) {
 
 export function deleteMetric(metricId, confirm = false) {
   return {
-    type: 'delete metric',
+    type: 'DELETE_METRIC',
     metricId,
     confirm,
   };
@@ -56,56 +56,56 @@ export function deleteMetric(metricId, confirm = false) {
 
 export function updateEditedMetric(updatedProps) {
   return {
-    type: 'update edited metric',
+    type: 'UPDATE_EDITED_METRIC',
     updatedProps,
   };
 }
 
 export function requestConfirmModal() {
   return {
-    type: 'request confirm modal',
+    type: 'REQUEST_CONFIRM_MODAL',
   };
 }
 
 export function requestCancelModal() {
   return {
-    type: 'request cancel modal',
+    type: 'REQUEST_CANCEL_MODAL',
   };
 }
 
 export function successConfirmModal() {
   return {
-    type: 'success confirm modal',
+    type: 'SUCCESS_CONFIRM_MODAL',
   };
 }
 
 export function errorConfirmModal() {
   return {
-    type: 'error confirm modal',
+    type: 'ERROR_CONFIRM_MODAL',
   };
 }
 
 export function successCancelModal() {
   return {
-    type: 'success cancel modal',
+    type: 'SUCCESS_CANCEL_MODAL',
   };
 }
 
 export function errorCancelModal() {
   return {
-    type: 'error cancel modal',
+    type: 'ERROR_CANCEL_MODAL',
   };
 }
 
 export function beginSyncData() {
   return {
-    type: 'begin sync data',
+    type: 'BEGIN_SYNC_DATA',
   };
 }
 
 export function successSyncData(data, lastSynced) {
   return {
-    type: 'success sync data',
+    type: 'SUCCESS_SYNC_DATA',
     data,
     lastSynced,
   };
@@ -113,20 +113,20 @@ export function successSyncData(data, lastSynced) {
 
 export function errorSyncData(error) {
   return {
-    type: 'error sync data',
+    type: 'ERROR_SYNC_DATA',
     error,
   };
 }
 
 export function beginCheckLogin() {
   return {
-    type: 'begin check login',
+    type: 'BEGIN_CHECK_LOGIN',
   };
 }
 
 export function successCheckLogin(accessToken, lastAuthenticated) {
   return {
-    type: 'success check login',
+    type: 'SUCCESS_CHECK_LOGIN',
     accessToken,
     lastAuthenticated,
   };
@@ -134,25 +134,45 @@ export function successCheckLogin(accessToken, lastAuthenticated) {
 
 export function errorCheckLogin(error) {
   return {
-    type: 'error check login',
+    type: 'ERROR_CHECK_LOGIN',
     error,
   };
 }
 
 export function requestLogout() {
   return {
-    type: 'request logout',
+    type: 'REQUEST_LOGOUT',
   };
 }
 
 export function successLogout() {
   return {
-    type: 'success logout',
+    type: 'SUCCESS_LOGOUT',
   };
 }
 
 export function requestSync() {
   return {
-    type: 'request sync',
+    type: 'REQUEST_SYNC',
+  };
+}
+
+export function requestRestoreCache() {
+  return {
+    type: 'REQUEST_RESTORE_CACHE',
+  };
+}
+
+export function successRestoreCache(data) {
+  return {
+    type: 'SUCCESS_RESTORE_CACHE',
+    data,
+  };
+}
+
+export function errorRestoreCache(error) {
+  return {
+    type: 'ERROR_RESTORE_CACHE',
+    error,
   };
 }

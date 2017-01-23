@@ -42,7 +42,7 @@ describe('reducer', () => {
       .to.deep.equal(INITIAL_STATE);
   });
 
-  describe('log metric', () => {
+  describe('LOG_METRIC', () => {
     it('appends an entry to the appropriate metric', () => {
       const dateString = (new Date(12439)).toJSON();
       const newState = reducer(
@@ -164,7 +164,7 @@ describe('reducer', () => {
     });
   });
 
-  describe('update metric', () => {
+  describe('UPDATE_METRIC', () => {
     let newState;
     beforeAll(() => {
       newState = reducer(
@@ -205,7 +205,7 @@ describe('reducer', () => {
     });
   });
 
-  describe('stop editing', () => {
+  describe('STOP_EDITING', () => {
     it('sets editedMetric to null if isModified is false', () => {
       const newState = reducer(
         STATE_EDITING_METRIC1_NOT_MODIFIED,
@@ -249,7 +249,7 @@ describe('reducer', () => {
     });
   });
 
-  describe('add metric', () => {
+  describe('ADD_METRIC', () => {
     it('creates a new metric with default values', () => {
       const newState = reducer(
         STATE_WITH_SOME_METRICS,
@@ -314,7 +314,7 @@ describe('reducer', () => {
     });
   });
 
-  describe('reorder metrics', () => {
+  describe('REORDER_METRICS', () => {
     const givenMetrics = [
       {
         id: 1,
@@ -428,7 +428,7 @@ describe('reducer', () => {
     });
   });
 
-  describe('delete metric', () => {
+  describe('DELETE_METRIC', () => {
     const givenMetrics = [
       {
         id: 1,
@@ -561,7 +561,7 @@ describe('reducer', () => {
     });
   });
 
-  describe('update edited metric', () => {
+  describe('UPDATE_EDITED_METRIC', () => {
     it('updates the name of the currently edited metric', () => {
       const newState = reducer(
         STATE_EDITING_METRIC1_NOT_MODIFIED,
@@ -668,7 +668,7 @@ describe('reducer', () => {
     });
   });
 
-  describe('request confirm modal', () => {
+  describe('REQUEST_CONFIRM_MODAL', () => {
     it('does nothing if no modal exists', () => {
       const newState = reducer(
         STATE_WITH_SOME_METRICS,
@@ -740,7 +740,7 @@ describe('reducer', () => {
     });
   });
 
-  describe('request cancel modal', () => {
+  describe('REQUEST_CANCEL_MODAL', () => {
     it('does nothing if no modal exists', () => {
       const newState = reducer(
         STATE_WITH_SOME_METRICS,
@@ -812,7 +812,7 @@ describe('reducer', () => {
     });
   });
 
-  describe('success confirm modal', () => {
+  describe('SUCCESS_CONFIRM_MODAL', () => {
     const givenState = {
       modals: [{
         title: 'Test modal',
@@ -842,7 +842,7 @@ describe('reducer', () => {
     });
   });
 
-  describe('success cancel modal', () => {
+  describe('SUCCESS_CANCEL_MODAL', () => {
     const givenState = {
       modals: [{
         title: 'Test modal',
@@ -872,14 +872,14 @@ describe('reducer', () => {
     });
   });
 
-  describe('begin sync data', () => {
+  describe('BEGIN_SYNC_DATA', () => {
     it('sets state.metrics.isSyncing to true', () => {
       expect(reducer(STATE_WITH_SOME_METRICS, beginSyncData()))
         .to.have.property('metrics').and.to.have.property('isSyncing', true);
     });
   });
 
-  describe('success sync data', () => {
+  describe('SUCCESS_SYNC_DATA', () => {
     const data = [
       { id: 1, props: DEFAULT_METRIC_PROPS, lastModified: 12, entries: [] },
       { id: 2, props: DEFAULT_METRIC_PROPS, lastModified: 132, entries: [] },
@@ -915,7 +915,7 @@ describe('reducer', () => {
     });
   });
 
-  describe('error sync data', () => {
+  describe('ERROR_SYNC_DATA', () => {
     let newState;
     beforeAll(() => {
       newState = reducer(
@@ -946,7 +946,7 @@ describe('reducer', () => {
     });
   });
 
-  describe('begin check login', () => {
+  describe('BEGIN_CHECK_LOGIN', () => {
     it('sets isAuthenticating to true', () => {
       const newState = reducer(INITIAL_STATE, beginCheckLogin());
       expect(newState).to.have.property('authentication');
@@ -954,7 +954,7 @@ describe('reducer', () => {
     });
   });
 
-  describe('success check login', () => {
+  describe('SUCCESS_CHECK_LOGIN', () => {
     let newState;
     beforeEach(() => {
       newState = reducer(
@@ -983,7 +983,7 @@ describe('reducer', () => {
     });
   });
 
-  describe('error check login', () => {
+  describe('ERROR_CHECK_LOGIN', () => {
     let newState;
     beforeAll(() => {
       newState = reducer(

@@ -48,7 +48,7 @@ describe('App', () => {
 
       expect(store.dispatch.mock.calls).to.have.length(1);
       expect(store.dispatch.mock.calls[0]).to.have.length(1);
-      expect(store.dispatch.mock.calls[0][0]).to.have.property('type', 'begin sync data');
+      expect(store.dispatch.mock.calls[0][0]).to.have.property('type', 'BEGIN_SYNC_DATA');
     });
   });
 
@@ -64,7 +64,7 @@ describe('App', () => {
     mount(<Provider store={store}><ConnectedApp /></Provider>);
     expect(store.dispatch.mock.calls).to.have.length(1);
     expect(store.dispatch.mock.calls[0]).to.have.length(1);
-    expect(store.dispatch.mock.calls[0][0]).to.have.property('type', 'begin check login');
+    expect(store.dispatch.mock.calls[0][0]).to.have.property('type', 'BEGIN_CHECK_LOGIN');
   });
 
   it('renders loading screen if authenticated and no data', () => {
