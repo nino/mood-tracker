@@ -157,3 +157,22 @@ export function requestSync() {
   };
 }
 
+export function requestRestoreCache() {
+  return {
+    type: 'REQUEST_RESTORE_CACHE',
+  };
+}
+
+export function successRestoreCache(data) {
+  return {
+    type: 'SUCCESS_RESTORE_CACHE',
+    data,
+  };
+}
+
+export function errorRestoreCache(error) {
+  return {
+    type: 'ERROR_RESTORE_CACHE',
+    error,
+  };
+}

@@ -10,6 +10,8 @@ import {
   beginSyncData,
   successSyncData,
   errorSyncData,
+  successRestoreCache,
+  errorRestoreCache,
   successLogout,
   successConfirmModal,
   errorConfirmModal,
@@ -25,6 +27,7 @@ import {
   downloadFileAsJSON,
   mergeMetrics,
   uploadAsJSON,
+  isValidMetricsArray,
 } from './lib';
 
 export function* syncData() {
@@ -64,6 +67,19 @@ export function* syncData() {
       yield put(successSyncData(mergedMetrics, (new Date()).getTime()));
     }
   }
+}
+
+export function* restoreCache() {
+  const metricsItems = yield select(getMetricsItems);
+  if (metricsItems === null && typeof localStorage.metrics === 'string') {
+    const restoredMetrics = JSON.parse(localStorage.metrics);
+    if (restoredMetrics instanceof Array && isValidMetricsArray(restoredMetrics)) {
+      yield put(successRestoreCache(restoredMetrics));
+      return;
+    }
+  }
+
+  yield put(errorRestoreCache('Either no cached data present or data already loaded'));
 }
 
 export function* checkLogin() {
@@ -123,4 +139,5 @@ export function* watcherSaga() {
   yield takeEvery('REQUEST_CONFIRM_MODAL', executeConfirmModal);
   yield takeEvery('REQUEST_CANCEL_MODAL', executeCancelModal);
   yield takeEvery('REQUEST_LOGOUT', executeLogout);
+  yield takeEvery('REQUEST_RESTORE_CACHE', restoreCache);
 }

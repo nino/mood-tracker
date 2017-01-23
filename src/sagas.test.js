@@ -3,12 +3,14 @@
 import { expect } from 'chai';
 import {
   syncData,
+  restoreCache,
   checkLogin,
   executeCancelModal,
   executeConfirmModal,
   executeLogout,
 } from './sagas';
 import {
+  INITIAL_STATE,
   STATE_WITH_SOME_METRICS,
 } from '../test/SampleApplicationStates';
 import {
@@ -673,6 +675,56 @@ describe('sync data saga', () => {
         .and.to.have.property('PUT').and.to.have.property('action')
         .and.to.have.property('type', 'ERROR_SYNC_DATA');
     });
+  });
+});
+
+describe('restore cache saga', () => {
+  it('PUTs error if app state already has data', () => {
+    const metricsState = STATE_WITH_SOME_METRICS.metrics;
+    const generator = restoreCache();
+    let next = generator.next();
+
+    expect(next, 'must fetch metrics state').to.have.property('value').and.to.have.property('SELECT');
+    next = generator.next(metricsState);
+
+    expect(next, 'must PUT errorRestoreCache').to.have.property('value').and.to.have.property('PUT').and.to.have.property('action').and.to.have.property('type', 'ERROR_RESTORE_CACHE');
+    next = generator.next();
+
+    expect(next, 'saga must be finished').to.have.property('done', true);
+  });
+
+  it('loads localStorage data into store if store has no data but cache does', () => {
+    const metrics = null;
+    global.localStorage = { metrics: JSON.stringify(STATE_WITH_SOME_METRICS.metrics.items) };
+    const generator = restoreCache();
+    let next = generator.next();
+
+    expect(next, 'must fetch metrics state').to.have.property('value').and.to.have.property('SELECT');
+    next = generator.next(metrics);
+
+    expect(next, 'must PUT successRestoreCache').to.have.property('value').to.have.property('PUT')
+      .and.to.have.property('action').and.to.have.property('type', 'SUCCESS_RESTORE_CACHE');
+    expect(next.value.PUT.action, 'must pass cached metrics in action')
+      .to.have.property('data').and.to.have.length(2);
+    next = generator.next();
+
+    expect(next, 'saga must be complete').to.have.property('done', true);
+  });
+
+  it('PUTs error if no data cached', () => {
+    const metricsState = INITIAL_STATE.metrics.items;
+    global.localStorage = {};
+    const generator = restoreCache();
+    let next = generator.next();
+
+    expect(next, 'must fetch metrics state').to.have.property('value').and.to.have.property('SELECT');
+    next = generator.next(metricsState);
+
+    expect(next, 'must PUT errorRestoreCache').to.have.property('value').to.have.property('PUT')
+      .and.to.have.property('action').and.to.have.property('type', 'ERROR_RESTORE_CACHE');
+    next = generator.next();
+
+    expect(next, 'saga must be complete').to.have.property('done', true);
   });
 });
 

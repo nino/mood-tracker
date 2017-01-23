@@ -536,7 +536,12 @@ export function reducer(state = INITIAL_STATE, action) {
       return successSyncData(state, action);
     case 'ERROR_SYNC_DATA':
       return errorSyncData(state, action);
-    case 'request logout':
+    case 'SUCCESS_RESTORE_CACHE':
+      return {
+        ...state,
+        metrics: { ...state.metrics, items: action.data },
+      };
+    case 'REQUEST_LOGOUT':
       return state;
     case 'SUCCESS_LOGOUT':
       return {
