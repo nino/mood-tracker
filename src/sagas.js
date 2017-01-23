@@ -10,6 +10,7 @@ import {
   beginSyncData,
   successSyncData,
   errorSyncData,
+  requestRestoreCache,
   successRestoreCache,
   errorRestoreCache,
   successLogout,
@@ -42,17 +43,18 @@ export function* syncData() {
   if (!accessToken) {
     yield put(errorSyncData('Not authenticated'));
   } else {
+    yield put(requestRestoreCache());
     const metricsFromStore = yield select(getMetricsItems);
     const localMetrics = metricsFromStore || [];
     const dbx = new Dropbox({ accessToken });
     const apiResponse = yield call(downloadFileAsJSON, dbx, DATA_FILE_PATH);
     if (!apiResponse.ok && apiResponse.error !== 'Error: File not found') {
-      localStorage.metrics = localMetrics;
+      localStorage.metrics = JSON.stringify(localMetrics);
       yield put(errorSyncData(apiResponse.error));
     } else {
       const remoteMetrics = apiResponse.data ? apiResponse.data : [];
       const mergedMetrics = mergeMetrics(localMetrics.concat(remoteMetrics));
-      localStorage.metrics = mergedMetrics;
+      localStorage.metrics = JSON.stringify(mergedMetrics);
       const uploadResponse = yield call(
         uploadAsJSON,
         dbx,
