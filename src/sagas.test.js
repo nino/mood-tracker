@@ -31,7 +31,7 @@ describe('check login saga', () => {
     const generator = checkLogin();
     const next = generator.next();
     expect(next.value).to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success check login');
+      .and.to.have.property('type', 'SUCCESS_CHECK_LOGIN');
     expect(next.value.PUT.action).to.have.property('accessToken', 'abc');
     expect(next.value.PUT.action).to.have.property('lastAuthenticated').and.to.be.a('number');
     expect(generator.next()).to.have.property('done', true);
@@ -43,7 +43,7 @@ describe('check login saga', () => {
     const generator = checkLogin();
     const next = generator.next();
     expect(next.value).to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success check login');
+      .and.to.have.property('type', 'SUCCESS_CHECK_LOGIN');
     expect(next.value.PUT.action).to.have.property('accessToken', 'abc2');
     expect(next.value.PUT.action).to.have.property('lastAuthenticated').and.to.be.a('number');
     expect(generator.next()).to.have.property('done', true);
@@ -55,7 +55,7 @@ describe('check login saga', () => {
     const generator = checkLogin();
     const next = generator.next();
     expect(next.value).to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success check login');
+      .and.to.have.property('type', 'SUCCESS_CHECK_LOGIN');
     expect(next.value.PUT.action).to.have.property('accessToken', 'abcHash');
     expect(next.value.PUT.action).to.have.property('lastAuthenticated').and.to.be.a('number');
     expect(generator.next()).to.have.property('done', true);
@@ -67,7 +67,7 @@ describe('check login saga', () => {
     const generator = checkLogin();
     const next = generator.next();
     expect(next.value).to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'error check login');
+      .and.to.have.property('type', 'ERROR_CHECK_LOGIN');
     expect(generator.next()).to.have.property('done', true);
   });
 });
@@ -80,7 +80,7 @@ describe('sync data saga', () => {
     next = generator.next(authenticationMock);
     expect(next).to.have.property('value').and.to.have.property('PUT')
       .and.to.have.property('action')
-      .and.to.have.property('type', 'error sync data');
+      .and.to.have.property('type', 'ERROR_SYNC_DATA');
     expect(generator.next()).to.have.property('done', true);
   });
 
@@ -144,7 +144,7 @@ describe('sync data saga', () => {
     // PUT action to finish the saga
     expect(next, 'must PUT success sync data').to.have.property('value')
       .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success sync data');
+      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
     expect(next.value.PUT.action.data[0], 'metrics must be unchanged')
       .to.have.property('props').and.to.eql(metricsMock[0].props);
     expect(next.value.PUT.action.data[1]).to.have.property('props')
@@ -203,7 +203,7 @@ describe('sync data saga', () => {
     // PUT finish
     expect(next).to.have.property('value')
       .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success sync data');
+      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
     next = generator.next();
     expect(next.done, 'generator should be done').to.equal(true);
   });
@@ -269,7 +269,7 @@ describe('sync data saga', () => {
     // PUT success with remote metrics
     expect(next, 'must PUT success sync data action').to.have.property('value')
       .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success sync data');
+      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
     expect(next.value.PUT.action).to.have.property('data')
       .and.to.deep.equal(remoteMetricsMock);
     expect(next.value.PUT.action).to.have.property('lastSynced').and.to.be.a('number');
@@ -351,7 +351,7 @@ describe('sync data saga', () => {
     // put success with remote metrics
     expect(next).to.have.property('value').and.to.have.property('PUT')
       .and.to.have.property('action')
-      .and.to.have.property('type', 'success sync data');
+      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
     expect(next.value.PUT.action.data).to.eql(mergedMetrics);
     expect(next.value.PUT.action.lastSynced).to.be.a('number');
     expect(generator.next()).to.have.property('done', true);
@@ -435,7 +435,7 @@ describe('sync data saga', () => {
     // put success with remote metrics
     expect(next, 'must put success sync data').to.have.property('value')
       .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success sync data');
+      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
     expect(next.value.PUT.action)
       .to.have.property('data').and.to.eql(localMetricsMock);
     expect(next.value.PUT.action).to.have.property('lastSynced').and.to.be.a('number');
@@ -520,7 +520,7 @@ describe('sync data saga', () => {
     // put success with remote metrics
     expect(next, 'must put success sync data').to.have.property('value')
       .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success sync data');
+      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
     expect(next.value.PUT.action)
       .to.have.property('data').and.to.eql(downloadMock.data);
     expect(next.value.PUT.action).to.have.property('lastSynced').and.to.be.a('number');
@@ -588,7 +588,7 @@ describe('sync data saga', () => {
     // put success with remote metrics
     expect(next, 'must put success sync data').to.have.property('value')
       .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'success sync data');
+      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
     expect(next.value.PUT.action)
       .to.have.property('data').and.to.have.length(1);
     expect(next.value.PUT.action.data[0]).to.have.property('props');
@@ -629,7 +629,7 @@ describe('sync data saga', () => {
       // PUT error
       expect(next, 'must PUT error sync data').to.have.property('value')
         .and.to.have.property('PUT').and.to.have.property('action')
-        .and.to.have.property('type', 'error sync data');
+        .and.to.have.property('type', 'ERROR_SYNC_DATA');
     });
 
     it('cancels on filesUpload error, but updates localStorage', () => {
@@ -671,7 +671,7 @@ describe('sync data saga', () => {
       // PUT error
       expect(next, 'must PUT error sync data').to.have.property('value')
         .and.to.have.property('PUT').and.to.have.property('action')
-        .and.to.have.property('type', 'error sync data');
+        .and.to.have.property('type', 'ERROR_SYNC_DATA');
     });
   });
 });
@@ -733,7 +733,7 @@ describe('executeConfirmModal', () => {
     expect(next).to.have.property('value')
       .and.to.have.property('PUT')
       .and.to.have.property('action')
-      .and.to.eql({ type: 'success confirm modal' });
+      .and.to.eql({ type: 'SUCCESS_CONFIRM_MODAL' });
     next = generator.next();
   });
 });
@@ -795,7 +795,7 @@ describe('executeCancelModal', () => {
     expect(next).to.have.property('value')
       .and.to.have.property('PUT')
       .and.to.have.property('action')
-      .and.to.eql({ type: 'success cancel modal' });
+      .and.to.eql({ type: 'SUCCESS_CANCEL_MODAL' });
     next = generator.next();
   });
 });
@@ -816,7 +816,7 @@ describe('executeLogout', () => {
     expect(next).to.have.property('value')
       .and.to.have.property('PUT')
       .and.to.have.property('action')
-      .and.to.have.property('type', 'success logout');
+      .and.to.have.property('type', 'SUCCESS_LOGOUT');
     expect(generator.next()).to.have.property('done', true);
   });
 });

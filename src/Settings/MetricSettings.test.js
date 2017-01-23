@@ -91,7 +91,7 @@ describe('MetricSettings', () => {
         input.simulate('change');
         expect(dispatch.mock.calls.length).to.equal(callsSoFar + 1);
         expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
-          .to.have.property('type', 'update edited metric');
+          .to.have.property('type', 'UPDATE_EDITED_METRIC');
       });
     });
 
@@ -100,7 +100,7 @@ describe('MetricSettings', () => {
       component.find('.color-group-minValue-field').first().simulate('change');
       expect(dispatch.mock.calls.length).to.equal(callsSoFar + 1);
       expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
-        .to.have.property('type', 'update edited metric');
+        .to.have.property('type', 'UPDATE_EDITED_METRIC');
       expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
         .to.have.property('updatedProps')
         .and.to.have.property('colorGroups').and.to.have.length(4);
@@ -113,7 +113,7 @@ describe('MetricSettings', () => {
       moveUpButton.simulate('click');
       expect(dispatch.mock.calls.length).to.equal(callsSoFar + 1);
       expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
-        .to.have.property('type', 'reorder metrics');
+        .to.have.property('type', 'REORDER_METRICS');
       expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
         .to.have.property('direction', 'up');
       expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
@@ -121,7 +121,7 @@ describe('MetricSettings', () => {
       moveDownButton.simulate('click');
       expect(dispatch.mock.calls.length).to.equal(callsSoFar + 2);
       expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
-        .to.have.property('type', 'reorder metrics');
+        .to.have.property('type', 'REORDER_METRICS');
       expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
         .to.have.property('direction', 'down');
       expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
@@ -134,7 +134,7 @@ describe('MetricSettings', () => {
       deleteButton.simulate('click');
       expect(dispatch.mock.calls.length).to.equal(callsSoFar + 1);
       expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
-        .to.have.property('type', 'delete metric');
+        .to.have.property('type', 'DELETE_METRIC');
       expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
         .to.have.property('metricId', 1);
     });
@@ -145,7 +145,7 @@ describe('MetricSettings', () => {
       cancelButton.simulate('click');
       expect(dispatch.mock.calls.length).to.equal(callsSoFar + 1);
       expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
-        .to.have.property('type', 'stop editing');
+        .to.have.property('type', 'STOP_EDITING');
     });
 
     it('dispatches "update metric" on click save', () => {
@@ -154,7 +154,7 @@ describe('MetricSettings', () => {
       saveButton.simulate('click');
       expect(dispatch.mock.calls.length).to.equal(callsSoFar + 1);
       expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
-        .to.have.property('type', 'update metric');
+        .to.have.property('type', 'UPDATE_METRIC');
     });
   });
 
@@ -164,7 +164,7 @@ describe('MetricSettings', () => {
       const component = mount(<MetricSettings metric={MoodWithEntries} dispatch={dispatch} />);
       component.find('button').simulate('click');
       expect(dispatch.mock.calls).to.have.length(1);
-      expect(dispatch.mock.calls[0][0]).to.have.property('type', 'start editing');
+      expect(dispatch.mock.calls[0][0]).to.have.property('type', 'START_EDITING');
       expect(dispatch.mock.calls[0][0]).to.have.property('metricId', 1);
     });
   });

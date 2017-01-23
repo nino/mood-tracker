@@ -114,13 +114,13 @@ export function* executeSyncData() {
 }
 
 export function* watcherSaga() {
-  yield takeEvery('log metric', executeSyncData);
-  yield takeEvery('update metric', executeSyncData);
-  yield takeEvery('delete metric', executeSyncData);
-  yield takeEvery('reorder metrics', executeSyncData);
-  yield takeLatest('begin check login', checkLogin);
-  yield takeLatest('begin sync data', syncData);
-  yield takeEvery('request confirm modal', executeConfirmModal);
-  yield takeEvery('request cancel modal', executeCancelModal);
-  yield takeEvery('request logout', executeLogout);
+  yield takeEvery('LOG_METRIC', executeSyncData);
+  yield takeEvery('UPDATE_METRIC', executeSyncData);
+  yield takeEvery('DELETE_METRIC', executeSyncData);
+  yield takeEvery('REORDER_METRICS', executeSyncData);
+  yield takeLatest('BEGIN_CHECK_LOGIN', checkLogin);
+  yield takeLatest('BEGIN_SYNC_DATA', syncData);
+  yield takeEvery('REQUEST_CONFIRM_MODAL', executeConfirmModal);
+  yield takeEvery('REQUEST_CANCEL_MODAL', executeCancelModal);
+  yield takeEvery('REQUEST_LOGOUT', executeLogout);
 }

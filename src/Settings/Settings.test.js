@@ -55,6 +55,6 @@ describe('Settings', () => {
     button.simulate('click');
     expect(store.dispatch.mock.calls).to.have.length(1);
     expect(store.dispatch.mock.calls[0]).to.have.length(1);
-    expect(store.dispatch.mock.calls[0][0]).to.have.property('type', 'add metric');
+    expect(store.dispatch.mock.calls[0][0]).to.have.property('type', 'ADD_METRIC');
   });
 });

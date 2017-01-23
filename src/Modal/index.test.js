@@ -70,14 +70,14 @@ describe('Modal', () => {
       expect(document.getElementsByClassName('confirm-modal-button')).to.have.length(1);
       document.getElementsByClassName('confirm-modal-button')[0].click();
       expect(dispatch.mock.calls).to.have.length(1);
-      expect(dispatch.mock.calls[0][0]).to.have.property('type', 'request confirm modal');
+      expect(dispatch.mock.calls[0][0]).to.have.property('type', 'REQUEST_CONFIRM_MODAL');
     });
 
     it('dispatches cancelModal on click cancel', () => {
       expect(document.getElementsByClassName('cancel-modal-button')).to.have.length(1);
       document.getElementsByClassName('cancel-modal-button')[0].click();
       expect(dispatch.mock.calls).to.have.length(2);
-      expect(dispatch.mock.calls[1][0]).to.have.property('type', 'request cancel modal');
+      expect(dispatch.mock.calls[1][0]).to.have.property('type', 'REQUEST_CANCEL_MODAL');
     });
   });
 });

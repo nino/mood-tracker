@@ -491,11 +491,11 @@ export function reducer(state = INITIAL_STATE, action) {
     return state;
   }
   switch (action.type) {
-    case 'begin check login':
+    case 'BEGIN_CHECK_LOGIN':
       return beginCheckLogin(state, action);
-    case 'success check login':
+    case 'SUCCESS_CHECK_LOGIN':
       return successCheckLogin(state, action);
-    case 'error check login':
+    case 'ERROR_CHECK_LOGIN':
       return errorCheckLogin(state, action);
     case 'logout':
       return {
@@ -506,41 +506,39 @@ export function reducer(state = INITIAL_STATE, action) {
           accessToken: null,
         },
       };
-    case 'log metric':
+    case 'LOG_METRIC':
       return logMetric(state, action);
-    case 'start editing':
+    case 'START_EDITING':
       return startEditingMetric(state, action);
-    case 'update metric':
+    case 'UPDATE_METRIC':
       return updateMetric(state, action);
-    case 'stop editing':
+    case 'STOP_EDITING':
       return stopEditing(state, action);
-    case 'add metric':
+    case 'ADD_METRIC':
       return addMetric(state, action);
-    case 'reorder metrics':
+    case 'REORDER_METRICS':
       return reorderMetrics(state, action);
-    case 'delete metric':
+    case 'DELETE_METRIC':
       return deleteMetric(state, action);
-    case 'update edited metric':
+    case 'UPDATE_EDITED_METRIC':
       return updateEditedMetric(state, action);
-    case 'request confirm modal':
+    case 'REQUEST_CONFIRM_MODAL':
       return requestConfirmModal(state, action);
-    case 'request cancel modal':
+    case 'REQUEST_CANCEL_MODAL':
       return requestCancelModal(state, action);
-    case 'success confirm modal':
+    case 'SUCCESS_CONFIRM_MODAL':
       return successConfirmModal(state, action);
-    case 'success cancel modal':
+    case 'SUCCESS_CANCEL_MODAL':
       return successCancelModal(state, action);
-    case 'begin sync data':
+    case 'BEGIN_SYNC_DATA':
       return beginSyncData(state, action);
-    case 'success sync data':
+    case 'SUCCESS_SYNC_DATA':
       return successSyncData(state, action);
-    case 'error sync data':
+    case 'ERROR_SYNC_DATA':
       return errorSyncData(state, action);
-    case 'request login':
-      return state;
     case 'request logout':
       return state;
-    case 'success logout':
+    case 'SUCCESS_LOGOUT':
       return {
         ...state,
         authentication: {
@@ -550,7 +548,7 @@ export function reducer(state = INITIAL_STATE, action) {
           error: null,
         },
       };
-    case 'request sync':
+    case 'REQUEST_SYNC':
       return state;
     default:
       return state;
