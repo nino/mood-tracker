@@ -1,3 +1,11 @@
+// @flow
+import type {
+  ApplicationState,
+  AuthenticationState,
+  MetricsState,
+  Modal,
+  SettingsState,
+} from '../src/types';
 import {
   MoodWithEntries,
   MoodWithoutEntries,
@@ -5,7 +13,7 @@ import {
   BurnsWithoutEntries,
 } from './SampleMetrics';
 
-export const INITIAL_STATE = {
+export const INITIAL_STATE: ApplicationState = {
   metrics: {
     isSyncing: false,
     isSynced: true,
@@ -21,13 +29,14 @@ export const INITIAL_STATE = {
     isAuthenticating: false,
   },
   modals: [],
+  charts: [],
   settings: {
     editedMetric: null,
     isModified: false,
   },
 };
 
-export const STATE_WITH_SOME_METRICS = {
+export const STATE_WITH_SOME_METRICS: ApplicationState = {
   metrics: {
     isSyncing: false,
     isSynced: true,
@@ -46,13 +55,14 @@ export const STATE_WITH_SOME_METRICS = {
     isAuthenticating: false,
   },
   modals: [],
+  charts: [],
   settings: {
     editedMetric: null,
     isModified: false,
   },
 };
 
-export const STATE_WITH_LOTS_OF_METRICS = {
+export const STATE_WITH_LOTS_OF_METRICS: ApplicationState = {
   metrics: {
     isSyncing: false,
     isSynced: true,
@@ -71,13 +81,14 @@ export const STATE_WITH_LOTS_OF_METRICS = {
     isAuthenticating: false,
   },
   modals: [],
+  charts: [],
   settings: {
     editedMetric: null,
     isModified: false,
   },
 };
 
-export const STATE_EDITING_METRIC1_MODIFIED = {
+export const STATE_EDITING_METRIC1_MODIFIED: ApplicationState = {
   metrics: {
     isSyncing: false,
     isSynced: true,
@@ -96,6 +107,7 @@ export const STATE_EDITING_METRIC1_MODIFIED = {
     isAuthenticating: false,
   },
   modals: [],
+  charts: [],
   settings: {
     editedMetric: {
       id: MoodWithEntries.id,
@@ -108,7 +120,7 @@ export const STATE_EDITING_METRIC1_MODIFIED = {
   },
 };
 
-export const STATE_EDITING_METRIC1_NOT_MODIFIED = {
+export const STATE_EDITING_METRIC1_NOT_MODIFIED: ApplicationState = {
   metrics: {
     isSyncing: false,
     isSynced: true,
@@ -127,6 +139,7 @@ export const STATE_EDITING_METRIC1_NOT_MODIFIED = {
     isAuthenticating: false,
   },
   modals: [],
+  charts: [],
   settings: {
     editedMetric: {
       id: MoodWithEntries.id,
@@ -136,7 +149,7 @@ export const STATE_EDITING_METRIC1_NOT_MODIFIED = {
   },
 };
 
-export const authSubStates = {
+export const authSubStates: { [string]: AuthenticationState } = {
   authenticated: {
     isAuthenticated: true,
     isAuthenticating: false,
@@ -167,7 +180,7 @@ export const authSubStates = {
   },
 };
 
-export const metricsSubStates = {
+export const metricsSubStates: { [string]: MetricsState } = {
   notSyncingWithData: {
     isSynced: false,
     isSyncing: false,
@@ -226,7 +239,7 @@ export const metricsSubStates = {
   },
 };
 
-export const modalsSubStates = {
+export const modalsSubStates: { [string]: Modal[] } = {
   noModals: [],
   oneModal: [{
     title: 'Test modal',
@@ -292,7 +305,7 @@ export const modalsSubStates = {
   ],
 };
 
-export const settingsSubStates = {
+export const settingsSubStates: { [string]: SettingsState } = {
   notEditing: {
     editedMetric: null,
     isModified: false,

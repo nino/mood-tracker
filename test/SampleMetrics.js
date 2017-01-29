@@ -1,4 +1,7 @@
-export const MoodWithEntries = {
+// @flow
+import type { Metric } from '../src/types';
+
+export const MoodWithEntries: Metric = {
   id: 1,
   lastModified: 1481462412358,
   props: {
@@ -73,7 +76,7 @@ export const MoodWithEntries = {
   ],
 };
 
-export const MoodWithoutEntries = {
+export const MoodWithoutEntries: Metric = {
   id: 1,
   props: {
     name: 'Mood',
@@ -106,7 +109,7 @@ export const MoodWithoutEntries = {
   entries: [],
 };
 
-export const BurnsWithEntries = {
+export const BurnsWithEntries: Metric = {
   id: 2,
   lastModified: 1325809,
   props: {
@@ -124,7 +127,7 @@ export const BurnsWithEntries = {
   ],
 };
 
-export const BurnsWithoutEntries = {
+export const BurnsWithoutEntries: Metric = {
   id: 2,
   lastModified: 135987,
   props: {
