@@ -1,3 +1,4 @@
+/* @flow */
 export const getAuthentication = state => state.authentication;
 export const getMetrics = state => state.metrics;
 export const getMetricsItems = state => state.metrics.items;

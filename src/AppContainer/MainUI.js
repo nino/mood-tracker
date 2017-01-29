@@ -1,3 +1,4 @@
+/* @flow */
 import React from 'react';
 import DataDisplayContainer from '../DataDisplay/DataDisplayContainer';
 import DataEntryContainer from '../DataEntry/DataEntryContainer';

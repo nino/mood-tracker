@@ -1,3 +1,4 @@
+/* @flow */
 export const DATA_FILE_PATH = process.env.NODE_ENV === 'production'
   ? 'data.json'
   : 'data-dev.json';

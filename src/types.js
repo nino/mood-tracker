@@ -1,86 +1,122 @@
-import { PropTypes } from 'react';
+// @flow
+import type { Action } from './actionTypes';
 
-export const colorGroupShape = PropTypes.shape({
-  minValue: PropTypes.number.isRequired,
-  maxValue: PropTypes.number.isRequired,
-  color: PropTypes.string.isRequired,
-});
+export type Chart = {
+    id: number,
+    metrics: {
+      id: number,
+      visible: bool,
+    }[],
+    animation?: {
+      target: {
+        zoomFactor?: number,
+        viewCenter?: number,
+      },
+      finishTime: number,
+    },
+    zoomFactor: number,
+    viewCenter: number,
+};
 
-export const nullableColorGroupShape = PropTypes.shape({
-  minValue: PropTypes.number,
-  maxValue: PropTypes.number,
-  color: PropTypes.string.isRequired,
-});
+export type MetricType = 'int';
 
-export const propsShape = PropTypes.shape({
-  name: PropTypes.string.isRequired,
-  maxValue: PropTypes.number.isRequired,
-  minValue: PropTypes.number.isRequired,
-  colorGroups: PropTypes.arrayOf(colorGroupShape).isRequired,
-  type: PropTypes.string.isRequired,
-});
+export type ColorGroup = {
+  minValue: number,
+  maxValue: number,
+  color: string,
+};
 
-export const nullablePropsShape = PropTypes.shape({
-  name: PropTypes.string.isRequired,
-  maxValue: PropTypes.number,
-  minValue: PropTypes.number,
-  colorGroups: PropTypes.arrayOf(nullableColorGroupShape).isRequired,
-  type: PropTypes.string.isRequired,
-});
+export type NullableColorGroup = {
+  minValue?: number,
+  maxValue?: number,
+  color: string,
+};
 
-export const entryShape = PropTypes.shape({
-  date: PropTypes.string.isRequired,
-  value: PropTypes.number.isRequired,
-});
+export type MetricProps = {
+  name: string,
+  maxValue: number,
+  minValue: number,
+  colorGroups: ColorGroup[],
+  type: MetricType,
+};
 
-export const metricShape = PropTypes.shape({
-  id: PropTypes.number.isRequired,
-  props: propsShape.isRequired,
-  lastModified: PropTypes.number,
-  entries: PropTypes.arrayOf(entryShape).isRequired,
-});
+export type NullableMetricProps = {
+  name?: string,
+  maxValue?: number,
+  minValue?: number,
+  colorGroups?: NullableColorGroup[],
+  type?: MetricType,
+};
 
-export const editedMetricShape = PropTypes.shape({
-  id: PropTypes.number.isRequired,
-  props: nullablePropsShape.isRequired,
-  lastModified: PropTypes.number,
-});
+export type EditedMetricProps = {
+  name: string,
+  maxValue?: number,
+  minValue?: number,
+  colorGroups: NullableColorGroup[],
+  type?: MetricType,
+};
 
-export const modalActionShape = PropTypes.shape({
-  label: PropTypes.string.isRequired,
-  action: PropTypes.shape({ type: PropTypes.string }),
-});
+export type MetricEntry = {
+  date: string,
+  value: number,
+};
 
-export const modalShape = PropTypes.shape({
-  title: PropTypes.string.isRequired,
-  message: PropTypes.string.isRequired,
-  actions: PropTypes.shape({
-    confirm: modalActionShape,
-    cancel: modalActionShape,
-  }),
-});
+export type Metric = {
+  id: number,
+  props: MetricProps,
+  lastModified?: number,
+  entries: MetricEntry[],
+};
 
-export const stateShapes = {
-  metrics: PropTypes.shape({
-    isSyncing: PropTypes.bool.isRequired,
-    isSynced: PropTypes.bool.isRequired,
-    lastSynced: PropTypes.number,
-    items: PropTypes.arrayOf(metricShape),
-    error: PropTypes.shape({ error: PropTypes.string }),
-  }),
-  authentication: PropTypes.shape({
-    isAuthenticated: PropTypes.bool.isRequired,
-    isAuthenticating: PropTypes.bool.isRequired,
-    error: PropTypes.shape({ error: PropTypes.string }),
-    accessToken: PropTypes.string,
-    lastAuthenticated: PropTypes.number,
-  }),
-  modals: PropTypes.arrayOf(modalShape),
-  settings: PropTypes.shape({
-    editedMetric: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      props: nullablePropsShape,
-    }),
-    isModified: PropTypes.bool.isRequired,
-  }),
+export type EditedMetric = {
+  id: number,
+  props: {
+    name: string,
+    maxValue?: number,
+    minValue?: number,
+    colorGroups: NullableColorGroup[],
+  },
+};
+
+export type AuthenticationState = {
+  isAuthenticated: boolean,
+  isAuthenticating: boolean,
+  accessToken?: string,
+  error?: string,
+  lastAuthenticated?: number,
+};
+
+export type MetricsState = {
+  isSyncing: boolean,
+  isSynced: boolean,
+  lastSynced?: number,
+  items?: Metric[],
+  error?: string,
+};
+
+export type ModalAction = {
+  label: string,
+  action: Action, // TODO create action types
+};
+
+export type Modal = {
+  title: string,
+  message: string,
+  actions: {
+    confirm: ModalAction,
+    cancel: ModalAction,
+  },
+};
+
+export type SettingsState = {
+    editedMetric?: EditedMetric,
+    isModified: boolean,
+};
+
+export type ApplicationState = {
+  metrics: MetricsState,
+  charts: Chart[],
+  authentication: AuthenticationState,
+  modals: Modal[],
+  settings: SettingsState,
 };

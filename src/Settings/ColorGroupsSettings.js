@@ -1,8 +1,16 @@
+/* @flow */
 import React from 'react';
 import { Button } from '@blueprintjs/core';
-import { nullableColorGroupShape } from '../types';
+import type { NullableColorGroup } from '../types';
 
-export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDelete }) => (
+type SingleColorGroupSettingsProps = {
+  colorGroup: NullableColorGroup,
+  onUpdate: { [string]: number } => void,
+  editing: boolean,
+  onDelete: (number) => void,
+};
+
+export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDelete }: SingleColorGroupSettingsProps) => (
   <div className={`single-color-group-${editing ? 'editing' : 'not-editing'}`}>
     <label className="pt-label pt-inline" htmlFor="minValue">
       From
@@ -47,14 +55,13 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
   </div>
 );
 
-SingleColorGroupSettings.propTypes = {
-  colorGroup: nullableColorGroupShape.isRequired,
-  onUpdate: React.PropTypes.func.isRequired,
-  editing: React.PropTypes.bool,
-  onDelete: React.PropTypes.func.isRequired,
+type ColorGroupsSettingsProps = {
+  colorGroups: NullableColorGroup[],
+  onUpdate: (NullableColorGroup[]) => void,
+  editing: boolean,
 };
 
-const ColorGroupsSettings = ({ colorGroups, onUpdate, editing }) => {
+const ColorGroupsSettings = ({ colorGroups, onUpdate, editing }: ColorGroupsSettingsProps) => {
   function handleChange(index, updatedField) {
     onUpdate({
       colorGroups: colorGroups.slice(0, index).concat(
@@ -80,6 +87,8 @@ const ColorGroupsSettings = ({ colorGroups, onUpdate, editing }) => {
     });
   }
 
+  // TODO give eveyrthing an ID
+  /* eslint-disable react/no-array-index-key */
   return (
     <div className={`color-groups-settings-${editing ? 'editing' : 'not-editing'} pt-card`}>
       <h5>Color groups</h5>
@@ -102,12 +111,6 @@ const ColorGroupsSettings = ({ colorGroups, onUpdate, editing }) => {
         ) : null}
     </div>
   );
-};
-
-ColorGroupsSettings.propTypes = {
-  colorGroups: React.PropTypes.arrayOf(nullableColorGroupShape).isRequired,
-  onUpdate: React.PropTypes.func.isRequired,
-  editing: React.PropTypes.bool,
 };
 
 export default ColorGroupsSettings;

@@ -1,3 +1,4 @@
+/* @flow */
 /* global window localStorage */
 import { put, select, call } from 'redux-saga/effects';
 import { takeLatest, takeEvery } from 'redux-saga';

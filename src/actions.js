@@ -5,6 +5,7 @@ export function logMetric(metricId, date, value) {
     date,
     value,
   };
+/* @flow */
 }
 
 export function startEditingMetric(metricId, discard = false) {

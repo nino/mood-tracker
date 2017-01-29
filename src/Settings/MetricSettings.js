@@ -1,7 +1,8 @@
+/* @flow */
 import React from 'react';
 import { connect } from 'react-redux';
 import { Button } from '@blueprintjs/core';
-import { editedMetricShape } from '../types';
+import type { Metric, EditedMetric } from '../types';
 import {
   startEditingMetric,
   updateEditedMetric,
@@ -14,6 +15,26 @@ import ColorGroupsSettings from './ColorGroupsSettings';
 
 import './MetricSettings.css';
 
+type MetricSettingsProps = {
+  /**
+   * A tracking metric must be provided.
+   */
+  metric: EditedMetric | Metric,
+
+  /**
+   * Setting this to true will enable the form fields
+   * for manipulation by the user.
+   * default value: false.
+   */
+  editing: boolean,
+
+  /**
+   * Send action to parent.
+   */
+  dispatch: (any) => void,
+};
+
+
 /**
  * Settings panel for a single metric, e.g. "Mood" or "Burns depression score".
  * This component displays form fields for all properties of the given metric.
@@ -21,7 +42,7 @@ import './MetricSettings.css';
  * This can be changed by passing the prop editing=true.
  * Clicking the component should activate edit-mode.
  */
-export const MetricSettings = ({ metric, editing, dispatch }) => {
+export const MetricSettings = ({ metric, editing, dispatch }: MetricSettingsProps) => {
   let ButtonRow;
   if (editing) {
     ButtonRow = (
@@ -110,25 +131,6 @@ export const MetricSettings = ({ metric, editing, dispatch }) => {
       </form>
     </div>
   );
-};
-
-MetricSettings.propTypes = {
-  /**
-   * A tracking metric must be provided.
-   */
-  metric: editedMetricShape.isRequired,
-
-  /**
-   * Setting this to true will enable the form fields
-   * for manipulation by the user.
-   * default value: false.
-   */
-  editing: React.PropTypes.bool,
-
-  /**
-   * Send action to parent.
-   */
-  dispatch: React.PropTypes.func.isRequired,
 };
 
 export default connect()(MetricSettings);

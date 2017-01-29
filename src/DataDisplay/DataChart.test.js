@@ -1,16 +1,17 @@
+/* @flow */
 /* eslint-env jest */
 /* eslint-disable no-unused-expressions */
 import React from 'react';
-import { shallow } from 'enzyme';
-import { expect } from 'chai';
-import { VictoryChart } from 'victory';
+import { shallow, mount } from 'enzyme';
 import { MoodWithEntries } from '../../test/SampleMetrics';
 
 import DataChart from './DataChart';
+import Line from './Line';
 
 describe('DataChart', () => {
-  it('renders a VictoryChart', () => {
-    const component = shallow(<DataChart metric={MoodWithEntries} />);
-    expect(component.find(VictoryChart)).to.have.length(1);
-  });
+  it('renders a div.data-chart with the correct width', () => {});
+
+  it('renders a Line for each metric in the chart', () => { });
+
+  it('scrolls the div.data-chart-container to the correct viewCenter position', () => {});
 });

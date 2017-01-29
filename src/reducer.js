@@ -1,8 +1,11 @@
+/* @flow */
 import { max } from 'lodash';
 import * as Actions from './actions';
 import { DEFAULT_METRIC_PROPS } from './constants';
+import chartsReducer from './DataDisplay/reducer';
+import type { ApplicationState, Action } from './types';
 
-export const INITIAL_STATE = {
+export const INITIAL_STATE: ApplicationState = {
   metrics: {
     isSyncing: false,
     isSynced: false,
@@ -10,6 +13,7 @@ export const INITIAL_STATE = {
     items: null,
     error: null,
   },
+  charts: [],
   authentication: {
     isAuthenticated: false,
     error: null,
@@ -24,7 +28,7 @@ export const INITIAL_STATE = {
   },
 };
 
-function beginCheckLogin(state) {
+function beginCheckLogin(state: ApplicationState) {
   return {
     ...state,
     authentication: {
@@ -34,7 +38,7 @@ function beginCheckLogin(state) {
   };
 }
 
-function successCheckLogin(state, action) {
+function successCheckLogin(state: ApplicationState, action: Action) {
   return {
     ...state,
     authentication: {
@@ -47,7 +51,7 @@ function successCheckLogin(state, action) {
   };
 }
 
-function errorCheckLogin(state, action) {
+function errorCheckLogin(state: ApplicationState, action: Action) {
   return {
     ...state,
     authentication: {
@@ -58,7 +62,7 @@ function errorCheckLogin(state, action) {
   };
 }
 
-function startEditingMetric(state, action) {
+function startEditingMetric(state: ApplicationState, action: Action) {
   const { metrics, settings } = state;
   const { editedMetric, isModified } = settings;
   const { items } = metrics;
@@ -107,7 +111,7 @@ function startEditingMetric(state, action) {
   };
 }
 
-function updateMetric(state, action) {
+function updateMetric(state: ApplicationState, action: Action) {
   const { metricId, newProps, lastModified } = action;
   const { metrics } = state;
   const { items } = metrics;
@@ -137,7 +141,7 @@ function updateMetric(state, action) {
   };
 }
 
-function logMetric(state, action) {
+function logMetric(state: ApplicationState, action: Action) {
   const { metrics } = state;
   const { items } = metrics;
   const { metricId, date, value } = action;
@@ -166,7 +170,7 @@ function logMetric(state, action) {
   };
 }
 
-function stopEditing(state, action) {
+function stopEditing(state: ApplicationState, action: Action) {
   const { settings, modals } = state;
   const { editedMetric, isModified } = settings;
   const { discard } = action;
@@ -203,7 +207,7 @@ function stopEditing(state, action) {
   };
 }
 
-function addMetric(state, action) {
+function addMetric(state: ApplicationState, action: Action) {
   const { discard } = action;
   const { metrics, settings, modals } = state;
   const { items } = metrics;
@@ -266,7 +270,7 @@ function addMetric(state, action) {
   };
 }
 
-function reorderMetrics(state, action) {
+function reorderMetrics(state: ApplicationState, action: Action) {
   const { metrics } = state;
   const { metricId, direction } = action;
   const { items } = metrics;
@@ -303,7 +307,7 @@ function reorderMetrics(state, action) {
   };
 }
 
-function deleteMetric(state, action) {
+function deleteMetric(state: ApplicationState, action: Action) {
   const { metricId, confirm } = action;
   const { metrics, modals } = state;
   const { items } = metrics;
@@ -350,7 +354,7 @@ function deleteMetric(state, action) {
   };
 }
 
-function updateEditedMetric(state, action) {
+function updateEditedMetric(state: ApplicationState, action: Action) {
   const { settings } = state;
   const { editedMetric } = settings;
   if (!editedMetric) {
@@ -403,7 +407,7 @@ function updateEditedMetric(state, action) {
   };
 }
 
-function requestConfirmModal(state) {
+function requestConfirmModal(state: ApplicationState) {
   const { modals } = state;
   if (modals.length === 0) {
     return state;
@@ -419,7 +423,7 @@ function requestConfirmModal(state) {
   };
 }
 
-function requestCancelModal(state) {
+function requestCancelModal(state: ApplicationState) {
   const { modals } = state;
   if (modals.length === 0) {
     return state;
@@ -435,21 +439,21 @@ function requestCancelModal(state) {
   };
 }
 
-function successConfirmModal(state) {
+function successConfirmModal(state: ApplicationState) {
   return {
     ...state,
     modals: state.modals.slice(1, state.modals.length),
   };
 }
 
-function successCancelModal(state) {
+function successCancelModal(state: ApplicationState) {
   return {
     ...state,
     modals: state.modals.slice(1, state.modals.length),
   };
 }
 
-function beginSyncData(state) {
+function beginSyncData(state: ApplicationState) {
   return {
     ...state,
     metrics: {
@@ -459,7 +463,7 @@ function beginSyncData(state) {
   };
 }
 
-function successSyncData(state, action) {
+function successSyncData(state: ApplicationState, action: Action) {
   const { metrics } = state;
   return {
     ...state,
@@ -474,7 +478,7 @@ function successSyncData(state, action) {
   };
 }
 
-function errorSyncData(state, action) {
+function errorSyncData(state: ApplicationState, action: Action) {
   const { metrics } = state;
   return {
     ...state,
@@ -486,9 +490,9 @@ function errorSyncData(state, action) {
   };
 }
 
-export function reducer(state = INITIAL_STATE, action) {
+export function reducer(state: ApplicationState = INITIAL_STATE, action?: Action) {
   if (!action || !action.type) {
-    return state;
+    return chartsReducer(state);
   }
   switch (action.type) {
     case 'BEGIN_CHECK_LOGIN':
@@ -556,6 +560,6 @@ export function reducer(state = INITIAL_STATE, action) {
     case 'REQUEST_SYNC':
       return state;
     default:
-      return state;
+      return chartsReducer(state, action);
   }
 }

@@ -1,3 +1,4 @@
+/* @flow */
 /* global window */
 import React from 'react';
 import Dropbox from 'dropbox';

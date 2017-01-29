@@ -1,3 +1,4 @@
+/* @flow */
 /* global FileReader */
 
 function readFileBlobAsJSON(fileBlob) {

@@ -1,12 +1,19 @@
+/* @flow */
 import React from 'react';
 import { Button } from '@blueprintjs/core';
 
-const ButtonRow = ({ values, colors, onClick }) => (
+type ButtonRowProps = {
+  values: number[],
+  colors: string[],
+  onClick: void => void,
+};
+
+const ButtonRow = ({ values, colors, onClick }: ButtonRowProps) => (
   <div className="pt-button-group pt-fill" style={{ position: 'relative', maxWidth: '100%' }}>
     {values.map((value, idx) => (
       <Button
         className="button-row-button"
-        key={idx}
+        key={value}
         style={{
           color: colors[idx] || 'black',
         }}
@@ -17,11 +24,5 @@ const ButtonRow = ({ values, colors, onClick }) => (
     ))}
   </div>
 );
-
-ButtonRow.propTypes = {
-  values: React.PropTypes.arrayOf(React.PropTypes.number).isRequired,
-  colors: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
-  onClick: React.PropTypes.func.isRequired,
-};
 
 export default ButtonRow;

@@ -1,26 +1,46 @@
+// @flow
 import React from 'react';
 import { connect } from 'react-redux';
-import { metricShape } from '../types';
+import type {
+  Metric,
+  Chart,
+  ApplicationState,
+} from '../types';
 import './DataDisplayContainer.css';
-
 import DataChart from './DataChart';
 
-export const DataDisplayContainer = ({ metrics }) => {
-  if (!metrics || metrics.length === 0) {
+type DataDisplayContainerProps = {
+  metrics: Metric[],
+  charts: Chart[],
+  dispatch: (action: any) => void,
+};
+
+export const DataDisplayContainer = ({
+  metrics,
+  charts,
+  dispatch,
+ }: DataDisplayContainerProps) => {
+  if (!charts || charts.length === 0) {
     return <div>There are no metrics yet.</div>;
   }
 
   return (
     <div className="data-display-container">
-      {metrics.map(metric => <DataChart metric={metric} key={metric.id} />)}
+      {charts.map((chart, idx) => (
+        <DataChart
+          metrics={[metrics[metrics.findIndex(m => m.id === charts[idx].metrics[0].id)]]}
+          chart={charts[idx]}
+          key={chart.id}
+          dispatch={dispatch}
+        />
+      ))}
     </div>
   );
 };
 
-DataDisplayContainer.propTypes = {
-  metrics: React.PropTypes.arrayOf(metricShape),
-};
-
-const stateToProps = state => ({ metrics: state.metrics.items });
+const stateToProps = (state: ApplicationState) => ({
+  metrics: state.metrics.items,
+  charts: state.charts,
+});
 
 export default connect(stateToProps)(DataDisplayContainer);

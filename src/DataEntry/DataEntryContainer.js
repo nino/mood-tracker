@@ -1,10 +1,15 @@
+/* @flow */
 import React from 'react';
 import { connect } from 'react-redux';
-import { metricShape } from '../types';
+import type { Metric } from '../types';
 
 import MetricEntryContainer from './MetricEntryContainer';
 
-export const DataEntryContainer = ({ metrics }) => {
+type DataEntryContainerProps = {
+  metrics: Metric[],
+};
+
+export const DataEntryContainer = ({ metrics }: DataEntryContainerProps) => {
   if (!metrics || metrics.length === 0) {
     return <div>There are no metrics yet.</div>;
   }
@@ -15,10 +20,6 @@ export const DataEntryContainer = ({ metrics }) => {
       ))}
     </div>
   );
-};
-
-DataEntryContainer.propTypes = {
-  metrics: React.PropTypes.arrayOf(metricShape),
 };
 
 const stateToProps = state => ({ metrics: state.metrics.items });

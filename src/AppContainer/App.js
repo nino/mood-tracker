@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 import { connect } from 'react-redux';
 import './App.css';
@@ -10,9 +11,23 @@ import LoginScreen from '../components/LoginScreen';
 import { beginSyncData, beginCheckLogin } from '../actions';
 import Modal from '../Modal';
 import ActivityIndicator from '../ActivityIndicator';
-import { stateShapes } from '../types';
+import type {
+  ApplicationState,
+  MetricsState,
+  AuthenticationState,
+} from '../types';
+
+type AppProps = {
+  // TODO add doc
+  dispatch: (action: any) => void,
+  metrics: MetricsState,
+  authentication: AuthenticationState,
+};
 
 export class App extends React.Component {
+  props: AppProps;
+  state: void;
+
   componentDidMount() {
     const { dispatch, metrics, authentication } = this.props;
     const { isAuthenticated, isAuthenticating } = authentication;
@@ -39,7 +54,7 @@ export class App extends React.Component {
     const { metrics, authentication } = this.props;
     const { isAuthenticated } = authentication;
     const { items } = metrics;
-    let child;
+    let child: React.Element<any> = <div />;
 
     if (!isAuthenticated) {
       child = authentication.error ? <LoginScreen /> : <LoadingScreen />;
@@ -63,13 +78,7 @@ export class App extends React.Component {
   }
 }
 
-App.propTypes = {
-  dispatch: React.PropTypes.func.isRequired,
-  metrics: stateShapes.metrics,
-  authentication: stateShapes.authentication,
-};
-
-const stateToProps = state => ({
+const stateToProps = (state: ApplicationState) => ({
   authentication: state.authentication,
   metrics: state.metrics,
 });
