@@ -18,6 +18,8 @@ module.exports = {
       {"devDependencies": ["**/*.test.js", "**/*.spec.js"]}
     ],
     "import/no-named-as-default": "off",
-    "max-len": "off"
+    "max-len": "off",
+    "flowtype/define-flow-type": 1,
+    "flowtype/use-flow-type": 1
   },
 };
