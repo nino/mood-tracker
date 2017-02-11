@@ -17,10 +17,11 @@ const localStorageMock = {
 
 const DropboxControllerMock = {};
 
-const wrapComponent = Component => (
-  class ComponentWrapper extends React.Component {
+const wrapComponent = (Component: any) => (
+  class ComponentWrapper extends React.Component { // eslint-disable-line react/prefer-stateless-function
+    props: any;
     render() {
-      return (<Component {...this.props}>{this.children}</Component>);
+      return (<Component {...this.props}>{this.props.children}</Component>);
     }
   }
 );
