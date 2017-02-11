@@ -6,7 +6,6 @@ import MainUI from './MainUI';
 import AppHeader from './AppHeader';
 import AppFooter from './AppFooter';
 import LoadingScreen from '../components/LoadingScreen';
-import ErrorMessage from '../components/ErrorMessage';
 import LoginScreen from '../components/LoginScreen';
 import { beginSyncData, beginCheckLogin } from '../actions';
 import Modal from '../Modal';
@@ -61,7 +60,7 @@ export class App extends React.Component {
     } else if (items) {
       child = <MainUI />;
     } else if (metrics.error) {
-      child = (<ErrorMessage>Could not load data ...</ErrorMessage>);
+      child = (<div className="error-message">Could not load data ...</div>);
     } else {
       child = <LoadingScreen />;
     }
