@@ -819,3 +819,38 @@ describe('restore cache', () => {
   });
 });
 
+describe('update metric', () => {
+  // Outline:
+  // - Check if valid TMetricProps.
+  // - PUT success/error with date
+  it('dispatches SUCCESS_UPDATE_METRIC if passed props are valid TMetricProps', () => {
+    const updatedProps: TEditedMetricProps = {
+      ...DEFAULT_METRIC_PROPS,
+      minValue: 2,
+      name: 'Cool',
+    };
+    const generator = updateMetric(requestUpdateMetric(1, updatedProps));
+    let next = generator.next();
+
+    expect(next).to.have.deep.property('value.PUT.action.type', 'SUCCESS_UPDATE_METRIC');
+    expect(next).to.have.deep.property('value.PUT.action.lastModified').and.to.be.a('number');
+    expect(next).to.have.deep.property('value.PUT.action.newProps').and.to.eql(updatedProps);
+    next = generator.next();
+    expect(next).to.have.property('done', true);
+  });
+
+  it('dispatches ERROR_UPDATE_METRIC if passed props are not valid', () => {
+    const updatedProps: TEditedMetricProps = {
+      ...DEFAULT_METRIC_PROPS,
+      minValue: null,
+      colorGroups: [{ minValue: null, maxValue: 4, color: 'green' }],
+    };
+    const generator = updateMetric(requestUpdateMetric(1, updatedProps));
+    let next = generator.next();
+
+    expect(next).to.have.deep.property('value.PUT.action.type', 'ERROR_UPDATE_METRIC');
+    expect(next).to.have.deep.property('value.PUT.action.invalidFields').and.to.eql(['minValue', 'colorGroups/0/minValue']);
+    next = generator.next();
+    expect(next).to.have.property('done', true);
+  });
+});

@@ -19,6 +19,8 @@ import {
   errorConfirmModal,
   successCancelModal,
   errorCancelModal,
+  successUpdateMetric,
+  errorUpdateMetric,
 } from './actions';
 import type {
   TAuthenticationState,
@@ -36,7 +38,9 @@ import {
   mergeMetrics,
   uploadAsJSON,
   isValidMetricsArray,
+  asTMetricProps,
 } from './lib';
+import type { TRequestUpdateMetricAction } from './actionTypes';
 
 export function* syncData(): Generator<any, any, any> {
   const authentication: TAuthenticationState = yield* select(getAuthentication);
@@ -142,6 +146,28 @@ export function* executeSyncData(): Generator<any, any, any> {
   yield put(beginSyncData());
 }
 
+export function* updateMetric(action: TRequestUpdateMetricAction): Generator<any, any, any> {
+  const newProps: ?TMetricProps = asTMetricProps(action.newProps);
+  if (newProps != null) {
+    yield* put(successUpdateMetric(action.metricId, newProps, (new Date()).getTime()));
+  } else {
+    const invalidFields: string[] = [];
+    Object.keys(action.newProps).forEach((key: string) => {
+      if (action.newProps[key] == null) {
+        invalidFields.push(key);
+      }
+    });
+    action.newProps.colorGroups.forEach((colorGroup: TEditedColorGroup, index: number) => {
+      Object.keys(colorGroup).forEach((key: string) => {
+        if (colorGroup[key] == null) {
+          invalidFields.push(`colorGroups/${index}/${key}`);
+        }
+      });
+    });
+    yield* put(errorUpdateMetric(invalidFields));
+  }
+}
+
 export function* watcherSaga(): Generator<any, any, any> {
   yield* takeEvery('LOG_METRIC', executeSyncData);
   yield* takeEvery('SUCCESS_UPDATE_METRIC', executeSyncData);
@@ -152,5 +178,6 @@ export function* watcherSaga(): Generator<any, any, any> {
   yield* takeEvery('REQUEST_CONFIRM_MODAL', executeConfirmModal);
   yield* takeEvery('REQUEST_CANCEL_MODAL', executeCancelModal);
   yield* takeEvery('REQUEST_LOGOUT', executeLogout);
-  yield takeEvery('REQUEST_RESTORE_CACHE', restoreCache);
+  yield* takeEvery('REQUEST_RESTORE_CACHE', restoreCache);
+  yield* takeEvery('REQUEST_UPDATE_METRIC', updateMetric);
 }
