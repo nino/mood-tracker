@@ -768,3 +768,54 @@ describe('executeLogout', () => {
     expect(generator.next()).to.have.property('done', true);
   });
 });
+
+describe('restore cache', () => {
+  // Rough outline of what the generator does:
+  // - select metrics->items from store
+  // - If non-null, put error
+  // - Otherwise:
+  //   - If localStorage has valid metrics, put success
+  //   - Otherwise, put error
+  it('fails if there is data in the store, no matter if there is data in localStorage', () => {
+    const generator = restoreCache();
+    let next = generator.next();
+
+    expect(next, 'must get metrics->items').to.have.deep.property('value.SELECT.selector', getMetricsItems);
+    next = generator.next([MoodWithEntries]);
+
+    expect(next, 'must dispatch ERROR_RESTORE_CACHE action').to.have.deep.property('value.PUT.action.type', 'ERROR_RESTORE_CACHE');
+    next = generator.next();
+
+    expect(next).to.have.property('done', true);
+  });
+
+  it('succeeds if data is in localStorage', () => {
+    localStorage.setItem('metrics', JSON.stringify([MoodWithEntries, BurnsWithEntries]));
+    const generator = restoreCache();
+    let next = generator.next();
+
+    expect(next).to.have.deep.property('value.SELECT.selector', getMetricsItems);
+    next = generator.next(null);
+
+    expect(next).to.have.deep.property('value.PUT.action.type', 'SUCCESS_RESTORE_CACHE');
+    expect(next).to.have.deep.property('value.PUT.action.data').and.to.eql([MoodWithEntries, BurnsWithEntries]);
+    next = generator.next();
+
+    expect(next).to.have.property('done', true);
+  });
+
+  it('fails if localStorage data is not valid metrics', () => {
+    localStorage.setItem('metrics', 'huh');
+    const generator = restoreCache();
+    let next = generator.next();
+
+    expect(next).to.have.deep.property('value.SELECT.selector', getMetricsItems);
+    next = generator.next(null);
+
+    expect(next).to.have.deep.property('value.PUT.action.type', 'ERROR_RESTORE_CACHE');
+    next = generator.next();
+
+    expect(next).to.have.property('done', true);
+  });
+});
+
