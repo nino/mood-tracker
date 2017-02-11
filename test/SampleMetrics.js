@@ -1,7 +1,7 @@
 // @flow
-import type { Metric } from '../src/types';
+import type { TMetric } from '../src/types';
 
-export const MoodWithEntries: Metric = {
+export const MoodWithEntries: TMetric = {
   id: 1,
   lastModified: 1481462412358,
   props: {
@@ -76,7 +76,7 @@ export const MoodWithEntries: Metric = {
   ],
 };
 
-export const MoodWithoutEntries: Metric = {
+export const MoodWithoutEntries: TMetric = {
   id: 1,
   props: {
     name: 'Mood',
@@ -109,7 +109,7 @@ export const MoodWithoutEntries: Metric = {
   entries: [],
 };
 
-export const BurnsWithEntries: Metric = {
+export const BurnsWithEntries: TMetric = {
   id: 2,
   lastModified: 1325809,
   props: {
@@ -127,7 +127,7 @@ export const BurnsWithEntries: Metric = {
   ],
 };
 
-export const BurnsWithoutEntries: Metric = {
+export const BurnsWithoutEntries: TMetric = {
   id: 2,
   lastModified: 135987,
   props: {

@@ -1,122 +1,137 @@
 // @flow
-import type { Action } from './actionTypes';
+import type { TAction } from './actionTypes';
 
-export type Chart = {
-    id: number,
-    metrics: {
-      id: number,
-      visible: bool,
-    }[],
-    animation?: {
-      target: {
-        zoomFactor?: number,
-        viewCenter?: number,
+export type TChart = {
+  +id: number;
+  +metrics: {
+      +id: number,
+      +visible: bool,
+    }[];
+  +animation?: {
+      +target: {
+        +zoomFactor?: number,
+        +viewCenter?: number,
       },
-      finishTime: number,
+      +finishTime: number,
     },
-    zoomFactor: number,
-    viewCenter: number,
+  +zoomFactor: number,
+  +viewCenter: number,
 };
 
-export type MetricType = 'int';
+export type TMetricType = 'int';
 
-export type ColorGroup = {
-  minValue: number,
-  maxValue: number,
-  color: string,
+export type TColorGroup = {
+  +minValue: number,
+  +maxValue: number,
+  +color: string,
 };
 
-export type NullableColorGroup = {
-  minValue?: number,
-  maxValue?: number,
-  color: string,
+export type TEditedColorGroup = {
+  +minValue: ?number,
+  +maxValue: ?number,
+  +color: string,
 };
 
-export type MetricProps = {
-  name: string,
-  maxValue: number,
-  minValue: number,
-  colorGroups: ColorGroup[],
-  type: MetricType,
+export type TNullableColorGroup = {
+  +minValue?: ?number | string,
+  +maxValue?: ?number | string,
+  +color?: string,
 };
 
-export type NullableMetricProps = {
-  name?: string,
-  maxValue?: number,
-  minValue?: number,
-  colorGroups?: NullableColorGroup[],
-  type?: MetricType,
+export type TMetricProps = {
+  +name: string,
+  +maxValue: number,
+  +minValue: number,
+  +colorGroups: TColorGroup[],
+  +type: TMetricType,
 };
 
-export type EditedMetricProps = {
-  name: string,
-  maxValue?: number,
-  minValue?: number,
-  colorGroups: NullableColorGroup[],
-  type?: MetricType,
+export type TNullableMetricProps = {
+  +name?: string,
+  +maxValue?: ?number | string,
+  +minValue?: ?number | string,
+  +colorGroups?: TNullableColorGroup[],
+  +type?: ?TMetricType,
 };
 
-export type MetricEntry = {
-  date: string,
-  value: number,
+export type TEditedMetricProps = {
+  +name: string,
+  +maxValue: ?number,
+  +minValue: ?number,
+  +colorGroups: TEditedColorGroup[],
+  +type: ?TMetricType,
 };
 
-export type Metric = {
+export type TMetricEntry = {
+  +date: string,
+  +value: number,
+};
+
+export type TMetric = {
+  +id: number,
+  +props: TMetricProps,
+  +lastModified?: number,
+  +entries: TMetricEntry[],
+};
+
+export type TOldMetric = {
   id: number,
-  props: MetricProps,
-  lastModified?: number,
-  entries: MetricEntry[],
+  name?: ?string,
+  maxValue?: ?number,
+  minValue?: ?number,
+  type?: ?TMetricType,
+  colorGroups?: ?TColorGroup[],
+  entries?: ?TMetricEntry[],
 };
 
-export type EditedMetric = {
-  id: number,
-  props: {
-    name: string,
-    maxValue?: number,
-    minValue?: number,
-    colorGroups: NullableColorGroup[],
+export type TEditedMetric = {
+  +id: number,
+  +props: TEditedMetricProps,
+};
+
+export type TAuthenticationState = {
+  +isAuthenticated: boolean,
+  +isAuthenticating: boolean,
+  +accessToken?: string,
+  +error?: string,
+  +lastAuthenticated?: number,
+};
+
+export type TMetricsState = {
+  +isSyncing: boolean,
+  +isSynced: boolean,
+  +lastSynced?: number,
+  +items?: TMetric[],
+  +error?: string,
+};
+
+export type TModalAction = {
+  +label: string,
+  +action: TAction,
+};
+
+export type TModal = {
+  +title: string,
+  +message: string,
+  +actions: {
+    +confirm: TModalAction,
+    +cancel: TModalAction,
   },
+  +userResponse?: 'confirm' | 'cancel' | null,
 };
 
-export type AuthenticationState = {
-  isAuthenticated: boolean,
-  isAuthenticating: boolean,
-  accessToken?: string,
-  error?: string,
-  lastAuthenticated?: number,
+export type TSettingsState = {
+  +editedMetric?: TEditedMetric,
+  +isModified: boolean,
+  +error?: string,
 };
 
-export type MetricsState = {
-  isSyncing: boolean,
-  isSynced: boolean,
-  lastSynced?: number,
-  items?: Metric[],
-  error?: string,
-};
+export type TChartsState = TChart[];
 
-export type ModalAction = {
-  label: string,
-  action: Action, // TODO create action types
-};
-
-export type Modal = {
-  title: string,
-  message: string,
-  actions: {
-    confirm: ModalAction,
-    cancel: ModalAction,
-  },
-};
-
-export type SettingsState = {
-    editedMetric?: EditedMetric,
-    isModified: boolean,
-};
-
-export type ApplicationState = {
-  metrics: MetricsState,
-  charts: Chart[],
-  authentication: AuthenticationState,
-  modals: Modal[],
-  settings: SettingsState,
+export type TApplicationState = {
+  +metrics: TMetricsState,
+  +charts: TChartsState,
+  +authentication: TAuthenticationState,
+  +modals: TModal[],
+  +settings: TSettingsState,
 };

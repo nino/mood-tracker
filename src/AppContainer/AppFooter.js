@@ -3,8 +3,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Button } from '@blueprintjs/core';
 import { requestLogout } from '../actions';
-import type { ApplicationState } from '../types';
-import type { Action } from '../actionTypes';
+import type { TApplicationState } from '../types';
+import type { TAction } from '../actionTypes';
 import './AppFooter.css';
 
 type LogoutButtonProps = { logoutClick: (void) => void };
@@ -29,11 +29,11 @@ export const AppFooter = ({ loggedIn, logoutClick }: AppFooterProps) => (
 
 AppFooter.defaultProps = { loggedIn: false };
 
-const stateToProps = (state: ApplicationState) => ({
+const stateToProps = (state: TApplicationState) => ({
   loggedIn: state.authentication.isAuthenticated,
 });
 
-const dispatchToProps = (dispatch: Action => void) => ({
+const dispatchToProps = (dispatch: TAction => void) => ({
   logoutClick: () => dispatch(requestLogout()),
 });
 

@@ -1,21 +1,22 @@
 /* @flow */
+/* global SyntheticInputEvent */
 import React from 'react';
 import { Button } from '@blueprintjs/core';
-import type { NullableColorGroup } from '../types';
+import type { TNullableMetricProps, TEditedColorGroup, TNullableColorGroup } from '../types';
 
-type SingleColorGroupSettingsProps = {
-  colorGroup: NullableColorGroup,
-  onUpdate: { [string]: number } => void,
-  editing: boolean,
-  onDelete: (number) => void,
+type TSingleColorGroupSettingsProps = {
+  colorGroup: TEditedColorGroup,
+  onUpdate: (TNullableColorGroup) => void,
+  editing?: boolean,
+  onDelete: (void) => void,
 };
 
-export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDelete }: SingleColorGroupSettingsProps) => (
+export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDelete }: TSingleColorGroupSettingsProps) => (
   <div className={`single-color-group-${editing ? 'editing' : 'not-editing'}`}>
     <label className="pt-label pt-inline" htmlFor="minValue">
       From
       <input
-        onChange={e => onUpdate({ minValue: e.target.value })}
+        onChange={(e: SyntheticInputEvent) => onUpdate({ minValue: e.target.value })}
         name="minValue"
         className="color-group-minValue-field pt-input"
         disabled={!editing}
@@ -25,7 +26,7 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
     <label className="pt-label pt-inline" htmlFor="maxValue">
       to
       <input
-        onChange={e => onUpdate({ maxValue: e.target.value })}
+        onChange={(e: SyntheticInputEvent) => onUpdate({ maxValue: e.target.value })}
         name="maxValue"
         className="color-group-maxValue-field pt-input"
         disabled={!editing}
@@ -35,7 +36,7 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
     <label className="pt-label pt-inline" htmlFor="color">
       use
       <input
-        onChange={e => onUpdate({ color: e.target.value })}
+        onChange={(e: SyntheticInputEvent) => onUpdate({ color: e.target.value })}
         name="color"
         className="color-group-color-field pt-input"
         disabled={!editing}
@@ -55,14 +56,16 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
   </div>
 );
 
-type ColorGroupsSettingsProps = {
-  colorGroups: NullableColorGroup[],
-  onUpdate: (NullableColorGroup[]) => void,
+SingleColorGroupSettings.defaultProps = { editing: false };
+
+type TColorGroupsSettingsProps = {
+  colorGroups: TEditedColorGroup[],
+  onUpdate: (TNullableMetricProps) => void,
   editing: boolean,
 };
 
-const ColorGroupsSettings = ({ colorGroups, onUpdate, editing }: ColorGroupsSettingsProps) => {
-  function handleChange(index, updatedField) {
+const ColorGroupsSettings = ({ colorGroups, onUpdate, editing }: TColorGroupsSettingsProps) => {
+  function handleChange(index: number, updatedField: TNullableColorGroup): void {
     onUpdate({
       colorGroups: colorGroups.slice(0, index).concat(
         { ...colorGroups[index], ...updatedField },

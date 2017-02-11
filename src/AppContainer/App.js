@@ -12,16 +12,16 @@ import { beginSyncData, beginCheckLogin } from '../actions';
 import Modal from '../Modal';
 import ActivityIndicator from '../ActivityIndicator';
 import type {
-  ApplicationState,
-  MetricsState,
-  AuthenticationState,
+  TApplicationState,
+  TMetricsState,
+  TAuthenticationState,
 } from '../types';
+import type { TAction } from '../actionTypes';
 
 type AppProps = {
-  // TODO add doc
-  dispatch: (action: any) => void,
-  metrics: MetricsState,
-  authentication: AuthenticationState,
+  dispatch: (TAction) => void,
+  metrics: TMetricsState,
+  authentication: TAuthenticationState,
 };
 
 export class App extends React.Component {
@@ -78,7 +78,7 @@ export class App extends React.Component {
   }
 }
 
-const stateToProps = (state: ApplicationState) => ({
+const stateToProps = (state: TApplicationState) => ({
   authentication: state.authentication,
   metrics: state.metrics,
 });

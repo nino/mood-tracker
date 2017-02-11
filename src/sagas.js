@@ -20,6 +20,12 @@ import {
   successCancelModal,
   errorCancelModal,
 } from './actions';
+import type {
+  TAuthenticationState,
+  TMetric,
+  TMetricProps,
+  TEditedColorGroup,
+} from './types';
 import {
   getAuthentication,
   getMetricsItems,

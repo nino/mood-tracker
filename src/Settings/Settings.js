@@ -4,12 +4,13 @@ import { connect } from 'react-redux';
 import { Button } from '@blueprintjs/core';
 import MetricSettings from './MetricSettings';
 import * as Actions from '../actions';
-import type { Metric, EditedMetric } from '../types';
+import type { TMetric, TEditedMetric, TApplicationState } from '../types';
+import type { TAction } from '../actionTypes';
 
-type SettingsProps = {
-  metrics: Metric[],
-  editedMetric: EditedMetric,
-  addMetric: (void) => void,
+type TSettingsProps = {
+  metrics: TMetric[],
+  editedMetric: TEditedMetric | null,
+  addMetric: (TAction) => void,
 };
 
 /**
@@ -17,7 +18,7 @@ type SettingsProps = {
  * The primary purpose of the settings is
  * to add, modify, and delete tracked metrics.
  */
-export const Settings = ({ metrics, editedMetric, addMetric }: SettingsProps) => (
+export const Settings = ({ metrics, editedMetric, addMetric }: TSettingsProps) => (
   <div className="settings">
     <h4>Settings</h4>
     {metrics.map((metric) => {
@@ -37,12 +38,12 @@ export const Settings = ({ metrics, editedMetric, addMetric }: SettingsProps) =>
   </div>
 );
 
-const stateToProps = state => ({
+const stateToProps = (state: TApplicationState) => ({
   metrics: state.metrics.items,
   editedMetric: state.settings.editedMetric,
 });
 
-const dispatchToProps = dispatch => ({
+const dispatchToProps = (dispatch: (TAction) => void) => ({
   addMetric: () => dispatch(Actions.addMetric()),
 });
 

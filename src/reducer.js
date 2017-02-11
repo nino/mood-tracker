@@ -2,43 +2,62 @@
 import { max } from 'lodash';
 import * as Actions from './actions';
 import { DEFAULT_METRIC_PROPS } from './constants';
-import chartsReducer from './DataDisplay/reducer';
-import type { ApplicationState, Action } from './types';
+import chartsReducer from './Charts/reducer';
+import type {
+  TApplicationState,
+  TEditedColorGroup,
+  TNullableColorGroup,
+  TEditedMetricProps,
+} from './types';
+import type {
+  TAction,
+  TLogMetricAction,
+  TStartEditingAction,
+  TStopEditingAction,
+  TSuccessUpdateMetricAction,
+  TErrorUpdateMetricAction,
+  TAddMetricAction,
+  TReorderMetricsAction,
+  TDeleteMetricAction,
+  TUpdateEditedMetricAction,
+  TSuccessSyncDataAction,
+  TErrorSyncDataAction,
+  TSuccessCheckLoginAction,
+  TErrorCheckLoginAction,
+  TSuccessRestoreCacheAction,
+} from './actionTypes';
 
-export const INITIAL_STATE: ApplicationState = {
+export const INITIAL_STATE: TApplicationState = {
   metrics: {
     isSyncing: false,
     isSynced: false,
-    lastSynced: null,
-    items: null,
-    error: null,
   },
   charts: [],
   authentication: {
     isAuthenticated: false,
-    error: null,
-    accessToken: null,
-    lastAuthenticated: null,
     isAuthenticating: false,
   },
   modals: [],
   settings: {
-    editedMetric: null,
     isModified: false,
   },
 };
 
-function beginCheckLogin(state: ApplicationState) {
+function beginCheckLogin(state: TApplicationState): TApplicationState {
   return {
     ...state,
     authentication: {
       isAuthenticating: true,
-      error: null,
+      isAuthenticated: false,
     },
   };
 }
 
-function successCheckLogin(state: ApplicationState, action: Action) {
+function successCheckLogin(state: TApplicationState, action: TSuccessCheckLoginAction): TApplicationState {
+  if (!action.lastAuthenticated || !action.accessToken) {
+    return state;
+  }
+
   return {
     ...state,
     authentication: {

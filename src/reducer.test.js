@@ -36,6 +36,7 @@ import {
   errorCheckLogin,
 } from './actions';
 import { DEFAULT_METRIC_PROPS } from './constants';
+import type { TApplicationState, TMetric } from './types';
 
 describe('reducer', () => {
   it('returns the state when receiving an unknown action', () => {

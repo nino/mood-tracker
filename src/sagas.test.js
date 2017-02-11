@@ -21,8 +21,17 @@ import {
 } from '../test/SampleMetrics';
 import { DATA_FILE_PATH } from './constants';
 import { isValidMetricsArray } from './lib';
+import type {
+  TMetric,
+  TEditedMetricProps,
+  TAuthenticationState,
+  TOldMetric,
+  TModal,
+ } from './types';
+import { requestUpdateMetric } from './actions';
+import { getMetricsItems, getAuthentication } from './selectors';
 
-const authAuthenticated = {
+const authAuthenticated: TAuthenticationState = {
   isAuthenticated: true,
   isAuthenticating: false,
   accessToken: 'yup',

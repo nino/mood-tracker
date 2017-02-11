@@ -2,7 +2,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Button } from '@blueprintjs/core';
-import type { Metric, EditedMetric } from '../types';
+import type { TEditedMetric, TMetric, TNullableMetricProps } from '../types';
+import type { TAction } from '../actionTypes';
 import {
   startEditingMetric,
   updateEditedMetric,
@@ -15,11 +16,11 @@ import ColorGroupsSettings from './ColorGroupsSettings';
 
 import './MetricSettings.css';
 
-type MetricSettingsProps = {
+type TMetricSettingsProps = {
   /**
    * A tracking metric must be provided.
    */
-  metric: EditedMetric | Metric,
+  metric: TEditedMetric | TMetric,
 
   /**
    * Setting this to true will enable the form fields
@@ -31,7 +32,7 @@ type MetricSettingsProps = {
   /**
    * Send action to parent.
    */
-  dispatch: (any) => void,
+  dispatch: (TAction) => void,
 };
 
 
@@ -42,7 +43,7 @@ type MetricSettingsProps = {
  * This can be changed by passing the prop editing=true.
  * Clicking the component should activate edit-mode.
  */
-export const MetricSettings = ({ metric, editing, dispatch }: MetricSettingsProps) => {
+export const MetricSettings = ({ metric, editing, dispatch }: TMetricSettingsProps) => {
   let ButtonRow;
   if (editing) {
     ButtonRow = (
@@ -109,7 +110,7 @@ export const MetricSettings = ({ metric, editing, dispatch }: MetricSettingsProp
             className="minValue-field pt-input"
             disabled={!editing}
             value={metric.props.minValue || ''}
-            onChange={event => dispatch(updateEditedMetric({ minValue: event.target.value }))}
+            onChange={(event: SyntheticInputEvent) => dispatch(updateEditedMetric({ minValue: event.target.value }))}
           />
         </label>
         <label className="pt-label" htmlFor="maxValue">
