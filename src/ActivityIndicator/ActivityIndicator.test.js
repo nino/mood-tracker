@@ -2,9 +2,8 @@
 /* eslint-env jest */
 /* eslint-disable no-unused-expressions */
 import React from 'react';
-import { shallow, mount } from 'enzyme';
 import { expect } from 'chai';
-
+import { shallow, mount } from 'enzyme';
 import { ActivityIndicator } from '../ActivityIndicator';
 
 describe('ActivityIndicator', () => {
@@ -20,17 +19,13 @@ describe('ActivityIndicator', () => {
 
   it('renders a toast in the toaster if syncing', () => {
     const component = mount(<ActivityIndicator isSyncing />).update();
-    expect(component.find('Toaster').get(0))
-      .to.have.property('getToasts').and.to.be.a('function');
-    expect(component.find('Toaster').get(0).getToasts())
-      .to.have.length(1);
+    expect(typeof component.find('Toaster').get(0).props.getToasts === 'function');
+    expect(component.find('Toaster').get(0).props.getToasts().length).to.equal(1);
   });
 
   it('renders no toast in the toaster if not syncing', () => {
     const component = mount(<ActivityIndicator isSyncing={false} />).update();
-    expect(component.find('Toaster').get(0))
-      .to.have.property('getToasts').and.to.be.a('function');
-    expect(component.find('Toaster').get(0).getToasts())
-      .to.have.length(0);
+    expect(typeof component.find('Toaster').get(0).props.getToasts === 'function');
+    expect(component.find('Toaster').get(0).props.getToasts().length === 0);
   });
 });
