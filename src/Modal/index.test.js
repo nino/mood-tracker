@@ -31,10 +31,7 @@ describe('Modal', () => {
 
   describe('if modals exist', () => {
     const component = shallow(
-      <Modal
-        modals={modalsSubStates.oneModal}
-        dispatch={jest.fn()}
-      />);
+      <Modal modals={modalsSubStates.oneModal} dispatch={jest.fn()} />);
 
     it('renders one modal-container div', () => {
       expect(component.find('div.no-modal')).to.have.length(0);
@@ -58,13 +55,7 @@ describe('Modal', () => {
     const dispatch = jest.fn();
 
     beforeAll(() => {
-      mount(
-        <WrappedComponent
-          modals={modalsSubStates.oneModal}
-          dispatch={dispatch}
-        />,
-        { attachTo: document.body },
-      );
+      mount(<WrappedComponent modals={modalsSubStates.oneModal} dispatch={dispatch} />, { attachTo: document.createElement('div') });
     });
 
     it('dispatches confirmModal on click confirm', () => {

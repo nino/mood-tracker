@@ -1,12 +1,12 @@
 /* @flow */
 import React from 'react';
 import { connect } from 'react-redux';
-import type { Metric } from '../types';
+import type { TMetric } from '../types';
 
 import MetricEntryContainer from './MetricEntryContainer';
 
 type DataEntryContainerProps = {
-  metrics: Metric[],
+  metrics: TMetric[],
 };
 
 export const DataEntryContainer = ({ metrics }: DataEntryContainerProps) => {

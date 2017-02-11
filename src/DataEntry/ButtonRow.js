@@ -5,7 +5,7 @@ import { Button } from '@blueprintjs/core';
 type ButtonRowProps = {
   values: number[],
   colors: string[],
-  onClick: void => void,
+  onClick: (value: number) => void,
 };
 
 const ButtonRow = ({ values, colors, onClick }: ButtonRowProps) => (

@@ -13,7 +13,7 @@ describe('MetricSettings', () => {
   describe('sub-components', () => {
     it('renders sub-components if editing', () => {
       const component = shallow(
-        <MetricSettings metric={MoodWithEntries} dispatch={() => null} editing />);
+        <MetricSettings metric={MoodWithEntries} dispatch={jest.fn()} editing />);
 
       const nameField = component.find('.name-field');
       expect(nameField, 'must render name field').to.have.length(1);
@@ -47,7 +47,7 @@ describe('MetricSettings', () => {
 
     it('renders subcomponents if not editing', () => {
       const component = shallow(
-        <MetricSettings metric={MoodWithEntries} dispatch={() => null} />);
+        <MetricSettings metric={MoodWithEntries} dispatch={jest.fn()} />);
 
       const nameField = component.find('.name-field');
       expect(nameField, 'must render name field').to.have.length(1);

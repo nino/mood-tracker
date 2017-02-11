@@ -1,14 +1,15 @@
 // @flow
 import React from 'react';
 import { connect } from 'react-redux';
-import { Metric, Action, ColorGroup } from '../types';
+import type { TMetric, TColorGroup } from '../types';
+import type { TAction } from '../actionTypes';
 import { logMetric } from '../actions';
 import './MetricEntryContainer.css';
 
 import ButtonRow from './ButtonRow';
 import TextInput from './TextInput';
 
-function getColors(values: number[], colorGroups: ColorGroup[]): string[] {
+function getColors(values: number[], colorGroups: TColorGroup[]): string[] {
   if (!colorGroups || colorGroups.length === 0) {
     return values.map(() => '');
   }
@@ -23,8 +24,8 @@ function getColors(values: number[], colorGroups: ColorGroup[]): string[] {
 }
 
 type MetricEntryContainerProps = {
-  metric: Metric,
-  dispatch: Action => void,
+  metric: TMetric,
+  dispatch: TAction => void,
 };
 
 export const MetricEntryContainer = ({ metric, dispatch }: MetricEntryContainerProps) => {
@@ -45,7 +46,7 @@ export const MetricEntryContainer = ({ metric, dispatch }: MetricEntryContainerP
       <ButtonRow
         values={values}
         colors={getColors(values, colorGroups)}
-        onClick={value => dispatch(logMetric(id, dateString, value))}
+        onClick={(value: number) => dispatch(logMetric(id, dateString, value))}
       />);
   } else {
     entryComponent = <TextInput onSubmit={value => dispatch(logMetric(id, dateString, value))} />;

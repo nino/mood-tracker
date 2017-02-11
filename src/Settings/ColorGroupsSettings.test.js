@@ -9,21 +9,18 @@ import { MoodWithEntries } from '../../test/SampleMetrics';
 describe('SingleColorGroupSettings', () => {
   it('renders all text fields', () => {
     const component = shallow(
-      <SingleColorGroupSettings colorGroup={MoodWithEntries.props.colorGroups} editing />);
-    expect(component.find('.color-group-maxValue-field'), 'must render maxValue field')
-      .to.have.length(1);
-    expect(component.find('.color-group-minValue-field'), 'must render minValue field')
-      .to.have.length(1);
-    expect(component.find('.color-group-color-field'), 'must render color field')
-      .to.have.length(1);
+      <SingleColorGroupSettings colorGroup={MoodWithEntries.props.colorGroups[0]} onUpdate={jest.fn()} onDelete={jest.fn()} editing />);
+    expect(component.find('.color-group-maxValue-field'), 'must render maxValue field').to.have.length(1);
+    expect(component.find('.color-group-minValue-field'), 'must render minValue field').to.have.length(1);
+    expect(component.find('.color-group-color-field'), 'must render color field').to.have.length(1);
   });
 
   it('renders a "delete color group" button if editing', () => {
     const component = shallow(
       <SingleColorGroupSettings
         colorGroup={MoodWithEntries.props.colorGroups[0]}
-        onUpdate={() => null}
-        onDelete={() => null}
+        onUpdate={jest.fn()}
+        onDelete={jest.fn()}
         editing
       />);
     expect(component.find('.delete-color-group-button')).to.have.length(1);
@@ -33,8 +30,8 @@ describe('SingleColorGroupSettings', () => {
     const component = shallow(
       <SingleColorGroupSettings
         colorGroup={MoodWithEntries.props.colorGroups[0]}
-        onUpdate={() => null}
-        onDelete={() => null}
+        onUpdate={jest.fn()}
+        onDelete={jest.fn()}
       />);
     expect(component.find('.delete-color-group-button')).to.have.length(0);
   });
@@ -77,23 +74,19 @@ describe('SingleColorGroupSettings', () => {
 describe('ColorGroupsSettings', () => {
   it('renders 4 SingleColorGroupSettings', () => {
     const component = shallow(
-      <ColorGroupsSettings colorGroups={MoodWithEntries.props.colorGroups} editing />);
+      <ColorGroupsSettings colorGroups={MoodWithEntries.props.colorGroups} onUpdate={jest.fn()} editing />);
     expect(component.find('SingleColorGroupSettings')).to.have.length(4);
   });
 
   it('renders a "new color group" button if editing', () => {
     const component = shallow(
-      <ColorGroupsSettings
-        colorGroups={MoodWithEntries.props.colorGroups} onUpdate={() => null} editing
-      />);
+      <ColorGroupsSettings colorGroups={MoodWithEntries.props.colorGroups} onUpdate={jest.fn()} editing />);
     expect(component.find('.add-color-group-button')).to.have.length(1);
   });
 
   it('does not render a "new color group" button if not editing', () => {
     const component = shallow(
-      <ColorGroupsSettings
-        colorGroups={MoodWithEntries.props.colorGroups} onUpdate={() => null}
-      />);
+      <ColorGroupsSettings colorGroups={MoodWithEntries.props.colorGroups} onUpdate={jest.fn()} editing={false} />);
     expect(component.find('.add-color-group-button')).to.have.length(0);
   });
 

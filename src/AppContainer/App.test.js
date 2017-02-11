@@ -74,11 +74,7 @@ describe('App', () => {
       metricsSubStates.syncingNoData,
     ];
     metricsOptions.forEach((metricsOption) => {
-      const component = shallow(
-        <App
-          metrics={metricsOption}
-          authentication={authSubStates.authenticated}
-        />);
+      const component = shallow(<App dispatch={jest.fn()} metrics={metricsOption} authentication={authSubStates.authenticated} />);
       expect(component.find('LoadingScreen')).to.have.length(1);
     });
   });
@@ -91,6 +87,7 @@ describe('App', () => {
     metricsOptions.forEach((metricsOption) => {
       const component = shallow(
         <App
+          dispatch={jest.fn()}
           metrics={metricsOption}
           authentication={authSubStates.authenticated}
         />);
@@ -103,7 +100,7 @@ describe('App', () => {
       <App
         metrics={metricsSubStates.syncedMetricsWithEntries}
         authentication={authSubStates.notAuthenicatedNotAuthenticating}
-        dispatch={() => null}
+        dispatch={jest.fn()}
       />);
     expect(component.find('LoadingScreen')).to.have.length(1);
   });
@@ -113,7 +110,7 @@ describe('App', () => {
       <App
         metrics={metricsSubStates.syncedMetricsWithEntries}
         authentication={authSubStates.withError}
-        dispatch={() => null}
+        dispatch={jest.fn()}
       />);
     expect(component.find(LoginScreen)).to.have.length(1);
   });
@@ -122,6 +119,7 @@ describe('App', () => {
     const component = shallow(
       <App
         metrics={metricsSubStates.syncedMetricsWithEntries}
+        dispatch={jest.fn()}
         authentication={authSubStates.authenticated}
       />);
 

@@ -47,11 +47,8 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
       <Button
         onClick={onDelete}
         className="delete-color-group-button pt-icon-delete"
-        style={{
-          height: '1em',
-        }}
       />
-    ) : (null)
+    ) : (<div />)
     }
   </div>
 );
@@ -66,28 +63,26 @@ type TColorGroupsSettingsProps = {
 
 const ColorGroupsSettings = ({ colorGroups, onUpdate, editing }: TColorGroupsSettingsProps) => {
   function handleChange(index: number, updatedField: TNullableColorGroup): void {
+    const selectedColorGroup: TEditedColorGroup = colorGroups[index];
+    if (selectedColorGroup == null) { return; }
+    const updatedColorGroup: TNullableColorGroup = { ...selectedColorGroup, ...updatedField };
     onUpdate({
-      colorGroups: colorGroups.slice(0, index).concat(
-        { ...colorGroups[index], ...updatedField },
-        colorGroups.slice(index + 1, colorGroups.length),
-      ),
+      colorGroups: [
+        ...colorGroups.slice(0, index),
+        updatedColorGroup,
+        ...colorGroups.slice(index + 1, colorGroups.length),
+      ],
     });
   }
 
   function handleAddColorGroup() {
-    onUpdate({
-      colorGroups: colorGroups.concat({
-        minValue: null,
-        maxValue: null,
-        color: '',
-      }),
-    });
+    onUpdate({ colorGroups: [...colorGroups, { color: '', minValue: null, maxValue: null }] });
   }
 
-  function handleDeleteColorGroup(idx) {
-    onUpdate({
-      colorGroups: colorGroups.slice(0, idx).concat(colorGroups.slice(idx + 1, colorGroups.length)),
-    });
+  function handleDeleteColorGroup(idx: number): void {
+    const before = colorGroups.slice(0, idx);
+    const after = colorGroups.slice(idx + 1, colorGroups.length);
+    onUpdate({ colorGroups: [...before, ...after] });
   }
 
   // TODO give eveyrthing an ID

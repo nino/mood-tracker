@@ -39,10 +39,9 @@ describe('MetricEntryContainer', () => {
 
   it('dispatches "log metric" action on submitting text form', () => {
     const dispatch = jest.fn();
-    const component = mount(<MetricEntryContainer
-      metric={BurnsWithoutEntries} dispatch={dispatch}
-    />);
-    component.find('input.metric-entry-text-input').get(0).value = '12';
+    const component = mount(<MetricEntryContainer metric={BurnsWithoutEntries} dispatch={dispatch} />);
+    const input = component.find('input.metric-entry-text-input').get(0);
+    (input: React.DOM.HTMLElement).value = '12';
     component.find('input.metric-entry-text-input').first().simulate('change');
     component.find('form').first().simulate('submit');
     expect(dispatch.mock.calls).to.have.length(1);

@@ -2,15 +2,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Button, Dialog, Intent } from '@blueprintjs/core';
-import type { Modal as TModal, Action, ApplicationState } from '../types';
+import type { TModal, TApplicationState } from '../types';
+import type { TAction } from '../actionTypes';
 import { requestConfirmModal, requestCancelModal } from '../actions';
 
-type ModalProps = {
+type TModalProps = {
   modals: TModal[],
-  dispatch: Action => void,
+  dispatch: TAction => void,
 };
 
-export const Modal = ({ modals, dispatch }: ModalProps) => {
+export const Modal = ({ modals, dispatch }: TModalProps) => {
   if (modals.length === 0) {
     return <div className="no-modal" />;
   }
@@ -42,6 +43,6 @@ export const Modal = ({ modals, dispatch }: ModalProps) => {
   );
 };
 
-const stateToProps = (state: ApplicationState) => ({ modals: state.modals });
+const stateToProps = (state: TApplicationState) => ({ modals: state.modals });
 
 export default connect(stateToProps)(Modal);

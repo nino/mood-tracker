@@ -19,12 +19,12 @@ const mockStore = configureMockStore();
 describe('Settings', () => {
   it('renders MetricSettings for each metric', () => {
     const component = shallow(
-      <Settings metrics={[MoodWithEntries, BurnsWithoutEntries]} editedMetric={null} />);
+      <Settings metrics={[MoodWithEntries, BurnsWithoutEntries]} editedMetric={null} addMetric={jest.fn()} />);
     expect(component.find(MetricSettings)).to.have.length(2);
   });
 
-  it('renders Add Metric button', () => {
-    const component = shallow(<Settings metrics={[MoodWithEntries]} />);
+  it('renders Add TMetric button', () => {
+    const component = shallow(<Settings metrics={[MoodWithEntries]} editedMetric={null} addMetric={jest.fn()} />);
     expect(component.find('#add-metric-button')).to.have.length(1);
     expect(component.find('#add-metric-button').first()).to.have.property('props')
       .and.to.be.a('function');
@@ -32,11 +32,12 @@ describe('Settings', () => {
       .to.have.property('disabled', false);
   });
 
-  it('disables Add Metric button if editing', () => {
+  it('disables Add TMetric button if editing', () => {
     const component = shallow(
       <Settings
         metrics={[MoodWithEntries, BurnsWithoutEntries]}
-        editedMetric={{ id: 1, props: MoodWithEntries.props }}
+        editedMetric={{ id: 1, props: { ...MoodWithEntries.props } }}
+        addMetric={jest.fn()}
       />);
     expect(component.find('#add-metric-button')).to.have.length(1);
     expect(component.find('#add-metric-button').first()).to.have.property('props')

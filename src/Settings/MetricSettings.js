@@ -1,4 +1,5 @@
 /* @flow */
+/* global SyntheticInputEvent */
 import React from 'react';
 import { connect } from 'react-redux';
 import { Button } from '@blueprintjs/core';
@@ -7,7 +8,7 @@ import type { TAction } from '../actionTypes';
 import {
   startEditingMetric,
   updateEditedMetric,
-  updateMetric,
+  requestUpdateMetric,
   reorderMetrics,
   stopEditing,
   deleteMetric,
@@ -27,7 +28,7 @@ type TMetricSettingsProps = {
    * for manipulation by the user.
    * default value: false.
    */
-  editing: boolean,
+  editing?: boolean,
 
   /**
    * Send action to parent.
@@ -71,7 +72,7 @@ export const MetricSettings = ({ metric, editing, dispatch }: TMetricSettingsPro
         </Button>
         <Button
           className="update-metric-button pt-intent-success pt-icon-tick"
-          onClick={() => dispatch(updateMetric(metric.id, metric.props, (new Date()).getTime()))}
+          onClick={() => dispatch(requestUpdateMetric(metric.id, metric.props))}
         >
           Save
         </Button>
@@ -100,7 +101,7 @@ export const MetricSettings = ({ metric, editing, dispatch }: TMetricSettingsPro
             className="name-field pt-input"
             disabled={!editing}
             value={metric.props.name || ''}
-            onChange={event => dispatch(updateEditedMetric({ name: event.target.value }))}
+            onChange={(event: SyntheticInputEvent) => dispatch(updateEditedMetric({ name: event.target.value }))}
           />
         </label>
         <label className="pt-label" htmlFor="minValue">
@@ -120,18 +121,20 @@ export const MetricSettings = ({ metric, editing, dispatch }: TMetricSettingsPro
             className="maxValue-field pt-input"
             disabled={!editing}
             value={metric.props.maxValue || ''}
-            onChange={event => dispatch(updateEditedMetric({ maxValue: event.target.value }))}
+            onChange={(event: SyntheticInputEvent) => dispatch(updateEditedMetric({ maxValue: event.target.value }))}
           />
         </label>
         <ColorGroupsSettings
           colorGroups={metric.props.colorGroups}
-          editing={editing}
-          onUpdate={newProps => dispatch(updateEditedMetric(newProps))}
+          editing={!!editing}
+          onUpdate={(newProps: TNullableMetricProps) => dispatch(updateEditedMetric({ ...newProps }))}
         />
         {ButtonRow}
       </form>
     </div>
   );
 };
+
+MetricSettings.defaultProps = { editing: false };
 
 export default connect()(MetricSettings);
