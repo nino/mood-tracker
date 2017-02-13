@@ -41,6 +41,7 @@ import {
   asTMetricProps,
 } from './lib';
 import type { TRequestUpdateMetricAction } from './actionTypes';
+import chartSagas from './Charts/sagas';
 
 export function* syncData(): Generator<any, any, any> {
   const authentication: TAuthenticationState = yield* select(getAuthentication);
@@ -180,4 +181,5 @@ export function* watcherSaga(): Generator<any, any, any> {
   yield* takeEvery('REQUEST_LOGOUT', executeLogout);
   yield* takeEvery('REQUEST_RESTORE_CACHE', restoreCache);
   yield* takeEvery('REQUEST_UPDATE_METRIC', updateMetric);
+  yield* chartSagas();
 }
