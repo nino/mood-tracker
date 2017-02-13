@@ -65,12 +65,15 @@ function successCheckLogin(state: TApplicationState, action: TSuccessCheckLoginA
       isAuthenticated: true,
       lastAuthenticated: action.lastAuthenticated,
       accessToken: action.accessToken,
-      error: null,
     },
   };
 }
 
-function errorCheckLogin(state: ApplicationState, action: Action) {
+function errorCheckLogin(state: TApplicationState, action: TErrorCheckLoginAction): TApplicationState {
+  if (!action.error) {
+    return state;
+  }
+
   return {
     ...state,
     authentication: {
@@ -81,23 +84,37 @@ function errorCheckLogin(state: ApplicationState, action: Action) {
   };
 }
 
-function startEditingMetric(state: ApplicationState, action: Action) {
+function startEditingMetric(state: TApplicationState, action: TStartEditingAction): TApplicationState {
   const { metrics, settings } = state;
   const { editedMetric, isModified } = settings;
   const { items } = metrics;
   const { metricId, discard } = action;
+  if (metricId === null || metricId === undefined) {
+    return state;
+  }
+  if (discard === null || discard === undefined) {
+    return state;
+  }
+  if (items === null || items === undefined) {
+    return state;
+  }
   const index = items.findIndex(m => (m.id === metricId));
   if (index === -1) {
     return state;
   }
 
   if (!editedMetric || discard || !isModified) {
+    if (items[index] == null) {
+      return state;
+    }
+
+    const editedMetricProps: TEditedMetricProps = { ...items[index].props };
     return {
       ...state,
       settings: {
         editedMetric: {
           id: metricId,
-          props: items[index].props,
+          props: editedMetricProps,
         },
         isModified: false,
       },
@@ -120,7 +137,7 @@ function startEditingMetric(state: ApplicationState, action: Action) {
       },
       cancel: {
         label: `Continue editing ${editedMetric.props.name}`,
-        action: { type: 'default action' },
+        action: { type: 'DEFAULT_ACTION' },
       },
     },
   };
@@ -130,7 +147,11 @@ function startEditingMetric(state: ApplicationState, action: Action) {
   };
 }
 
-function updateMetric(state: ApplicationState, action: Action) {
+function requestUpdateMetric(state: TApplicationState): TApplicationState {
+  return state;
+}
+
+function successUpdateMetric(state: TApplicationState, action: TSuccessUpdateMetricAction): TApplicationState {
   const { metricId, newProps, lastModified } = action;
   const { metrics } = state;
   const { items } = metrics;
@@ -142,7 +163,6 @@ function updateMetric(state: ApplicationState, action: Action) {
   return {
     ...state,
     settings: {
-      editedMetric: null,
       isModified: false,
     },
     metrics: {
@@ -160,9 +180,26 @@ function updateMetric(state: ApplicationState, action: Action) {
   };
 }
 
-function logMetric(state: ApplicationState, action: Action) {
+function errorUpdateMetric(state: TApplicationState, action: TErrorUpdateMetricAction): TApplicationState {
+  return {
+    ...state,
+    modals: [{
+      title: 'Some fields are not quite right.',
+      message: `${JSON.stringify(action.invalidFields)}`,
+      actions: {
+        confirm: { action: { type: 'DEFAULT_ACTION' }, label: 'Ok' },
+        cancel: { action: { type: 'DEFAULT_ACTION' }, label: 'Ok' },
+      },
+    }],
+  };
+}
+
+function logMetric(state: TApplicationState, action: TLogMetricAction): TApplicationState {
   const { metrics } = state;
   const { items } = metrics;
+  if (!items) {
+    return state;
+  }
   const { metricId, date, value } = action;
   const metricIndex = items.findIndex(m => (m.id === metricId));
   if (metricIndex === -1) {
@@ -189,7 +226,7 @@ function logMetric(state: ApplicationState, action: Action) {
   };
 }
 
-function stopEditing(state: ApplicationState, action: Action) {
+function stopEditing(state: TApplicationState, action: TStopEditingAction): TApplicationState {
   const { settings, modals } = state;
   const { editedMetric, isModified } = settings;
   const { discard } = action;
@@ -199,7 +236,6 @@ function stopEditing(state: ApplicationState, action: Action) {
     return {
       ...state,
       settings: {
-        editedMetric: null,
         isModified: false,
       },
     };
@@ -218,7 +254,7 @@ function stopEditing(state: ApplicationState, action: Action) {
           label: 'Discard changes',
         },
         cancel: {
-          action: { type: 'default action' },
+          action: { type: 'DEFAULT_ACTION' },
           label: 'Continue editing',
         },
       },
@@ -226,12 +262,12 @@ function stopEditing(state: ApplicationState, action: Action) {
   };
 }
 
-function addMetric(state: ApplicationState, action: Action) {
+function addMetric(state: TApplicationState, action: TAddMetricAction): TApplicationState {
   const { discard } = action;
   const { metrics, settings, modals } = state;
   const { items } = metrics;
   const { editedMetric, isModified } = settings;
-  if (items === null) {
+  if (!items) {
     return {
       ...state,
       metrics: {
@@ -239,7 +275,6 @@ function addMetric(state: ApplicationState, action: Action) {
         items: [{
           id: 1,
           props: DEFAULT_METRIC_PROPS,
-          lastModified: null,
           entries: [],
         }],
       },
@@ -256,7 +291,7 @@ function addMetric(state: ApplicationState, action: Action) {
           label: 'Discard changes',
         },
         cancel: {
-          action: { type: 'default action' },
+          action: { type: 'DEFAULT_ACTION' },
           label: 'Continue editing',
         },
       },
@@ -267,7 +302,8 @@ function addMetric(state: ApplicationState, action: Action) {
     };
   }
 
-  const id = max(items.map(item => item.id)) + 1;
+  const id: number = max(items.map(item => item.id)) + 1;
+  const editedMetricProps: TEditedMetricProps = { ...DEFAULT_METRIC_PROPS };
   return {
     ...state,
     metrics: {
@@ -276,24 +312,23 @@ function addMetric(state: ApplicationState, action: Action) {
         id,
         props: DEFAULT_METRIC_PROPS,
         entries: [],
-        lastModified: null,
       }),
     },
     settings: {
       editedMetric: {
         id,
-        props: DEFAULT_METRIC_PROPS,
+        props: editedMetricProps,
       },
       isModified: true,
     },
   };
 }
 
-function reorderMetrics(state: ApplicationState, action: Action) {
+function reorderMetrics(state: TApplicationState, action: TReorderMetricsAction): TApplicationState {
   const { metrics } = state;
   const { metricId, direction } = action;
   const { items } = metrics;
-  if (items === null || (direction !== 'up' && direction !== 'down')) {
+  if (items == null || (direction !== 'up' && direction !== 'down')) {
     return state;
   }
 
@@ -326,11 +361,11 @@ function reorderMetrics(state: ApplicationState, action: Action) {
   };
 }
 
-function deleteMetric(state: ApplicationState, action: Action) {
+function deleteMetric(state: TApplicationState, action: TDeleteMetricAction): TApplicationState {
   const { metricId, confirm } = action;
   const { metrics, modals } = state;
   const { items } = metrics;
-  if (items === null) {
+  if (items == null) {
     return state;
   }
 
@@ -349,7 +384,7 @@ function deleteMetric(state: ApplicationState, action: Action) {
         },
         cancel: {
           label: 'Do not delete',
-          action: { type: 'default action' },
+          action: { type: 'DEFAULT_ACTION' },
         },
       },
     };
@@ -363,17 +398,15 @@ function deleteMetric(state: ApplicationState, action: Action) {
     ...state,
     metrics: {
       ...metrics,
-      items: (items.slice(0, index)
-        .concat(items.slice(index + 1, items.length))),
+      items: (items.slice(0, index).concat(items.slice(index + 1, items.length))),
     },
     settings: {
-      editedMetric: null,
       isModified: false,
     },
   };
 }
 
-function updateEditedMetric(state: ApplicationState, action: Action) {
+function updateEditedMetric(state: TApplicationState, action: TUpdateEditedMetricAction): TApplicationState {
   const { settings } = state;
   const { editedMetric } = settings;
   if (!editedMetric) {
@@ -383,13 +416,38 @@ function updateEditedMetric(state: ApplicationState, action: Action) {
   const { props } = editedMetric;
   const { updatedProps } = action;
   const name = updatedProps.name !== undefined ? updatedProps.name : props.name;
-  let colorGroups;
-  if (updatedProps.colorGroups instanceof Array) {
-    colorGroups = updatedProps.colorGroups.map(colorGroup => ({
-      minValue: parseInt(colorGroup.minValue, 10) || null,
-      maxValue: parseInt(colorGroup.maxValue, 10) || null,
-      color: colorGroup.color,
-    }));
+  let colorGroups: TEditedColorGroup[] = [];
+  if (updatedProps.colorGroups != null) {
+    colorGroups = updatedProps.colorGroups.map((colorGroup: TNullableColorGroup) => {
+      let minValue = null;
+      let maxValue = null;
+      let color = '';
+
+      if (typeof colorGroup.minValue === 'number') {
+        minValue = colorGroup.minValue;
+      } else if (typeof colorGroup.minValue === 'string') {
+        const numValue = parseInt(colorGroup.minValue, 10);
+        minValue = isNaN(numValue) ? null : numValue;
+      }
+
+      if (typeof colorGroup.maxValue === 'number') {
+        maxValue = colorGroup.maxValue;
+      } else if (typeof colorGroup.maxValue === 'string') {
+        const numValue = parseInt(colorGroup.maxValue, 10);
+        maxValue = isNaN(numValue) ? null : numValue;
+      }
+
+      if (colorGroup.color !== undefined) {
+        color = colorGroup.color;
+      }
+
+      const result: TEditedColorGroup = {
+        minValue,
+        maxValue,
+        color,
+      };
+      return result;
+    });
   } else {
     colorGroups = props.colorGroups;
   }
@@ -426,7 +484,7 @@ function updateEditedMetric(state: ApplicationState, action: Action) {
   };
 }
 
-function requestConfirmModal(state: ApplicationState) {
+function requestConfirmModal(state: TApplicationState): TApplicationState {
   const { modals } = state;
   if (modals.length === 0) {
     return state;
@@ -442,7 +500,7 @@ function requestConfirmModal(state: ApplicationState) {
   };
 }
 
-function requestCancelModal(state: ApplicationState) {
+function requestCancelModal(state: TApplicationState) {
   const { modals } = state;
   if (modals.length === 0) {
     return state;
@@ -458,21 +516,21 @@ function requestCancelModal(state: ApplicationState) {
   };
 }
 
-function successConfirmModal(state: ApplicationState) {
+function successConfirmModal(state: TApplicationState): TApplicationState {
   return {
     ...state,
     modals: state.modals.slice(1, state.modals.length),
   };
 }
 
-function successCancelModal(state: ApplicationState) {
+function successCancelModal(state: TApplicationState): TApplicationState {
   return {
     ...state,
     modals: state.modals.slice(1, state.modals.length),
   };
 }
 
-function beginSyncData(state: ApplicationState) {
+function beginSyncData(state: TApplicationState): TApplicationState {
   return {
     ...state,
     metrics: {
@@ -482,7 +540,7 @@ function beginSyncData(state: ApplicationState) {
   };
 }
 
-function successSyncData(state: ApplicationState, action: Action) {
+function successSyncData(state: TApplicationState, action: TSuccessSyncDataAction): TApplicationState {
   const { metrics } = state;
   return {
     ...state,
@@ -491,13 +549,12 @@ function successSyncData(state: ApplicationState, action: Action) {
       items: action.data,
       isSyncing: false,
       isSynced: true,
-      error: null,
       lastSynced: action.lastSynced,
     },
   };
 }
 
-function errorSyncData(state: ApplicationState, action: Action) {
+function errorSyncData(state: TApplicationState, action: TErrorSyncDataAction): TApplicationState {
   const { metrics } = state;
   return {
     ...state,
@@ -509,9 +566,30 @@ function errorSyncData(state: ApplicationState, action: Action) {
   };
 }
 
-export function reducer(state: ApplicationState = INITIAL_STATE, action?: Action) {
+function requestRestoreCache(state: TApplicationState): TApplicationState {
+  return state;
+}
+
+function successRestoreCache(state: TApplicationState, action: TSuccessRestoreCacheAction): TApplicationState {
+  return {
+    ...state,
+    metrics: {
+      ...state.metrics,
+      items: action.data,
+    },
+  };
+}
+
+function errorRestoreCache(state: TApplicationState): TApplicationState {
+  return state;
+}
+
+export function reducer(state: TApplicationState = INITIAL_STATE, action?: TAction): TApplicationState {
   if (!action || !action.type) {
-    return chartsReducer(state);
+    return {
+      ...state,
+      charts: chartsReducer(state.charts),
+    };
   }
   switch (action.type) {
     case 'BEGIN_CHECK_LOGIN':
@@ -526,15 +604,18 @@ export function reducer(state: ApplicationState = INITIAL_STATE, action?: Action
         authentication: {
           isAuthenticated: false,
           isAuthenticating: false,
-          accessToken: null,
         },
       };
     case 'LOG_METRIC':
       return logMetric(state, action);
     case 'START_EDITING':
       return startEditingMetric(state, action);
-    case 'UPDATE_METRIC':
-      return updateMetric(state, action);
+    case 'REQUEST_UPDATE_METRIC':
+      return requestUpdateMetric(state, action);
+    case 'SUCCESS_UPDATE_METRIC':
+      return successUpdateMetric(state, action);
+    case 'ERROR_UPDATE_METRIC':
+      return errorUpdateMetric(state, action);
     case 'STOP_EDITING':
       return stopEditing(state, action);
     case 'ADD_METRIC':
@@ -559,11 +640,12 @@ export function reducer(state: ApplicationState = INITIAL_STATE, action?: Action
       return successSyncData(state, action);
     case 'ERROR_SYNC_DATA':
       return errorSyncData(state, action);
+    case 'REQUEST_RESTORE_CACHE':
+      return requestRestoreCache(state, action);
     case 'SUCCESS_RESTORE_CACHE':
-      return {
-        ...state,
-        metrics: { ...state.metrics, items: action.data },
-      };
+      return successRestoreCache(state, action);
+    case 'ERROR_RESTORE_CACHE':
+      return errorRestoreCache(state, action);
     case 'REQUEST_LOGOUT':
       return state;
     case 'SUCCESS_LOGOUT':
@@ -572,13 +654,14 @@ export function reducer(state: ApplicationState = INITIAL_STATE, action?: Action
         authentication: {
           isAuthenticated: false,
           isAuthenticating: false,
-          accessToken: null,
-          error: null,
         },
       };
     case 'REQUEST_SYNC':
       return state;
     default:
-      return chartsReducer(state, action);
+      return {
+        ...state,
+        charts: chartsReducer(state.charts, action),
+      };
   }
 }
