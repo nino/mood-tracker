@@ -4,16 +4,16 @@ import type { TAction } from './actionTypes';
 export type TChart = {
   +id: number;
   +metrics: {
-      +id: number,
-      +visible: bool,
-    }[];
+    +id: number,
+    +visible: bool,
+  }[];
   +animation?: {
-      +target: {
-        +zoomFactor?: number,
-        +viewCenter?: number,
-      },
-      +finishTime: number,
+    +target: {
+      +zoomFactor?: number,
+      +viewCenter?: number,
     },
+    +finishTime: number,
+  },
   +zoomFactor: number,
   +viewCenter: number,
 };
