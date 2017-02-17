@@ -598,14 +598,6 @@ export function reducer(state: TApplicationState = INITIAL_STATE, action?: TActi
       return successCheckLogin(state, action);
     case 'ERROR_CHECK_LOGIN':
       return errorCheckLogin(state, action);
-    case 'logout':
-      return {
-        ...state,
-        authentication: {
-          isAuthenticated: false,
-          isAuthenticating: false,
-        },
-      };
     case 'LOG_METRIC':
       return logMetric(state, action);
     case 'START_EDITING':
