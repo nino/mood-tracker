@@ -170,16 +170,16 @@ export function* updateMetric(action: TRequestUpdateMetricAction): Generator<any
 }
 
 export function* watcherSaga(): Generator<any, any, any> {
-  yield* takeEvery('LOG_METRIC', executeSyncData);
-  yield* takeEvery('SUCCESS_UPDATE_METRIC', executeSyncData);
-  yield* takeEvery('DELETE_METRIC', executeSyncData);
-  yield* takeEvery('REORDER_METRICS', executeSyncData);
-  yield* takeLatest('BEGIN_CHECK_LOGIN', checkLogin);
-  yield* takeLatest('BEGIN_SYNC_DATA', syncData);
-  yield* takeEvery('REQUEST_CONFIRM_MODAL', executeConfirmModal);
-  yield* takeEvery('REQUEST_CANCEL_MODAL', executeCancelModal);
-  yield* takeEvery('REQUEST_LOGOUT', executeLogout);
-  yield* takeEvery('REQUEST_RESTORE_CACHE', restoreCache);
-  yield* takeEvery('REQUEST_UPDATE_METRIC', updateMetric);
-  yield* chartSagas();
+  yield takeEvery('LOG_METRIC', executeSyncData);
+  yield takeEvery('SUCCESS_UPDATE_METRIC', executeSyncData);
+  yield takeEvery('DELETE_METRIC', executeSyncData);
+  yield takeEvery('REORDER_METRICS', executeSyncData);
+  yield takeLatest('BEGIN_CHECK_LOGIN', checkLogin);
+  yield takeLatest('BEGIN_SYNC_DATA', syncData);
+  yield takeEvery('REQUEST_CONFIRM_MODAL', executeConfirmModal);
+  yield takeEvery('REQUEST_CANCEL_MODAL', executeCancelModal);
+  yield takeEvery('REQUEST_LOGOUT', executeLogout);
+  yield takeEvery('REQUEST_RESTORE_CACHE', restoreCache);
+  yield takeEvery('REQUEST_UPDATE_METRIC', updateMetric);
+  yield chartSagas();
 }
