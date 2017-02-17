@@ -8,21 +8,21 @@ import {
   beginZoom,
   setZoomFactor,
   finishZoom,
-  toggleVisibility,
+  cycleMode,
   scrollBy,
   createCharts,
 } from './actions';
 import type { TChartsState, TMetric } from '../types';
 import { MoodWithEntries, BurnsWithEntries } from '../../test/SampleMetrics';
 import reducer from './reducer';
-import { MS_PER_PX, FOUR_WEEKS } from './constants';
+import { MS_PER_PX, FOUR_WEEKS, LINE_COLORS } from './constants';
 
 describe('Charts reducer', () => {
   describe('charts/REQUEST_ZOOM', () => {
     it('returns the state unchanged', () => {
       const state: TChartsState = [{
         id: 1,
-        metrics: [{ id: 1, visible: true }],
+        lines: [{ metricId: 1, mode: 'on', color: LINE_COLORS[1] }],
         zoomFactor: 1,
         viewCenter: 3,
       }];
@@ -34,12 +34,12 @@ describe('Charts reducer', () => {
     it('sets the animation property of the chosen chart', () => {
       const state: TChartsState = [{
         id: 1,
-        metrics: [{ id: 1, visible: true }, { id: 3, visible: false }],
+        lines: [{ metricId: 1, mode: 'loess', color: LINE_COLORS[1] }, { metricId: 3, mode: 'off', color: LINE_COLORS[3 % LINE_COLORS.length] }],
         viewCenter: 5,
         zoomFactor: 3,
       }, {
         id: 2,
-        metrics: [{ id: 2, visible: true }, { id: 5, visible: false }],
+        lines: [{ metricId: 2, mode: 'on', color: LINE_COLORS[2] }, { metricId: 5, mode: 'off', color: LINE_COLORS[5 % LINE_COLORS.length] }],
         viewCenter: 2,
         zoomFactor: 5,
       }];
@@ -57,12 +57,12 @@ describe('Charts reducer', () => {
     it('sets the zoom factor of the selected chart', () => {
       const state: TChartsState = [{
         id: 1,
-        metrics: [{ id: 1, visible: true }, { id: 3, visible: false }],
+        lines: [{ metricId: 1, mode: 'on', color: LINE_COLORS[1] }, { metricId: 3, mode: 'loess', color: LINE_COLORS[3 % LINE_COLORS.length] }],
         viewCenter: 5,
         zoomFactor: 3,
       }, {
         id: 2,
-        metrics: [{ id: 2, visible: true }, { id: 5, visible: false }],
+        lines: [{ metricId: 2, mode: 'on', color: LINE_COLORS[2] }, { metricId: 5, mode: 'off', color: LINE_COLORS[5 % LINE_COLORS.length] }],
         viewCenter: 2,
         zoomFactor: 5,
       }];
@@ -77,7 +77,7 @@ describe('Charts reducer', () => {
     it('deletes the animation property on the chosen chart', () => {
       const state: TChartsState = [{
         id: 1,
-        metrics: [{ id: 1, visible: true }, { id: 3, visible: false }],
+        lines: [{ metricId: 1, mode: 'loess', color: LINE_COLORS[1] }, { metricId: 3, mode: 'off', color: LINE_COLORS[3 % LINE_COLORS.length] }],
         viewCenter: 5,
         zoomFactor: 3,
         animation: {
@@ -86,7 +86,7 @@ describe('Charts reducer', () => {
         },
       }, {
         id: 2,
-        metrics: [{ id: 2, visible: true }, { id: 5, visible: false }],
+        lines: [{ metricId: 2, mode: 'on', color: LINE_COLORS[2] }, { metricId: 5, mode: 'off', color: LINE_COLORS[5 % LINE_COLORS.length] }],
         viewCenter: 2,
         zoomFactor: 5,
         animation: {
@@ -106,7 +106,7 @@ describe('Charts reducer', () => {
     it('does nothing if the chosen chart has no animation', () => {
       const state: TChartsState = [{
         id: 1,
-        metrics: [{ id: 1, visible: true }, { id: 3, visible: false }],
+        lines: [{ metricId: 1, mode: 'on', color: LINE_COLORS[1] }, { metricId: 3, mode: 'off', color: LINE_COLORS[3 % LINE_COLORS.length] }],
         viewCenter: 5,
         zoomFactor: 3,
         animation: {
@@ -115,7 +115,7 @@ describe('Charts reducer', () => {
         },
       }, {
         id: 2,
-        metrics: [{ id: 2, visible: true }, { id: 5, visible: false }],
+        lines: [{ metricId: 2, mode: 'on', color: LINE_COLORS[2] }, { metricId: 5, mode: 'loess', color: LINE_COLORS[5 % LINE_COLORS.length] }],
         viewCenter: 2,
         zoomFactor: 5,
       }];
@@ -127,11 +127,11 @@ describe('Charts reducer', () => {
     });
   });
 
-  describe('charts/TOGGLE_VISIBILITY', () => {
-    it('shows a hidden metric', () => {
+  describe('charts/CYCLE_MODE', () => {
+    it('turns a line from off to on', () => {
       const state: TChartsState = [{
         id: 1,
-        metrics: [{ id: 1, visible: true }, { id: 3, visible: false }],
+        lines: [{ metricId: 1, mode: 'on', color: LINE_COLORS[1] }, { metricId: 3, mode: 'off', color: LINE_COLORS[3 % LINE_COLORS.length] }],
         viewCenter: 5,
         zoomFactor: 3,
         animation: {
@@ -140,23 +140,23 @@ describe('Charts reducer', () => {
         },
       }, {
         id: 2,
-        metrics: [{ id: 2, visible: false }, { id: 5, visible: false }],
+        lines: [{ metricId: 2, mode: 'off', color: LINE_COLORS[2] }, { metricId: 5, mode: 'loess', color: LINE_COLORS[5 % LINE_COLORS.length] }],
         viewCenter: 2,
         zoomFactor: 5,
       }];
-      const action = toggleVisibility(2);
+      const action = cycleMode(2);
       deepFreeze(state);
       deepFreeze(action);
       const newState: TChartsState = reducer(state, action);
       expect(newState).to.have.length(2);
       expect(newState[0]).to.deep.equal(state[0]);
-      expect(newState[1]).to.have.deep.property('metrics[0].visible', true);
+      expect(newState[1]).to.have.deep.property('lines[0].mode', 'on');
     });
 
-    it('hides a visible metric', () => {
+    it('turns a line from on to loess', () => {
       const state: TChartsState = [{
         id: 1,
-        metrics: [{ id: 1, visible: false }, { id: 3, visible: true }],
+        lines: [{ metricId: 1, mode: 'off', color: LINE_COLORS[1] }, { metricId: 3, mode: 'on', color: LINE_COLORS[3 % LINE_COLORS.length] }],
         viewCenter: 5,
         zoomFactor: 3,
         animation: {
@@ -165,16 +165,41 @@ describe('Charts reducer', () => {
         },
       }, {
         id: 2,
-        metrics: [{ id: 2, visible: false }, { id: 5, visible: false }],
+        lines: [{ metricId: 2, mode: 'loess', color: LINE_COLORS[2] }, { metricId: 5, mode: 'off', color: LINE_COLORS[5 % LINE_COLORS.length] }],
         viewCenter: 2,
         zoomFactor: 5,
       }];
-      const action = toggleVisibility(3);
+      const action = cycleMode(3);
       deepFreeze(state);
       deepFreeze(action);
       const newState: TChartsState = reducer(state, action);
       expect(newState).to.have.length(2);
-      expect(newState[0]).to.have.deep.property('metrics[1].visible', false);
+      expect(newState[0]).to.have.deep.property('lines[1].mode', 'loess');
+      expect(newState[1]).to.deep.equal(state[1]);
+    });
+
+    it('turns a line from loess to off', () => {
+      const state: TChartsState = [{
+        id: 1,
+        lines: [{ metricId: 1, mode: 'off', color: LINE_COLORS[1] }, { metricId: 3, mode: 'loess', color: LINE_COLORS[3 % LINE_COLORS.length] }],
+        viewCenter: 5,
+        zoomFactor: 3,
+        animation: {
+          finishTime: 2000,
+          target: { zoomFactor: 2 },
+        },
+      }, {
+        id: 2,
+        lines: [{ metricId: 2, mode: 'loess', color: LINE_COLORS[2] }, { metricId: 5, mode: 'off', color: LINE_COLORS[5 % LINE_COLORS.length] }],
+        viewCenter: 2,
+        zoomFactor: 5,
+      }];
+      const action = cycleMode(3);
+      deepFreeze(state);
+      deepFreeze(action);
+      const newState: TChartsState = reducer(state, action);
+      expect(newState).to.have.length(2);
+      expect(newState[0]).to.have.deep.property('lines[1].mode', 'off');
       expect(newState[1]).to.deep.equal(state[1]);
     });
   });
@@ -184,12 +209,12 @@ describe('Charts reducer', () => {
       const state: TChartsState = [
         {
           id: 1,
-          metrics: [{ id: 1, visible: false }, { id: 3, visible: true }],
+          lines: [{ metricId: 1, mode: 'off', color: LINE_COLORS[1] }, { metricId: 3, mode: 'on', color: LINE_COLORS[3 % LINE_COLORS.length] }],
           viewCenter: 5,
           zoomFactor: 1,
         }, {
           id: 2,
-          metrics: [{ id: 2, visible: false }, { id: 5, visible: false }],
+          lines: [{ metricId: 2, mode: 'on', color: LINE_COLORS[2 % LINE_COLORS.length] }, { metricId: 5, mode: 'loess', color: LINE_COLORS[5 % LINE_COLORS.length] }],
           viewCenter: 2,
           zoomFactor: 1,
         },
@@ -207,12 +232,12 @@ describe('Charts reducer', () => {
       const state: TChartsState = [
         {
           id: 1,
-          metrics: [{ id: 1, visible: false }, { id: 3, visible: true }],
+          lines: [{ metricId: 1, mode: 'off', color: LINE_COLORS[1] }, { metricId: 3, mode: 'on', color: LINE_COLORS[3 % LINE_COLORS.length] }],
           viewCenter: 5,
           zoomFactor: 1,
         }, {
           id: 2,
-          metrics: [{ id: 2, visible: false }, { id: 5, visible: false }],
+          lines: [{ metricId: 2, mode: 'off', color: LINE_COLORS[2] }, { metricId: 5, mode: 'off', color: LINE_COLORS[5 % LINE_COLORS.length] }],
           viewCenter: 2,
           zoomFactor: 1,
         },
@@ -230,12 +255,12 @@ describe('Charts reducer', () => {
       const state: TChartsState = [
         {
           id: 1,
-          metrics: [{ id: 1, visible: false }, { id: 3, visible: true }],
+          lines: [{ metricId: 1, mode: 'off', color: LINE_COLORS[1] }, { metricId: 3, mode: 'on', color: LINE_COLORS[3 % LINE_COLORS.length] }],
           viewCenter: 5,
           zoomFactor: 2,
         }, {
           id: 2,
-          metrics: [{ id: 2, visible: false }, { id: 5, visible: false }],
+          lines: [{ metricId: 2, mode: 'loess', color: LINE_COLORS[2] }, { metricId: 5, mode: 'off', color: LINE_COLORS[5 % LINE_COLORS.length] }],
           viewCenter: 2,
           zoomFactor: 1,
         },
@@ -285,8 +310,8 @@ describe('Charts reducer', () => {
       deepFreeze(metrics);
       deepFreeze(action);
       expect(newState, JSON.stringify(newState)).to.have.length(2);
-      expect(newState[0]).to.have.property('metrics').and.to.eql([{ id: 1, visible: true }, { id: 3, visible: true }]);
-      expect(newState[1]).to.have.property('metrics').and.to.eql([{ id: 2, visible: true }, { id: 4, visible: true }]);
+      expect(newState[0].lines).to.eql([{ metricId: 1, mode: 'on', color: LINE_COLORS[1] }, { metricId: 3, mode: 'on', color: LINE_COLORS[3 % LINE_COLORS.length] }]);
+      expect(newState[1].lines).to.eql([{ metricId: 2, mode: 'on', color: LINE_COLORS[2] }, { metricId: 4, mode: 'on', color: LINE_COLORS[4 % LINE_COLORS.length] }]);
     });
 
     it('sets the zoomFactor and viewCenter such that all entries are in view if less than 4 weeks exist', () => {
@@ -315,7 +340,7 @@ describe('Charts reducer', () => {
       const expectedViewCenter = (dateRange[0] + dateRange[1]) / 2;
       const newState = reducer(state, action);
       expect(newState).to.have.length(1);
-      expect(newState[0].metrics).to.eql([{ id: 33, visible: true }, { id: 34, visible: true }]);
+      expect(newState[0].lines).to.eql([{ metricId: 33, mode: 'on', color: LINE_COLORS[33 % LINE_COLORS.length] }, { metricId: 34, mode: 'on', color: LINE_COLORS[34 % LINE_COLORS.length] }]);
       expect(newState[0].zoomFactor, (dateRange[1] - dateRange[0])).to.be.closeTo(MS_PER_PX / (dateRange[1] - dateRange[0]), 0.1);
       expect(newState[0].viewCenter).to.be.closeTo(expectedViewCenter, 100);
     });

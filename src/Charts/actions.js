@@ -5,7 +5,7 @@ import type {
   TBeginZoomAction,
   TSetZoomFactorAction,
   TFinishZoomAction,
-  TToggleVisibilityAction,
+  TCycleModeAction,
   TScrollByAction,
   TCreateChartsAction,
  } from './actionTypes';
@@ -35,8 +35,8 @@ export function finishZoom(chartId: number): TFinishZoomAction {
   return { type: 'charts/FINISH_ZOOM', chartId };
 }
 
-export function toggleVisibility(metricId: number): TToggleVisibilityAction {
-  return { type: 'charts/TOGGLE_VISIBILITY', metricId };
+export function cycleMode(metricId: number): TCycleModeAction {
+  return { type: 'charts/CYCLE_MODE', metricId };
 }
 
 export function scrollBy(chartId: number, deltaX: number): TScrollByAction {

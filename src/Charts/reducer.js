@@ -4,13 +4,13 @@ import type {
   TBeginZoomAction,
   TSetZoomFactorAction,
   TFinishZoomAction,
-  TToggleVisibilityAction,
+  TCycleModeAction,
   TScrollByAction,
   TCreateChartsAction,
 } from './actionTypes';
 import type { TAction } from '../actionTypes';
-import type { TChart, TMetric, TMetricEntry } from '../types';
-import { MS_PER_PX, FOUR_WEEKS } from './constants';
+import type { TChart, TMetric } from '../types';
+import { MS_PER_PX, FOUR_WEEKS, LINE_COLORS } from './constants';
 
 export type TChartsState = TChart[];
 
@@ -63,12 +63,18 @@ function finishZoom(state: TChartsState, action: TFinishZoomAction): TChartsStat
   ];
 }
 
-function toggleVisibility(state: TChartsState, action: TToggleVisibilityAction): TChartsState {
+function cycleMode(state: TChartsState, action: TCycleModeAction): TChartsState {
+  const nextMode = {
+    on: 'loess',
+    off: 'on',
+    loess: 'off',
+  };
   return state.map((chart: TChart) => ({
     ...chart,
-    metrics: chart.metrics.map(item => ({
-      id: item.id,
-      visible: item.id === action.metricId ? !item.visible : item.visible,
+    lines: chart.lines.map(line => ({
+      metricId: line.metricId,
+      mode: action.metricId === line.metricId ? nextMode[line.mode] : line.mode,
+      color: line.color,
     })),
   }));
 }
@@ -104,7 +110,7 @@ function createCharts(state: TChartsState, action: TCreateChartsAction): TCharts
 
     return {
       id: index,
-      metrics: _.map(metricGroup, metric => ({ id: metric.id, visible: true })),
+      lines: _.map(metricGroup, metric => ({ metricId: metric.id, mode: 'on', color: LINE_COLORS[metric.id % LINE_COLORS.length] })),
       viewCenter,
       zoomFactor,
     };
@@ -127,8 +133,8 @@ export default function reducer(state: TChartsState = INITIAL_STATE, action?: TA
       return setZoomFactor(state, action);
     case 'charts/FINISH_ZOOM':
       return finishZoom(state, action);
-    case 'charts/TOGGLE_VISIBILITY':
-      return toggleVisibility(state, action);
+    case 'charts/CYCLE_MODE':
+      return cycleMode(state, action);
     case 'charts/SCROLL_BY':
       return scrollBy(state, action);
     case 'charts/CREATE_CHARTS':

@@ -6,6 +6,7 @@ import { animateZoom } from './sagas';
 import { requestZoom } from './actions';
 import { getChart } from './selectors';
 import type { TChartsState } from '../types';
+import { LINE_COLORS } from './constants';
 
 describe('Charts sagas', () => {
   describe('animateZoom', () => {
@@ -14,12 +15,12 @@ describe('Charts sagas', () => {
       const chartsState: TChartsState = [
         {
           id: 1,
-          metrics: [{ id: 1, visible: true }],
+          lines: [{ metricId: 1, mode: 'on', color: LINE_COLORS[1] }],
           viewCenter: 35,
           zoomFactor: 2,
         }, {
           id: 2,
-          metrics: [{ id: 2, visible: true }],
+          lines: [{ metricId: 2, mode: 'off', color: LINE_COLORS[2] }],
           viewCenter: 2,
           zoomFactor: 1,
         },
@@ -80,7 +81,7 @@ describe('Charts sagas', () => {
       const chartsState: TChartsState = [
         {
           id: 1,
-          metrics: [{ id: 1, visible: true }],
+          lines: [{ metricId: 1, mode: 'on', color: 'red' }],
           viewCenter: 35,
           zoomFactor: 2,
           animation: {
@@ -89,7 +90,7 @@ describe('Charts sagas', () => {
           },
         }, {
           id: 2,
-          metrics: [{ id: 2, visible: true }],
+          lines: [{ metricId: 2, mode: 'on', color: 'green' }],
           viewCenter: 2,
           zoomFactor: 1,
         },

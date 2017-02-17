@@ -1,12 +1,15 @@
 // @flow
 import type { TAction } from './actionTypes';
 
+export type TChartLine = {
+  +metricId: number,
+  +mode: 'on' | 'off' | 'loess',
+  +color: string,
+};
+
 export type TChart = {
   +id: number;
-  +metrics: {
-    +id: number,
-    +visible: bool,
-  }[];
+  +lines: TChartLine[];
   +animation?: {
     +target: {
       +zoomFactor?: number,
