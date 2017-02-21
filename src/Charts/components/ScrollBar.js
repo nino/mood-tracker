@@ -1,7 +1,6 @@
 /* @flow */
 import React from 'react';
-import Measure from 'react-measure';
-import Draggable, { DraggableData } from 'react-draggable';
+import Draggable, { type DraggableData } from 'react-draggable';
 import './ScrollBar.css';
 
 type TScrollBarProps = {
@@ -15,22 +14,18 @@ type TScrollBarProps = {
    */
   viewRange: [number, number],
 
-  scrollBy: (deltaX: number) => void,
-};
-
-type TScrollBarItemProps = {
-  viewRange: [number, number],
-  dateRange: [number, number],
+  /**
+   * Width of the parent container in pixels
+   */
   width: number,
+
+  /**
+   * Callback function to dispatch scrollBy action
+   */
   scrollBy: (deltaX: number) => void,
 };
 
-/**
- * This component is the actual scroll-bar, and should be used for testing.
- * `ScrollBar` is just a proxy used for measuring the size of the chart
- * and passing the dimensions to `ScrollBarItem`.
- */
-export const ScrollBarItem = ({ width, viewRange, dateRange, scrollBy }: TScrollBarItemProps) => (
+const ScrollBar = ({ width, viewRange, dateRange, scrollBy }: TScrollBarProps) => (
   <div
     className="chart-scrollbar-container"
     style={{ display: 'block', overflow: 'hidden' }}
@@ -50,14 +45,6 @@ export const ScrollBarItem = ({ width, viewRange, dateRange, scrollBy }: TScroll
       />
     </Draggable>
   </div>
-);
-
-const ScrollBar = ({ dateRange, viewRange, scrollBy }: TScrollBarProps) => (
-  <Measure>
-    {(dimensions: { width: number, height: number }) => (
-      <ScrollBarItem width={dimensions.width} viewRange={viewRange} dateRange={dateRange} scrollBy={scrollBy} />
-    )}
-  </Measure>
 );
 
 export default ScrollBar;
