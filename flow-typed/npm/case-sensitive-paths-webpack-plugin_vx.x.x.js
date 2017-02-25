@@ -1,4 +1,4 @@
-// flow-typed signature: d66f0807866d789d2aae867197c4394f
+// flow-typed signature: ae3fa0fd1bb51ec9706eeaf590229ea6
 // flow-typed version: <<STUB>>/case-sensitive-paths-webpack-plugin_v1.1.4/flow_v0.38.0
 
 /**
@@ -42,31 +42,11 @@ declare module 'case-sensitive-paths-webpack-plugin/demo/src/utils/api' {
   declare module.exports: any;
 }
 
-declare module 'case-sensitive-paths-webpack-plugin/demo/test/case-sensitive-paths-test' {
-  declare module.exports: any;
-}
-
 declare module 'case-sensitive-paths-webpack-plugin/demo/tests.webpack' {
   declare module.exports: any;
 }
 
 declare module 'case-sensitive-paths-webpack-plugin/demo/webpack.config' {
-  declare module.exports: any;
-}
-
-declare module 'case-sensitive-paths-webpack-plugin/test/fixtures/deleting-folder/entry' {
-  declare module.exports: any;
-}
-
-declare module 'case-sensitive-paths-webpack-plugin/test/fixtures/wrong-case/entry' {
-  declare module.exports: any;
-}
-
-declare module 'case-sensitive-paths-webpack-plugin/test/fixtures/wrong-case/testfile' {
-  declare module.exports: any;
-}
-
-declare module 'case-sensitive-paths-webpack-plugin/test/index' {
   declare module.exports: any;
 }
 
@@ -86,9 +66,6 @@ declare module 'case-sensitive-paths-webpack-plugin/demo/src/init.js' {
 declare module 'case-sensitive-paths-webpack-plugin/demo/src/utils/api.js' {
   declare module.exports: $Exports<'case-sensitive-paths-webpack-plugin/demo/src/utils/api'>;
 }
-declare module 'case-sensitive-paths-webpack-plugin/demo/test/case-sensitive-paths-test.js' {
-  declare module.exports: $Exports<'case-sensitive-paths-webpack-plugin/demo/test/case-sensitive-paths-test'>;
-}
 declare module 'case-sensitive-paths-webpack-plugin/demo/tests.webpack.js' {
   declare module.exports: $Exports<'case-sensitive-paths-webpack-plugin/demo/tests.webpack'>;
 }
@@ -100,16 +77,4 @@ declare module 'case-sensitive-paths-webpack-plugin/index' {
 }
 declare module 'case-sensitive-paths-webpack-plugin/index.js' {
   declare module.exports: $Exports<'case-sensitive-paths-webpack-plugin'>;
-}
-declare module 'case-sensitive-paths-webpack-plugin/test/fixtures/deleting-folder/entry.js' {
-  declare module.exports: $Exports<'case-sensitive-paths-webpack-plugin/test/fixtures/deleting-folder/entry'>;
-}
-declare module 'case-sensitive-paths-webpack-plugin/test/fixtures/wrong-case/entry.js' {
-  declare module.exports: $Exports<'case-sensitive-paths-webpack-plugin/test/fixtures/wrong-case/entry'>;
-}
-declare module 'case-sensitive-paths-webpack-plugin/test/fixtures/wrong-case/testfile.js' {
-  declare module.exports: $Exports<'case-sensitive-paths-webpack-plugin/test/fixtures/wrong-case/testfile'>;
-}
-declare module 'case-sensitive-paths-webpack-plugin/test/index.js' {
-  declare module.exports: $Exports<'case-sensitive-paths-webpack-plugin/test/index'>;
 }

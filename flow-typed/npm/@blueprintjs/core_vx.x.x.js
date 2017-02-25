@@ -1,4 +1,4 @@
-// flow-typed signature: 3fd91d0ab3456d907cb676d79e44e17f
+// flow-typed signature: ef4017fb6712983816edbe18eff37579
 // flow-typed version: <<STUB>>/@blueprintjs/core_v^1.5.0/flow_v0.38.0
 
 /**
@@ -78,6 +78,14 @@ declare module '@blueprintjs/core/dist/common/utils' {
   declare module.exports: any;
 }
 
+declare module '@blueprintjs/core/dist/compatibility/browser' {
+  declare module.exports: any;
+}
+
+declare module '@blueprintjs/core/dist/compatibility/index' {
+  declare module.exports: any;
+}
+
 declare module '@blueprintjs/core/dist/components/alert/alert' {
   declare module.exports: any;
 }
@@ -123,6 +131,10 @@ declare module '@blueprintjs/core/dist/components/forms/controls' {
 }
 
 declare module '@blueprintjs/core/dist/components/forms/inputGroup' {
+  declare module.exports: any;
+}
+
+declare module '@blueprintjs/core/dist/components/forms/numericInput' {
   declare module.exports: any;
 }
 
@@ -270,6 +282,10 @@ declare module '@blueprintjs/core/dist/components/tree/treeNode' {
   declare module.exports: any;
 }
 
+declare module '@blueprintjs/core/dist/core.bundle' {
+  declare module.exports: any;
+}
+
 declare module '@blueprintjs/core/dist/generated/iconClasses' {
   declare module.exports: any;
 }
@@ -325,6 +341,12 @@ declare module '@blueprintjs/core/dist/common/tetherUtils.js' {
 declare module '@blueprintjs/core/dist/common/utils.js' {
   declare module.exports: $Exports<'@blueprintjs/core/dist/common/utils'>;
 }
+declare module '@blueprintjs/core/dist/compatibility/browser.js' {
+  declare module.exports: $Exports<'@blueprintjs/core/dist/compatibility/browser'>;
+}
+declare module '@blueprintjs/core/dist/compatibility/index.js' {
+  declare module.exports: $Exports<'@blueprintjs/core/dist/compatibility/index'>;
+}
 declare module '@blueprintjs/core/dist/components/alert/alert.js' {
   declare module.exports: $Exports<'@blueprintjs/core/dist/components/alert/alert'>;
 }
@@ -360,6 +382,9 @@ declare module '@blueprintjs/core/dist/components/forms/controls.js' {
 }
 declare module '@blueprintjs/core/dist/components/forms/inputGroup.js' {
   declare module.exports: $Exports<'@blueprintjs/core/dist/components/forms/inputGroup'>;
+}
+declare module '@blueprintjs/core/dist/components/forms/numericInput.js' {
+  declare module.exports: $Exports<'@blueprintjs/core/dist/components/forms/numericInput'>;
 }
 declare module '@blueprintjs/core/dist/components/forms/radioGroup.js' {
   declare module.exports: $Exports<'@blueprintjs/core/dist/components/forms/radioGroup'>;
@@ -468,6 +493,9 @@ declare module '@blueprintjs/core/dist/components/tree/tree.js' {
 }
 declare module '@blueprintjs/core/dist/components/tree/treeNode.js' {
   declare module.exports: $Exports<'@blueprintjs/core/dist/components/tree/treeNode'>;
+}
+declare module '@blueprintjs/core/dist/core.bundle.js' {
+  declare module.exports: $Exports<'@blueprintjs/core/dist/core.bundle'>;
 }
 declare module '@blueprintjs/core/dist/generated/iconClasses.js' {
   declare module.exports: $Exports<'@blueprintjs/core/dist/generated/iconClasses'>;

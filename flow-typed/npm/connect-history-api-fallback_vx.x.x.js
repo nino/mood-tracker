@@ -1,4 +1,4 @@
-// flow-typed signature: f86bd04954491fb530f873bf70e00b97
+// flow-typed signature: 83502937c718e272dd5f510dc58bc16f
 // flow-typed version: <<STUB>>/connect-history-api-fallback_v1.3.0/flow_v0.38.0
 
 /**
@@ -26,14 +26,7 @@ declare module 'connect-history-api-fallback/lib/index' {
   declare module.exports: any;
 }
 
-declare module 'connect-history-api-fallback/test/index_test' {
-  declare module.exports: any;
-}
-
 // Filename aliases
 declare module 'connect-history-api-fallback/lib/index.js' {
   declare module.exports: $Exports<'connect-history-api-fallback/lib/index'>;
-}
-declare module 'connect-history-api-fallback/test/index_test.js' {
-  declare module.exports: $Exports<'connect-history-api-fallback/test/index_test'>;
 }

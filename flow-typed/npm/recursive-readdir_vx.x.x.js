@@ -1,4 +1,4 @@
-// flow-typed signature: bf8380a9aabd5ec66e3804fbed53a1ab
+// flow-typed signature: ff947e6b04211f0c46ea19d03dfa926c
 // flow-typed version: <<STUB>>/recursive-readdir_v2.1.0/flow_v0.38.0
 
 /**
@@ -22,9 +22,7 @@ declare module 'recursive-readdir' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'recursive-readdir/test/recursive-readdir-test' {
-  declare module.exports: any;
-}
+
 
 // Filename aliases
 declare module 'recursive-readdir/index' {
@@ -32,7 +30,4 @@ declare module 'recursive-readdir/index' {
 }
 declare module 'recursive-readdir/index.js' {
   declare module.exports: $Exports<'recursive-readdir'>;
-}
-declare module 'recursive-readdir/test/recursive-readdir-test.js' {
-  declare module.exports: $Exports<'recursive-readdir/test/recursive-readdir-test'>;
 }

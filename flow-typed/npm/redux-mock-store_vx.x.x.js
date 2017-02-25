@@ -1,4 +1,4 @@
-// flow-typed signature: 7961c63bf6079685112dfa6c865749c2
+// flow-typed signature: b8a2a20e34f05e4df75abc97b4cdb74b
 // flow-typed version: <<STUB>>/redux-mock-store_v^1.2.1/flow_v0.38.0
 
 /**
@@ -26,21 +26,7 @@ declare module 'redux-mock-store/lib/index' {
   declare module.exports: any;
 }
 
-declare module 'redux-mock-store/test/index' {
-  declare module.exports: any;
-}
-
-declare module 'redux-mock-store/test/mock/middleware' {
-  declare module.exports: any;
-}
-
 // Filename aliases
 declare module 'redux-mock-store/lib/index.js' {
   declare module.exports: $Exports<'redux-mock-store/lib/index'>;
-}
-declare module 'redux-mock-store/test/index.js' {
-  declare module.exports: $Exports<'redux-mock-store/test/index'>;
-}
-declare module 'redux-mock-store/test/mock/middleware.js' {
-  declare module.exports: $Exports<'redux-mock-store/test/mock/middleware'>;
 }

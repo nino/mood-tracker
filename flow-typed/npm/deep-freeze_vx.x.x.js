@@ -1,4 +1,4 @@
-// flow-typed signature: 41ac8792a81def545f819737ecf06ee8
+// flow-typed signature: 33fc321470f025bdba3f5907ddebd0cb
 // flow-typed version: <<STUB>>/deep-freeze_v^0.0.1/flow_v0.38.0
 
 /**
@@ -22,24 +22,12 @@ declare module 'deep-freeze' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'deep-freeze/example/deep' {
-  declare module.exports: any;
-}
 
-declare module 'deep-freeze/test/deep' {
-  declare module.exports: any;
-}
 
 // Filename aliases
-declare module 'deep-freeze/example/deep.js' {
-  declare module.exports: $Exports<'deep-freeze/example/deep'>;
-}
 declare module 'deep-freeze/index' {
   declare module.exports: $Exports<'deep-freeze'>;
 }
 declare module 'deep-freeze/index.js' {
   declare module.exports: $Exports<'deep-freeze'>;
-}
-declare module 'deep-freeze/test/deep.js' {
-  declare module.exports: $Exports<'deep-freeze/test/deep'>;
 }
