@@ -28,7 +28,7 @@ declare module 'lodash' {
   };
 
   declare type NestedArray<T> = Array<Array<T>>;
-  
+
   declare type matchesIterateeShorthand = Object;
   declare type matchesPropertyIterateeShorthand = [string, any];
   declare type propertyIterateeShorthand = string;
@@ -38,7 +38,7 @@ declare module 'lodash' {
     | matchesIterateeShorthand
     | matchesPropertyIterateeShorthand
     | propertyIterateeShorthand;
-  
+
   declare type OIterateeWithResult<V, O, R> = Object|string|((value: V, key: string, object: O) => R);
   declare type OIteratee<O> = OIterateeWithResult<any, O, any>;
   declare type OFlatMapIteratee<T, U> = OIterateeWithResult<any, T, Array<U>>;
@@ -48,7 +48,7 @@ declare module 'lodash' {
     | matchesIterateeShorthand
     | matchesPropertyIterateeShorthand
     | propertyIterateeShorthand;
-  
+
   declare type _Iteratee<T> = (item: T, index: number, array: ?Array<T>) => mixed;
   declare type Iteratee<T> = _Iteratee<T>|Object|string;
   declare type Iteratee2<T, U> = ((item: T, index: number, array: ?Array<T>) => U)|Object|string;
@@ -509,4 +509,600 @@ declare module 'lodash' {
   }
 
   declare var exports: Lodash;
+}
+
+declare module 'lodash/fp' {
+  declare type TemplateSettings = {
+    escape?: RegExp,
+    evaluate?: RegExp,
+    imports?: Object,
+    interpolate?: RegExp,
+    variable?: string,
+  };
+
+  declare type TruncateOptions = {
+    length?: number,
+    omission?: string,
+    separator?: RegExp|string,
+  };
+
+  declare type DebounceOptions = {
+    leading?: bool,
+    maxWait?: number,
+    trailing?: bool,
+  };
+
+  declare type ThrottleOptions = {
+    leading?: bool,
+    trailing?: bool,
+  };
+
+  declare type NestedArray<T> = Array<Array<T>>;
+
+  declare type matchesIterateeShorthand = Object;
+  declare type matchesPropertyIterateeShorthand = [string, any];
+  declare type propertyIterateeShorthand = string;
+
+  declare type OPredicate<A, O> =
+    | ((value: A, key: string, object: O) => any)
+    | matchesIterateeShorthand
+    | matchesPropertyIterateeShorthand
+    | propertyIterateeShorthand;
+
+  declare type OIterateeWithResult<V, O, R> = Object|string|((value: V, key: string, object: O) => R);
+  declare type OIteratee<O> = OIterateeWithResult<any, O, any>;
+  declare type OFlatMapIteratee<T, U> = OIterateeWithResult<any, T, Array<U>>;
+
+  declare type Predicate<T> =
+    | ((value: T, index: number, array: Array<T>) => any)
+    | matchesIterateeShorthand
+    | matchesPropertyIterateeShorthand
+    | propertyIterateeShorthand;
+
+  declare type _Iteratee<T> = (item: T, index: number, array: ?Array<T>) => mixed;
+  declare type Iteratee<T> = _Iteratee<T>|Object|string;
+  declare type Iteratee2<T, U> = ((item: T, index: number, array: ?Array<T>) => U)|Object|string;
+  declare type FlatMapIteratee<T, U> = ((item: T, index: number, array: ?Array<T>) => Array<U>)|Object|string;
+  declare type Comparator<T> = (item: T, item2: T) => bool;
+
+  declare type MapIterator<T,U> =
+    | ((item: T, index: number, array: Array<T>) => U)
+    | propertyIterateeShorthand;
+
+  declare type OMapIterator<T,O,U> =
+    | ((item: T, key: string, object: O) => U)
+    | propertyIterateeShorthand;
+
+  declare class LodashFp {
+    // Array
+    chunk<T>(size?: number, array: ?Array<T>): Array<Array<T>>;
+    chunk(size?: number): <T>(array: ?Array<T>) => Array<Array<T>>;
+    compact<T,N:?T>(array: Array<N>): Array<T>;
+    concat<T>(base: Array<T>, ...elements: Array<any>): Array<T|any>;
+    difference<T>(values?: Array<T>, array: ?Array<T>): Array<T>;
+    difference<T>(values?: Array<T>): (array: ?Array<T>) => Array<T>;
+    differenceBy<T>(values: Array<T>, iteratee: Iteratee<T>, array: ?Array<T>): T[];
+    differenceBy<T>(values: Array<T>, iteratee: Iteratee<T>): (array: ?Array<T>) => T[];
+    differenceWith<T>(values: T[], comparator?: Comparator<T>, array: T[]): T[];
+    differenceWith<T>(values: T[], comparator?: Comparator<T>): (array: T[]) => T[];
+    drop<T>(n?: number, array: ?Array<T>): Array<T>;
+    drop<T>(n?: number): (array: ?Array<T>) => Array<T>;
+    dropRight<T>(n?: number, array: ?Array<T>): Array<T>;
+    dropRight<T>(n?: number): (array: ?Array<T>) => Array<T>;
+    dropRightWhile<T>(predicate?: Predicate<T>, array: ?Array<T>): Array<T>;
+    dropRightWhile<T>(predicate?: Predicate<T>): (array: ?Array<T>) => Array<T>;
+    dropWhile<T>(predicate?: Predicate<T>, array: ?Array<T>): Array<T>;
+    dropWhile<T>(predicate?: Predicate<T>): (array: ?Array<T>) => Array<T>;
+    fill<T, U>(value: U, start?: number, end?: number, array: ?Array<T>): Array<T|U>;
+    fill<T, U>(value: U, start?: number, end?: number): (array: ?Array<T>) => Array<T|U>;
+    findIndex<T>(predicate?: Predicate<T>, array: ?Array<T>): number;
+    findIndex<T>(predicate?: Predicate<T>): (array: ?Array<T>) => number;
+    findLastIndex<T>(predicate?: Predicate<T>, array: ?Array<T>): number;
+    findLastIndex<T>(predicate?: Predicate<T>): (array: ?Array<T>) => number;
+    // alias of _.head
+    first<T>(array: ?Array<T>): T;
+    flatten<T,X>(array: Array<Array<T>|X>): Array<T|X>;
+    flattenDeep<T>(array: any[]): Array<T>;
+    flattenDepth(depth?: number, array: any[]): any[];
+    flattenDepth(depth?: number): (array: any[]) => any[];
+    fromPairs<T>(pairs: Array<T>): Object;
+    head<T>(array: ?Array<T>): T;
+    indexOf<T>(value: T, fromIndex?: number, array: ?Array<T>): number;
+    indexOf<T>(value: T, fromIndex?: number): (array: ?Array<T>) => number;
+    initial<T>(array: ?Array<T>): Array<T>;
+    intersection<T>(array1: Array<T>, array2: Array<T>): Array<T>;
+    intersection<T>(array1: Array<T>): (array2: Array<T>) => Array<T>;
+    //Workaround until (...parameter: T, parameter2: U) works
+    intersectionBy<T>(iteratee?: Iteratee<T>, a1: Array<T>): (a2: Array<T>) => Array<T>;
+    intersectionBy<T>(iteratee?: Iteratee<T>, a1: Array<T>, a2: Array<T>): Array<T>;
+    //Workaround until (...parameter: T, parameter2: U) works
+    intersectionWith<T>(comparator: Comparator<T>, a1: Array<T>): (a2: Array<T>) => Array<T>;
+    intersectionWith<T>(comparator: Comparator<T>, a1: Array<T>, a2: Array<T>): Array<T>;
+    join<T>(separator?: string, array: ?Array<T>): string;
+    join<T>(separator?: string): (array: ?Array<T>) => string;
+    last<T>(array: ?Array<T>): T;
+    lastIndexOf<T>(value: T, fromIndex?: number, array: ?Array<T>): number;
+    lastIndexOf<T>(value: T, fromIndex?: number): (array: ?Array<T>) => number;
+    nth<T>(n?: number, array: T[]): T;
+    nth<T>(n?: number): (array: T[]) => T;
+    pull<T>(values?: Array<T>, array: ?Array<T>): Array<T>;
+    pull<T>(values?: Array<T>): (array: ?Array<T>) => Array<T>;
+    pullAll<T>(values: Array<T>, array: ?Array<T>): Array<T>;
+    pullAll<T>(values: Array<T>): (array: ?Array<T>) => Array<T>;
+    pullAllBy<T>(array: ?Array<T>, values: Array<T>, iteratee?: Iteratee<T>): Array<T>;
+    pullAllWith<T>(array?: T[], values: T[], comparator?: Function): T[];
+    pullAt<T>(indexed?: Array<number>, array: ?Array<T>): Array<T>;
+    pullAt<T>(indexed?: Array<number>): (array: ?Array<T>) => Array<T>;
+    remove<T>(predicate?: Predicate<T>, array: ?Array<T>): Array<T>;
+    remove<T>(predicate?: Predicate<T>): (array: ?Array<T>) => Array<T>;
+    reverse<T>(array: ?Array<T>): Array<T>;
+    slice<T>(start?: number, end?: number, array: ?Array<T>): Array<T>;
+    slice<T>(start?: number, end?: number): (array: ?Array<T>) => Array<T>;
+    sortedIndex<T>(value: T, array: ?Array<T>): number;
+    sortedIndex<T>(value: T): (array: ?Array<T>) => number;
+    sortedIndexBy<T>(value: T, iteratee?: Iteratee<T>, array: ?Array<T>): number;
+    sortedIndexBy<T>(value: T, iteratee?: Iteratee<T>): (array: ?Array<T>) => number;
+    sortedIndexOf<T>(value: T, array: ?Array<T>): number;
+    sortedIndexOf<T>(value: T): (array: ?Array<T>) => number;
+    sortedLastIndex<T>(value: T, array: ?Array<T>): number;
+    sortedLastIndex<T>(value: T): (array: ?Array<T>) => number;
+    sortedLastIndexBy<T>(value: T, iteratee?: Iteratee<T>, array: ?Array<T>): number;
+    sortedLastIndexBy<T>(value: T, iteratee?: Iteratee<T>): (array: ?Array<T>) => number;
+    sortedLastIndexOf<T>(value: T, array: ?Array<T>): number;
+    sortedLastIndexOf<T>(value: T): (array: ?Array<T>) => number;
+    sortedUniq<T>(array: ?Array<T>): Array<T>;
+    sortedUniqBy<T>(iteratee?: (value: T) => mixed, array: ?Array<T>): Array<T>;
+    sortedUniqBy<T>(iteratee?: (value: T) => mixed): (array: ?Array<T>) => Array<T>;
+    tail<T>(array: ?Array<T>): Array<T>;
+    take<T>(n?: number, array: ?Array<T>): Array<T>;
+    take<T>(n?: number): (array: ?Array<T>) => Array<T>;
+    takeRight<T>(n?: number, array: ?Array<T>): Array<T>;
+    takeRight<T>(n?: number): (array: ?Array<T>) => Array<T>;
+    takeRightWhile<T>(predicate?: Predicate<T>, array: ?Array<T>): Array<T>;
+    takeRightWhile<T>(predicate?: Predicate<T>): (array: ?Array<T>) => Array<T>;
+    takeWhile<T>(predicate?: Predicate<T>, array: ?Array<T>): Array<T>;
+    takeWhile<T>(predicate?: Predicate<T>): (array: ?Array<T>) => Array<T>;
+    union<T>(a1: Array<T>, a2: Array<T>): Array<T>;
+    union<T>(a1: Array<T>): (a2: Array<T>) => Array<T>;
+    //Workaround until (...parameter: T, parameter2: U) works
+    unionBy<T>(iteratee?: Iteratee<T>, a1: Array<T>, a2: Array<T>): Array<T>;
+    unionBy<T>(iteratee?: Iteratee<T>, a1: Array<T>): (a2: Array<T>) => Array<T>;
+    unionBy<T>(iteratee?: Iteratee<T>): (a1: Array<T>, a2: Array<T>) => Array<T>;
+    unionBy<T>(iteratee?: Iteratee<T>): (a1: Array<T>) => (a2: Array<T>) => Array<T>;
+    //Workaround until (...parameter: T, parameter2: U) works
+    unionWith<T>(comparator?: Comparator<T>, a1: Array<T>, a2: Array<T>): Array<T>;
+    unionWith<T>(comparator?: Comparator<T>, a1: Array<T>): (a2: Array<T>) => Array<T>;
+    unionWith<T>(comparator?: Comparator<T>): (a1: Array<T>, a2: Array<T>) => Array<T>;
+    unionWith<T>(comparator?: Comparator<T>): (a1: Array<T>) => (a2: Array<T>) => Array<T>;
+    uniq<T>(array: ?Array<T>): Array<T>;
+    uniqBy<T>(iteratee?: Iteratee<T>, array: ?Array<T>): Array<T>;
+    uniqBy<T>(iteratee?: Iteratee<T>): (array: ?Array<T>) => Array<T>;
+    uniqWith<T>(comparator?: Comparator<T>, array: ?Array<T>): Array<T>;
+    uniqWith<T>(comparator?: Comparator<T>): (array: ?Array<T>) => Array<T>;
+    unzip<T>(array: ?Array<T>): Array<T>;
+    unzipWith<T>(iteratee?: Iteratee<T>, array: ?Array<T>): Array<T>;
+    unzipWith<T>(iteratee?: Iteratee<T>): (array: ?Array<T>) => Array<T>;
+    without<T>(values?: Array<T>, array: ?Array<T>): Array<T>;
+    without<T>(values?: Array<T>): (array: ?Array<T>) => Array<T>;
+    xor<T>(a1: Array<T>, a2: Array<T>): Array<T>;
+    xor<T>(a1: Array<T>): (a2: Array<T>) => Array<T>;
+    //Workaround until (...parameter: T, parameter2: U) works
+    xorBy<T>(iteratee?: Iteratee<T>, a1: Array<T>, a2: Array<T>): Array<T>;
+    xorBy<T>(iteratee?: Iteratee<T>, a1: Array<T>): (a2: Array<T>) => Array<T>;
+    xorBy<T>(iteratee?: Iteratee<T>): (a1: Array<T>, a2: Array<T>) => Array<T>;
+    xorBy<T>(iteratee?: Iteratee<T>): (a1: Array<T>) => (a2: Array<T>) => Array<T>;
+    //Workaround until (...parameter: T, parameter2: U) works
+    xorWith<T>(comparator?: Comparator<T>, a1: Array<T>, a2: Array<T>): Array<T>;
+    xorWith<T>(comparator?: Comparator<T>, a1: Array<T>): (a2: Array<T>) => Array<T>;
+    xorWith<T>(comparator?: Comparator<T>): (a1: Array<T>, a2: Array<T>) => Array<T>;
+    xorWith<T>(comparator?: Comparator<T>): (a1: Array<T>) => (a2: Array<T>) => Array<T>;
+    zip<A, B>(a2: B[], a1: A[]): Array<[A, B]>;
+    zip<A, B>(a2: B[]): (a1: A[]) => Array<[A, B]>;
+
+    zipObject(props?: Array<any>, values?: Array<any>): Object;
+    zipObjectDeep(props?: any[], values?: any): Object;
+    //Workaround until (...parameter: T, parameter2: U) works
+    zipWith<T>(iteratee?: Iteratee<T>, a1: NestedArray<T>, a2: NestedArray<T>): Array<T>;
+    zipWith<T>(iteratee?: Iteratee<T>, a1: NestedArray<T>): (a2: NestedArray<T>) => Array<T>;
+    zipWith<T>(iteratee?: Iteratee<T>): (a1: NestedArray<T>, a2: NestedArray<T>) => Array<T>;
+    zipWith<T>(iteratee?: Iteratee<T>): (a1: NestedArray<T>) => (a2: NestedArray<T>) => Array<T>;
+
+    // Collection
+    countBy<T>(iteratee?: Iteratee<T>, array: ?Array<T>): Object;
+    countBy<T>(iteratee?: Iteratee<T>): (array: ?Array<T>) => Object;
+    countBy<T: Object>(iteratee?: OIteratee<T>, object: T): Object;
+    countBy<T: Object>(iteratee?: OIteratee<T>): (object: T) => Object;
+    // alias of _.forEach
+    each<T>(iteratee?: Iteratee<T>, array: ?Array<T>): Array<T>;
+    each<T>(iteratee?: Iteratee<T>): (array: ?Array<T>) => Array<T>;
+    each<T: Object>(iteratee?: OIteratee<T>, object: T): T;
+    each<T: Object>(iteratee?: OIteratee<T>): (object: T) => T;
+    // alias of _.forEachRight
+    eachRight<T>(iteratee?: Iteratee<T>, array: ?Array<T>): Array<T>;
+    eachRight<T>(iteratee?: Iteratee<T>): (array: ?Array<T>) => Array<T>;
+    eachRight<T: Object>(iteratee?: OIteratee<T>, object: T): T;
+    eachRight<T: Object>(iteratee?: OIteratee<T>): (object: T) => T;
+    every<T>(iteratee?: Iteratee<T>, array: ?Array<T>): bool;
+    every<T>(iteratee?: Iteratee<T>): (array: ?Array<T>) => bool;
+    every<T: Object>(iteratee?: OIteratee<T>, object: T): bool;
+    every<T: Object>(iteratee?: OIteratee<T>): (object: T) => bool;
+    filter<T>(predicate?: Predicate<T>): (array: ?Array<T>) => Array<T>;
+    filter<T>(predicate?: Predicate<T>, array: ?Array<T>): Array<T>;
+    filter<A, T: {[id: string]: A}>(predicate?: OPredicate<A, T>): (object: T) => Array<A>;
+    filter<A, T: {[id: string]: A}>(predicate?: OPredicate<A, T>, object: T): Array<A>;
+    find<T>(predicate?: Predicate<T>, array: ?Array<T>): T;
+    find<T>(predicate?: Predicate<T>): (array: ?Array<T>) => T;
+    find<V, A, T: {[id: string]: A}>(predicate?: OPredicate<A, T>, object: T): V;
+    find<V, A, T: {[id: string]: A}>(predicate?: OPredicate<A, T>): (object: T) => V;
+    findLast<T>(predicate?: Predicate<T>, array: ?Array<T>): T;
+    findLast<T>(predicate?: Predicate<T>): (array: ?Array<T>) => T;
+    findLast<V, A, T: {[id: string]: A}>(predicate?: OPredicate<A, T>, object: T): V;
+    findLast<V, A, T: {[id: string]: A}>(predicate?: OPredicate<A, T>): (object: T) => V;
+    flatMap<T, U>(iteratee?: FlatMapIteratee<T, U>, array: ?Array<T>): Array<U>;
+    flatMap<T, U>(iteratee?: FlatMapIteratee<T, U>): (array: ?Array<T>) => Array<U>;
+    flatMap<T: Object, U>(iteratee?: OFlatMapIteratee<T, U>, object: T): Array<U>;
+    flatMap<T: Object, U>(iteratee?: OFlatMapIteratee<T, U>): (object: T) => Array<U>;
+    flatMapDeep<T, U>(iteratee?: FlatMapIteratee<T, U>, array: ?Array<T>): Array<U>;
+    flatMapDeep<T, U>(iteratee?: FlatMapIteratee<T, U>): (array: ?Array<T>) => Array<U>;
+    flatMapDeep<T: Object, U>(iteratee?: OFlatMapIteratee<T, U>, object: T): Array<U>;
+    flatMapDeep<T: Object, U>(iteratee?: OFlatMapIteratee<T, U>): (object: T) => Array<U>;
+    flatMapDepth<T, U>(iteratee?: FlatMapIteratee<T, U>, depth?: number, array: ?Array<T>): Array<U>;
+    flatMapDepth<T, U>(iteratee?: FlatMapIteratee<T, U>, depth?: number): (array: ?Array<T>) => Array<U>;
+    flatMapDepth<T: Object, U>(iteratee?: OFlatMapIteratee<T, U>, depth?: number, object: T): Array<U>;
+    flatMapDepth<T: Object, U>(iteratee?: OFlatMapIteratee<T, U>, depth?: number): (object: T) => Array<U>;
+    forEach<T>(iteratee?: Iteratee<T>, array: ?Array<T>): Array<T>;
+    forEach<T>(iteratee?: Iteratee<T>): (array: ?Array<T>) => Array<T>;
+    forEach<T: Object>(iteratee?: OIteratee<T>, object: T): T;
+    forEach<T: Object>(iteratee?: OIteratee<T>): (object: T) => T;
+    forEachRight<T>(iteratee?: Iteratee<T>, array: ?Array<T>): Array<T>;
+    forEachRight<T>(iteratee?: Iteratee<T>): (array: ?Array<T>) => Array<T>;
+    forEachRight<T: Object>(iteratee?: OIteratee<T>, object: T): T;
+    forEachRight<T: Object>(iteratee?: OIteratee<T>): (object: T) => T;
+    groupBy<T>(iteratee?: Iteratee<T>, array: ?Array<T>): Object;
+    groupBy<T>(iteratee?: Iteratee<T>): (array: ?Array<T>) => Object;
+    groupBy<T: Object>(iteratee?: OIteratee<T>, object: T): Object;
+    groupBy<T: Object>(iteratee?: OIteratee<T>): (object: T) => Object;
+    includes<T>(value: T, fromIndex?: number, array: ?Array<T>): bool;
+    includes<T>(value: T, fromIndex?: number): (array: ?Array<T>) => bool;
+    includes<T: Object>(value: any, fromIndex?: number, object: T): bool;
+    includes<T: Object>(value: any, fromIndex?: number): (object: T) => bool;
+    includes(value: string, fromIndex?: number, str: string): bool;
+    includes(value: string, fromIndex?: number): (str: string) => bool;
+    invokeMap<T>(path: ((value: T) => Array<string>|string)|Array<string>|string, args?: Array<any>, array: ?Array<T>): Array<any>;
+    invokeMap<T>(path: ((value: T) => Array<string>|string)|Array<string>|string, args?: Array<any>): (array: ?Array<T>) => Array<any>;
+    invokeMap<T: Object>(path: ((value: any) => Array<string>|string)|Array<string>|string, args?: Array<any>, object: T): Array<any>;
+    invokeMap<T: Object>(path: ((value: any) => Array<string>|string)|Array<string>|string, args?: Array<any>): (object: T) => Array<any>;
+    keyBy<T, V>(iteratee?: Iteratee2<T, V>, array: ?Array<T>): {[key: V]: T};
+    keyBy<T, V>(iteratee?: Iteratee2<T, V>): (array: ?Array<T>) => {[key: V]: T};
+    keyBy<V, T: Object>(iteratee?: OIteratee<T>, object: T): Object;
+    keyBy<V, T: Object>(iteratee?: OIteratee<T>): (object: T) => Object;
+    map<T, U>(iteratee?: MapIterator<T, U>): (array: ?Array<T>) => Array<U>;
+    map<T, U>(iteratee?: MapIterator<T, U>, array: ?Array<T>): Array<U>;
+    map<V, T: Object, U>(iteratee?: OMapIterator<V, T, U>, object: ?T): Array<U>;
+    map<V, T: Object, U>(iteratee?: OMapIterator<V, T, U>): (object: ?T) => Array<U>;
+    map(iteratee?: (char: string, index: number, str: string, str: ?string) => any): string;
+    map(iteratee?: (char: string, index: number, str: string) => any): (str: ?string) => string;
+    orderBy<T>(iteratees?: Array<Iteratee<T>>|string, orders?: Array<'asc'|'desc'>|string, array: ?Array<T>): Array<T>;
+    orderBy<T>(iteratees?: Array<Iteratee<T>>|string, orders?: Array<'asc'|'desc'>|string): (array: ?Array<T>) => Array<T>;
+    orderBy<V, T: Object>(iteratees?: Array<OIteratee<*>>|string, orders?: Array<'asc'|'desc'>|string, object: T): Array<V>;
+    orderBy<V, T: Object>(iteratees?: Array<OIteratee<*>>|string, orders?: Array<'asc'|'desc'>|string): (object: T) => Array<V>;
+    partition<T>(predicate?: Predicate<T>, array: ?Array<T>): NestedArray<T>;
+    partition<T>(predicate?: Predicate<T>): (array: ?Array<T>) => NestedArray<T>;
+    partition<V, A, T: {[id: string]: A}>(predicate?: OPredicate<A, T>, object: T): NestedArray<V>;
+    partition<V, A, T: {[id: string]: A}>(predicate?: OPredicate<A, T>): (object: T) => NestedArray<V>;
+    reduce<T, U>(iteratee?: (accumulator: U, value: T, index: number, array: ?Array<T>) => U, accumulator?: U, array: ?Array<T>): U;
+    reduce<T, U>(iteratee?: (accumulator: U, value: T, index: number, array: ?Array<T>) => U, accumulator?: U): (array: ?Array<T>) => U;
+    reduce<T: Object, U>(iteratee?: (accumulator: U, value: any, key: string, object: T) => U, accumulator?: U, object: T): U;
+    reduce<T: Object, U>(iteratee?: (accumulator: U, value: any, key: string, object: T) => U, accumulator?: U): (object: T) => U;
+    reduceRight<T, U>(iteratee?: (accumulator: U, value: T, index: number, array: ?Array<T>) => U, accumulator?: U, array: ?Array<T>): U;
+    reduceRight<T, U>(iteratee?: (accumulator: U, value: T, index: number, array: ?Array<T>) => U, accumulator?: U): (array: ?Array<T>) => U;
+    reduceRight<T: Object, U>(iteratee?: (accumulator: U, value: any, key: string, object: T) => U, accumulator?: U, object: T): U;
+    reduceRight<T: Object, U>(iteratee?: (accumulator: U, value: any, key: string, object: T) => U, accumulator?: U): (object: T) => U;
+    reject<T>(predicate?: Predicate<T>, array: ?Array<T>): Array<T>;
+    reject<T>(predicate?: Predicate<T>): (array: ?Array<T>) => Array<T>;
+    reject<V: Object, A, T: {[id: string]: A}>(predicate?: OPredicate<A, T>, object: T): Array<V>;
+    reject<V: Object, A, T: {[id: string]: A}>(predicate?: OPredicate<A, T>): (object: T) => Array<V>;
+    sample<T>(array: ?Array<T>): T;
+    sample<V, T: Object>(object: T): V;
+    sampleSize<T>(n?: number, array: ?Array<T>): Array<T>;
+    sampleSize<T>(n?: number): (array: ?Array<T>) => Array<T>;
+    sampleSize<V, T: Object>(n?: number, object: T): Array<V>;
+    sampleSize<V, T: Object>(n?: number): (object: T) => Array<V>;
+    shuffle<T>(array: ?Array<T>): Array<T>;
+    shuffle<V, T: Object>(object: T): Array<V>;
+    size(collection: Array<any>|Object): number;
+    some<T>(predicate?: Predicate<T>, array: ?Array<T>): bool;
+    some<T>(predicate?: Predicate<T>): (array: ?Array<T>) => bool;
+    some<A, T: {[id: string]: A}>(predicate?: OPredicate<A, T>, object?: ?T): bool;
+    some<A, T: {[id: string]: A}>(predicate?: OPredicate<A, T>): (object?: ?T) => bool;
+    sortBy<T>(iteratees?: Array<Iteratee<T>>, array: ?Array<T>): Array<T>;
+    sortBy<T>(iteratees?: Array<Iteratee<T>>): (array: ?Array<T>) => Array<T>;
+    sortBy<T>(iteratees?: Array<Iteratee<T>>, array: ?Array<T>): Array<T>;
+    sortBy<T>(iteratees?: Array<Iteratee<T>>): (array: ?Array<T>) => Array<T>;
+    sortBy<V, T: Object>(iteratees?: Array<OIteratee<T>>, object: T): Array<V>;
+    sortBy<V, T: Object>(iteratees?: Array<OIteratee<T>>): (object: T) => Array<V>;
+    sortBy<V, T: Object>(iteratees?: Array<OIteratee<T>>, object: T): Array<V>;
+    sortBy<V, T: Object>(iteratees?: Array<OIteratee<T>>): (object: T) => Array<V>;
+
+    // Date
+    now(): number;
+
+    // Function
+    after(n: number, fn: Function): Function;
+    ary(func: Function, n?: number): Function;
+    before(n: number, fn: Function): Function;
+    bind(func: Function, thisArg: any, ...partials: Array<any>): Function;
+    bindKey(obj: Object, key: string, ...partials: Array<any>): Function;
+    curry(func: Function, arity?: number): Function;
+    curryRight(func: Function, arity?: number): Function;
+    debounce(func: Function, wait?: number, options?: DebounceOptions): Function;
+    defer(func: Function, ...args?: Array<any>): number;
+    delay(func: Function, wait: number, ...args?: Array<any>): number;
+    flip(func: Function): Function;
+    memoize(func: Function, resolver?: Function): Function;
+    negate(predicate: Function): Function;
+    once(func: Function): Function;
+    overArgs(func: Function, ...transforms: Array<Function>): Function;
+    overArgs(func: Function, transforms: Array<Function>): Function;
+    partial(func: Function, ...partials: any[]): Function;
+    partialRight(func: Function, ...partials: Array<any>): Function;
+    partialRight(func: Function, partials: Array<any>): Function;
+    rearg(func: Function, ...indexes: Array<number>): Function;
+    rearg(func: Function, indexes: Array<number>): Function;
+    rest(func: Function, start?: number): Function;
+    spread(func: Function): Function;
+    throttle(func: Function, wait?: number, options?: ThrottleOptions): Function;
+    unary(func: Function): Function;
+    wrap(value: any, wrapper: Function): Function;
+
+    // Lang
+    castArray(value: *): any[];
+    clone<T>(value: T): T;
+    cloneDeep<T>(value: T): T;
+    cloneDeepWith<T, U>(value: T, customizer?: ?(value: T, key: number|string, object: T, stack: any) => U): U;
+    cloneWith<T, U>(value: T, customizer?: ?(value: T, key: number|string, object: T, stack: any) => U): U;
+    conformsTo<T:{[key:string]:mixed}>(source: T, predicates: T&{[key:string]:(x:any)=>boolean}): boolean;
+    eq(value: any, other: any): bool;
+    gt(value: any, other: any): bool;
+    gte(value: any, other: any): bool;
+    isArguments(value: any): bool;
+    isArray(value: any): bool;
+    isArrayBuffer(value: any): bool;
+    isArrayLike(value: any): bool;
+    isArrayLikeObject(value: any): bool;
+    isBoolean(value: any): bool;
+    isBuffer(value: any): bool;
+    isDate(value: any): bool;
+    isElement(value: any): bool;
+    isEmpty(value: any): bool;
+    isEqual(value: any, other: any): bool;
+    isEqualWith<T, U>(value: T, other: U, customizer?: (objValue: any, otherValue: any, key: number|string, object: T, other: U, stack: any) => bool|void): bool;
+    isError(value: any): bool;
+    isFinite(value: any): bool;
+    isFunction(value: Function): true;
+    isFunction(value: number|string|void|null|Object): false;
+    isInteger(value: any): bool;
+    isLength(value: any): bool;
+    isMap(value: any): bool;
+    isMatch(object?: ?Object, source: Object): bool;
+    isMatchWith<T: Object, U: Object>(object: T, source: U, customizer?: (objValue: any, srcValue: any, key: number|string, object: T, source: U) => bool|void): bool;
+    isNaN(value: any): bool;
+    isNative(value: any): bool;
+    isNil(value: any): bool;
+    isNull(value: any): bool;
+    isNumber(value: any): bool;
+    isObject(value: any): bool;
+    isObjectLike(value: any): bool;
+    isPlainObject(value: any): bool;
+    isRegExp(value: any): bool;
+    isSafeInteger(value: any): bool;
+    isSet(value: any): bool;
+    isString(value: any): bool;
+    isSymbol(value: any): bool;
+    isTypedArray(value: any): bool;
+    isUndefined(value: any): bool;
+    isWeakMap(value: any): bool;
+    isWeakSet(value: any): bool;
+    lt(value: any, other: any): bool;
+    lte(value: any, other: any): bool;
+    toArray(value: any): Array<any>;
+    toFinite(value: any): number;
+    toInteger(value: any): number;
+    toLength(value: any): number;
+    toNumber(value: any): number;
+    toPlainObject(value: any): Object;
+    toSafeInteger(value: any): number;
+    toString(value: any): string;
+
+    // Math
+    add(augend: number, addend: number): number;
+    ceil(number: number, precision?: number): number;
+    divide(dividend: number, divisor: number): number;
+    floor(number: number, precision?: number): number;
+    max<T>(array: ?Array<T>): T;
+    maxBy<T>(array: ?Array<T>, iteratee?: Iteratee<T>): T;
+    mean(array: Array<*>): number;
+    meanBy<T>(array: Array<T>, iteratee?: Iteratee<T>): number;
+    min<T>(array: ?Array<T>): T;
+    minBy<T>(array: ?Array<T>, iteratee?: Iteratee<T>): T;
+    multiply(multiplier: number, multiplicand: number): number;
+    round(number: number, precision?: number): number;
+    subtract(minuend: number, subtrahend: number): number;
+    sum(array: Array<*>): number;
+    sumBy<T>(array: Array<T>, iteratee?: Iteratee<T>): number;
+
+    // number
+    clamp(number: number, lower?: number, upper: number): number;
+    inRange(number: number, start?: number, end: number): bool;
+    random(lower?: number, upper?: number, floating?: bool): number;
+
+    // Object
+    assign(object?: ?Object, ...sources?: Array<Object>): Object;
+    assignIn<A, B>(a: A, b: B): A & B;
+    assignIn<A, B, C>(a: A, b: B, c: C): A & B & C;
+    assignIn<A, B, C, D>(a: A, b: B, c: C, d: D): A & B & C & D;
+    assignIn<A, B, C, D, E>(a: A, b: B, c: C, d: D, e: E): A & B & C & D & E;
+    assignInWith<T: Object, A: Object>(object: T, s1: A, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A) => any|void): Object;
+    assignInWith<T: Object, A: Object, B: Object>(object: T, s1: A, s2: B, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A|B) => any|void): Object;
+    assignInWith<T: Object, A: Object, B: Object, C: Object>(object: T, s1: A, s2: B, s3: C, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A|B|C) => any|void): Object;
+    assignInWith<T: Object, A: Object, B: Object, C: Object, D: Object>(object: T, s1: A, s2: B, s3: C, s4: D, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A|B|C|D) => any|void): Object;
+    assignWith<T: Object, A: Object>(object: T, s1: A, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A) => any|void): Object;
+    assignWith<T: Object, A: Object, B: Object>(object: T, s1: A, s2: B, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A|B) => any|void): Object;
+    assignWith<T: Object, A: Object, B: Object, C: Object>(object: T, s1: A, s2: B, s3: C, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A|B|C) => any|void): Object;
+    assignWith<T: Object, A: Object, B: Object, C: Object, D: Object>(object: T, s1: A, s2: B, s3: C, s4: D, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A|B|C|D) => any|void): Object;
+    at(object?: ?Object, ...paths: Array<string>): Array<any>;
+    at(object?: ?Object, paths: Array<string>): Array<any>;
+    create<T>(prototype: T, properties?: Object): $Supertype<T>;
+    defaults(object?: ?Object, ...sources?: Array<Object>): Object;
+    defaultsDeep(object?: ?Object, ...sources?: Array<Object>): Object;
+    // alias for _.toPairs
+    entries(object?: ?Object): NestedArray<any>;
+    // alias for _.toPairsIn
+    entriesIn(object?: ?Object): NestedArray<any>;
+    // alias for _.assignIn
+    extend<A, B>(a: A, b: B): A & B;
+    extend<A, B, C>(a: A, b: B, c: C): A & B & C;
+    extend<A, B, C, D>(a: A, b: B, c: C, d: D): A & B & C & D;
+    extend<A, B, C, D, E>(a: A, b: B, c: C, d: D, e: E): A & B & C & D & E;
+    // alias for _.assignInWith
+    extendWith<T: Object, A: Object>(object: T, s1: A, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A) => any|void): Object;
+    extendWith<T: Object, A: Object, B: Object>(object: T, s1: A, s2: B, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A|B) => any|void): Object;
+    extendWith<T: Object, A: Object, B: Object, C: Object>(object: T, s1: A, s2: B, s3: C, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A|B|C) => any|void): Object;
+    extendWith<T: Object, A: Object, B: Object, C: Object, D: Object>(object: T, s1: A, s2: B, s3: C, s4: D, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A|B|C|D) => any|void): Object;
+    findKey<A, T: {[id: string]: A}>(object?: ?T, predicate?: OPredicate<A, T>): string|void;
+    findLastKey<A, T: {[id: string]: A}>(object?: ?T, predicate?: OPredicate<A, T>): string|void;
+    forIn(object?: ?Object, iteratee?: OIteratee<*>): Object;
+    forInRight(object?: ?Object, iteratee?: OIteratee<*>): Object;
+    forOwn(object?: ?Object, iteratee?: OIteratee<*>): Object;
+    forOwnRight(object?: ?Object, iteratee?: OIteratee<*>): Object;
+    functions(object?: ?Object): Array<string>;
+    functionsIn(object?: ?Object): Array<string>;
+    get(object?: ?Object, path?: ?Array<string>|string, defaultValue?: any): any;
+    has(object?: ?Object, path?: ?Array<string>|string): bool;
+    hasIn(object?: ?Object, path?: ?Array<string>|string): bool;
+    invert(object?: ?Object, multiVal?: bool): Object;
+    invertBy(object: ?Object, iteratee?: Function): Object;
+    invoke(object?: ?Object, path?: ?Array<string>|string, ...args?: Array<any>): any;
+    keys(object?: ?Object): Array<string>;
+    keysIn(object?: ?Object): Array<string>;
+    mapKeys(object?: ?Object, iteratee?: OIteratee<*>): Object;
+    mapValues(object?: ?Object, iteratee?: OIteratee<*>): Object;
+    merge(object?: ?Object, ...sources?: Array<?Object>): Object;
+    mergeWith<T: Object, A: Object>(object: T, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A) => any|void): Object;
+    mergeWith<T: Object, A: Object, B: Object>(object: T, s1: A, s2: B, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A|B) => any|void): Object;
+    mergeWith<T: Object, A: Object, B: Object, C: Object>(object: T, s1: A, s2: B, s3: C, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A|B|C) => any|void): Object;
+    mergeWith<T: Object, A: Object, B: Object, C: Object, D: Object>(object: T, s1: A, s2: B, s3: C, s4: D, customizer?: (objValue: any, srcValue: any, key: string, object: T, source: A|B|C|D) => any|void): Object;
+    omit(object?: ?Object, ...props: Array<string>): Object;
+    omit(object?: ?Object, props: Array<string>): Object;
+    omitBy<A, T: {[id: string]: A}>(object?: ?T, predicate?: OPredicate<A, T>): Object;
+    pick(object?: ?Object, ...props: Array<string>): Object;
+    pick(object?: ?Object, props: Array<string>): Object;
+    pickBy<A, T: {[id: string]: A}>(object?: ?T, predicate?: OPredicate<A, T>): Object;
+    result(object?: ?Object, path?: ?Array<string>|string, defaultValue?: any): any;
+    set(object?: ?Object, path?: ?Array<string>|string, value: any): Object;
+    setWith<T>(object: T, path?: ?Array<string>|string, value: any, customizer?: (nsValue: any, key: string, nsObject: T) => any): Object;
+    toPairs(object?: ?Object|Array<*>): NestedArray<any>;
+    toPairsIn(object?: ?Object): NestedArray<any>;
+    transform(collection: Object|Array<any>, iteratee?: OIteratee<*>, accumulator?: any): any;
+    unset(object?: ?Object, path?: ?Array<string>|string): bool;
+    update(object: Object, path: string[]|string, updater: Function): Object;
+    updateWith(object: Object, path: string[]|string, updater: Function, customizer?: Function): Object;
+    values(object?: ?Object): Array<any>;
+    valuesIn(object?: ?Object): Array<any>;
+
+    // Seq
+    // harder to read, but this is _()
+    (value: any): any;
+    chain<T>(value: T): any;
+    tap<T>(value: T, interceptor: (value:T)=>any): T;
+    thru<T1,T2>(value: T1, interceptor: (value:T1)=>T2): T2;
+    // TODO: _.prototype.*
+
+    // String
+    camelCase(string?: ?string): string;
+    capitalize(string?: string): string;
+    deburr(string?: string): string;
+    endsWith(string?: string, target?: string, position?: number): bool;
+    escape(string?: string): string;
+    escapeRegExp(string?: string): string;
+    kebabCase(string?: string): string;
+    lowerCase(string?: string): string;
+    lowerFirst(string?: string): string;
+    pad(string?: string, length?: number, chars?: string): string;
+    padEnd(string?: string, length?: number, chars?: string): string;
+    padStart(string?: string, length?: number, chars?: string): string;
+    parseInt(string: string, radix?: number): number;
+    repeat(string?: string, n?: number): string;
+    replace(string?: string, pattern: RegExp|string, replacement: ((string: string) => string)|string): string;
+    snakeCase(string?: string): string;
+    split(string?: string, separator: RegExp|string, limit?: number): Array<string>;
+    startCase(string?: string): string;
+    startsWith(string?: string, target?: string, position?: number): bool;
+    template(string?: string, options?: TemplateSettings): Function;
+    toLower(string?: string): string;
+    toUpper(string?: string): string;
+    trim(string?: string, chars?: string): string;
+    trimEnd(string?: string, chars?: string): string;
+    trimStart(string?: string, chars?: string): string;
+    truncate(string?: string, options?: TruncateOptions): string;
+    unescape(string?: string): string;
+    upperCase(string?: string): string;
+    upperFirst(string?: string): string;
+    words(string?: string, pattern?: RegExp|string): Array<string>;
+
+    // Util
+    attempt(func: Function): any;
+    bindAll(object?: ?Object, methodNames: Array<string>): Object;
+    bindAll(object?: ?Object, ...methodNames: Array<string>): Object;
+    cond(pairs: NestedArray<Function>): Function;
+    conforms(source: Object): Function;
+    constant<T>(value: T): () => T;
+    defaultTo<T1:string|boolean|Object,T2>(value: T1, default: T2): T1;
+    // NaN is a number instead of its own type, otherwise it would behave like null/void
+    defaultTo<T1:number,T2>(value: T1, default: T2): T1|T2;
+    defaultTo<T1:void|null,T2>(value: T1, default: T2): T2;
+    flow(...funcs?: Array<Function>): Function;
+    flow(funcs?: Array<Function>): Function;
+    flowRight(...funcs?: Array<Function>): Function;
+    flowRight(funcs?: Array<Function>): Function;
+    identity<T>(value: T): T;
+    iteratee(func?: any): Function;
+    matches(source: Object): Function;
+    matchesProperty(path?: ?Array<string>|string, srcValue: any): Function;
+    method(path?: ?Array<string>|string, ...args?: Array<any>): Function;
+    methodOf(object?: ?Object, ...args?: Array<any>): Function;
+    mixin<T: Function|Object>(object?: T, source: Object, options?: { chain: bool }): T;
+    noConflict(): LodashFp;
+    noop(): void;
+    nthArg(n?: number): Function;
+    over(...iteratees: Array<Function>): Function;
+    over(iteratees: Array<Function>): Function;
+    overEvery(...predicates: Array<Function>): Function;
+    overEvery(predicates: Array<Function>): Function;
+    overSome(...predicates: Array<Function>): Function;
+    overSome(predicates: Array<Function>): Function;
+    property(path?: ?Array<string>|string): Function;
+    propertyOf(object?: ?Object): Function;
+    range(start: number, end: number, step?: number): Array<number>;
+    range(end: number, step?: number): Array<number>;
+    rangeRight(start: number, end: number, step?: number): Array<number>;
+    rangeRight(end: number, step?: number): Array<number>;
+    runInContext(context?: Object): Function;
+
+    stubArray(): Array<*>;
+    stubFalse(): false;
+    stubObject(): {};
+    stubString(): '';
+    stubTrue(): true;
+    times(n: number, ...rest: Array<void>): Array<number>;
+    times<T>(n: number, iteratee: ((i: number) => T)): Array<T>;
+    toPath(value: any): Array<string>;
+    uniqueId(prefix?: string): string;
+
+    // Properties
+    VERSION: string;
+    templateSettings: TemplateSettings;
+  }
+
+  declare var exports: LodashFp;
 }
