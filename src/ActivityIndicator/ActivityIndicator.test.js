@@ -19,13 +19,17 @@ describe('ActivityIndicator', () => {
 
   it('renders a toast in the toaster if syncing', () => {
     const component = mount(<ActivityIndicator isSyncing />).update();
-    expect(typeof component.find('Toaster').get(0).props.getToasts === 'function');
-    expect(component.find('Toaster').get(0).props.getToasts().length).to.equal(1);
+    // $FlowFixMe
+    expect(component.find('Toaster').get(0).getToasts).to.be.a('function');
+    // $FlowFixMe
+    expect(component.find('Toaster').get(0).getToasts().length).to.equal(1);
   });
 
   it('renders no toast in the toaster if not syncing', () => {
     const component = mount(<ActivityIndicator isSyncing={false} />).update();
-    expect(typeof component.find('Toaster').get(0).props.getToasts === 'function');
-    expect(component.find('Toaster').get(0).props.getToasts().length === 0);
+    // $FlowFixMe
+    expect(component.find('Toaster').get(0).getToasts).to.be.a('function');
+    // $FlowFixMe
+    expect(component.find('Toaster').get(0).getToasts().length).to.equal(0);
   });
 });
