@@ -1,3 +1,4 @@
+/* @flow */
 /* eslint-env jest */
 /* eslint-disable no-unused-expressions */
 /* global Blob */
@@ -13,6 +14,8 @@ import {
   mergeMetrics,
   uploadAsJSON,
 } from './lib';
+
+import type { TMetric } from './types';
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -88,7 +91,7 @@ describe('lib', () => {
       const input = [
         {
           id: 3,
-          props: {},
+          props: { ...MoodWithEntries.props },
           lastModified: 10,
           entries: [
             { date: '2016-12-21T11:52:24.949Z', value: 4 },
@@ -97,10 +100,11 @@ describe('lib', () => {
         },
         {
           id: 3,
-          props: {},
+          props: { ...MoodWithEntries.props },
           lastModified: 10,
           entries: [
             { date: '2016-12-21T11:52:24.949Z', value: 6 },
+            // $FlowFixMe
             { date: 'asrcdi.', value: 'hu' },
           ],
         },
@@ -126,8 +130,7 @@ describe('lib', () => {
             type: 'int',
             colorGroups: [],
           },
-          entries: [
-          ],
+          entries: [],
         },
       ];
       expect(isValidMetricsArray(metrics)).to.equal(true);
@@ -194,7 +197,7 @@ describe('lib', () => {
       const input = [
         {
           id: 3,
-          props: {},
+          props: MoodWithEntries.props,
           lastModified: 10,
           entries: [
             { date: '2016-12-21T11:52:24.949Z', value: 4 },
@@ -203,7 +206,7 @@ describe('lib', () => {
         },
         {
           id: 3,
-          props: {},
+          props: MoodWithEntries.props,
           lastModified: 10,
           entries: [
             { date: '2016-12-21T11:52:24.949Z', value: 6 },

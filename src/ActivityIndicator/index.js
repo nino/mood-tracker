@@ -1,10 +1,19 @@
+/* @flow */
 import React from 'react';
 import { connect } from 'react-redux';
 import { Toaster } from '@blueprintjs/core';
+import type { TApplicationState } from '../types';
+
+type ActivityIndicatorProps = {
+  isSyncing: bool,
+};
 
 /* eslint-disable react/prefer-stateless-function */
 export class ActivityIndicator extends React.Component {
-  constructor(props) {
+  props: ActivityIndicatorProps;
+  toaster: any;
+
+  constructor(props: ActivityIndicatorProps) {
     super(props);
     this.toaster = null;
   }
@@ -25,11 +34,7 @@ export class ActivityIndicator extends React.Component {
 }
 /* eslint-enable react/prefer-stateless-function */
 
-ActivityIndicator.propTypes = {
-  isSyncing: React.PropTypes.bool,
-};
-
-const stateToProps = state => ({
+const stateToProps = (state: TApplicationState) => ({
   isSyncing: state.metrics.isSyncing,
 });
 

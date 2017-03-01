@@ -1,5 +1,7 @@
+/* @flow */
 /* eslint-env jest */
 /* eslint-disable no-unused-expressions */
+/* global localStorage window */
 import { expect } from 'chai';
 import {
   syncData,
@@ -8,9 +10,9 @@ import {
   executeCancelModal,
   executeConfirmModal,
   executeLogout,
+  updateMetric,
 } from './sagas';
 import {
-  INITIAL_STATE,
   STATE_WITH_SOME_METRICS,
 } from '../test/SampleApplicationStates';
 import {
@@ -18,10 +20,19 @@ import {
   BurnsWithoutEntries,
   BurnsWithEntries,
 } from '../test/SampleMetrics';
-import { DATA_FILE_PATH } from './constants';
+import { DATA_FILE_PATH, DEFAULT_METRIC_PROPS } from './constants';
 import { isValidMetricsArray } from './lib';
+import type {
+  TMetric,
+  TEditedMetricProps,
+  TAuthenticationState,
+  TOldMetric,
+  TModal,
+ } from './types';
+import { requestUpdateMetric } from './actions';
+import { getMetricsItems, getAuthentication } from './selectors';
 
-const authAuthenticated = {
+const authAuthenticated: TAuthenticationState = {
   isAuthenticated: true,
   isAuthenticating: false,
   accessToken: 'yup',
@@ -29,47 +40,43 @@ const authAuthenticated = {
 
 describe('check login saga', () => {
   it('uses the accessToken from localStorage to authenticate', () => {
-    global.localStorage = { accessToken: 'abc' };
+    localStorage.setItem('accessToken', 'abc');
     const generator = checkLogin();
     const next = generator.next();
-    expect(next.value).to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'SUCCESS_CHECK_LOGIN');
-    expect(next.value.PUT.action).to.have.property('accessToken', 'abc');
-    expect(next.value.PUT.action).to.have.property('lastAuthenticated').and.to.be.a('number');
+    expect(next).to.have.deep.property('value.PUT.action.type', 'SUCCESS_CHECK_LOGIN');
+    expect(next).to.have.deep.property('value.PUT.action.accessToken', 'abc');
+    expect(next).to.have.deep.property('value.PUT.action.lastAuthenticated').and.to.be.a('number');
     expect(generator.next()).to.have.property('done', true);
   });
 
   it('uses the accessToken from location hash to authenticate', () => {
-    global.localStorage = { };
-    global.window.location.hash = '#access_token=abc2';
+    localStorage.removeItem('accessToken');
+    window.location.hash = '#access_token=abc2';
     const generator = checkLogin();
     const next = generator.next();
-    expect(next.value).to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'SUCCESS_CHECK_LOGIN');
-    expect(next.value.PUT.action).to.have.property('accessToken', 'abc2');
-    expect(next.value.PUT.action).to.have.property('lastAuthenticated').and.to.be.a('number');
+    expect(next).to.have.deep.property('value.PUT.action.type', 'SUCCESS_CHECK_LOGIN');
+    expect(next).to.have.deep.property('value.PUT.action.accessToken', 'abc2');
+    expect(next).to.have.deep.property('value.PUT.action.lastAuthenticated').and.to.be.a('number');
     expect(generator.next()).to.have.property('done', true);
   });
 
   it('prefers location hash over local accessToken', () => {
-    global.localStorage = { accessToken: 'abcLocal' };
-    global.window.location.hash = '#access_token=abcHash';
+    localStorage.setItem('accessToken', 'abcLocal');
+    window.location.hash = '#access_token=abcHash';
     const generator = checkLogin();
     const next = generator.next();
-    expect(next.value).to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'SUCCESS_CHECK_LOGIN');
-    expect(next.value.PUT.action).to.have.property('accessToken', 'abcHash');
-    expect(next.value.PUT.action).to.have.property('lastAuthenticated').and.to.be.a('number');
+    expect(next).to.have.deep.property('value.PUT.action.type', 'SUCCESS_CHECK_LOGIN');
+    expect(next).to.have.deep.property('value.PUT.action.accessToken', 'abcHash');
+    expect(next).to.have.deep.property('value.PUT.action.lastAuthenticated').and.to.be.a('number');
     expect(generator.next()).to.have.property('done', true);
   });
 
   it('fails if no token is found in localStorage or location hash', () => {
-    global.localStorage = {};
-    global.window.location.hash = null;
+    localStorage.removeItem('accessToken');
+    window.location.hash = null;
     const generator = checkLogin();
     const next = generator.next();
-    expect(next.value).to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'ERROR_CHECK_LOGIN');
+    expect(next.value).to.have.deep.property('PUT.action.type', 'ERROR_CHECK_LOGIN');
     expect(generator.next()).to.have.property('done', true);
   });
 });
@@ -80,9 +87,7 @@ describe('sync data saga', () => {
     let next = generator.next();
     const authenticationMock = { isAuthenticated: false };
     next = generator.next(authenticationMock);
-    expect(next).to.have.property('value').and.to.have.property('PUT')
-      .and.to.have.property('action')
-      .and.to.have.property('type', 'ERROR_SYNC_DATA');
+    expect(next).to.have.deep.property('value.PUT.action.type', 'ERROR_SYNC_DATA');
     expect(generator.next()).to.have.property('done', true);
   });
 
@@ -91,73 +96,64 @@ describe('sync data saga', () => {
     let next = generator.next();
 
     // Fetch authentication state from store
-    next = generator.next({ accessToken: 'abc' });
+    expect(next).to.have.deep.property('value.SELECT.selector', getAuthentication);
+    const authMock: TAuthenticationState = {
+      isAuthenticated: true,
+      isAuthenticating: false,
+      accessToken: 'abc',
+    };
+    next = generator.next(authMock);
 
     // We're authenticated, so let's PUT the restore cache action
-    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
-      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.deep.property('value.PUT.action.type', 'REQUEST_RESTORE_CACHE');
     next = generator.next();
 
     // Fetch metrics items from store
-    expect(next, 'must SELECT metrics items').to.have.property('value').and.to.have.property('SELECT');
-    const metricsMock = STATE_WITH_SOME_METRICS.metrics.items;
+    expect(next, 'must SELECT metrics items').to.have.deep.property('value.SELECT.selector', getMetricsItems);
+    if (STATE_WITH_SOME_METRICS.metrics.items == null) { expect(false).to.be.ok; return; }
+    const metricsMock: TMetric[] = STATE_WITH_SOME_METRICS.metrics.items;
     next = generator.next(metricsMock);
 
     // Download data file as JSON
-    expect(next, 'must request data file download').to.have.property('value')
-      .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(2);
-    expect(next.value.CALL.args[1]).to.be.a('string');
-    const responseMock = {
+    expect(next, 'must request data file download').to.have.deep.property('value.CALL.args').and.to.have.length(2);
+    expect(next).to.have.deep.property('value.CALL.args[1]').and.to.be.a('string');
+    const responseMock: { ok: boolean, data: TMetric[] } = {
       ok: true,
       data: [
         {
-          id: STATE_WITH_SOME_METRICS.metrics.items[0].id,
-          props: STATE_WITH_SOME_METRICS.metrics.items[0].props,
-          entries: STATE_WITH_SOME_METRICS.metrics.items[0].entries.slice(0, 6),
+          id: metricsMock[0].id,
+          props: metricsMock[0].props,
+          entries: metricsMock[0].entries.slice(0, 6),
         },
         {
-          id: STATE_WITH_SOME_METRICS.metrics.items[1].id,
-          props: STATE_WITH_SOME_METRICS.metrics.items[1].props,
-          entries: STATE_WITH_SOME_METRICS.metrics.items[1].entries,
+          id: metricsMock[1].id,
+          props: metricsMock[1].props,
+          entries: metricsMock[1].entries,
         },
       ],
     };
     next = generator.next(responseMock);
 
-    expect(next, 'must request data file upload').to.have.property('value')
-      .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(3);
-    expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH);
-    expect(next.value.CALL.args[2]).to.be.a('array');
-    expect(
-      isValidMetricsArray(next.value.CALL.args[2]),
-      'uploaded metric needs to be valid',
-    ).to.be.ok;
+    expect(next, 'must request data file upload').to.have.deep.property('value.CALL.args').and.to.have.length(3);
+    expect(next).to.have.deep.property('value.CALL.args[1]').and.to.eql(DATA_FILE_PATH);
+    expect(next).to.have.deep.property('value.CALL.args[2]').and.to.be.a('array');
+    if (next.value == null) { expect(false).to.be.ok; return; }
+    expect(isValidMetricsArray(next.value.CALL.args[2]), 'uploaded metric needs to be valid').to.be.ok;
     next = generator.next({ ok: true });
 
-    expect(global.localStorage, 'localStorage must have metrics')
-      .to.have.property('metrics');
-    const localStorageMetrics = JSON.parse(global.localStorage.metrics);
-    expect(
-      localStorageMetrics,
-      'should still be exactly 2 metrics in localStorage',
-    ).to.have.length(2);
-    expect(
-      localStorageMetrics[0],
-      'should still be 10 entries in Mood metric in localStorage',
-    ).to.have.property('entries').and.to.have.length(10);
+    expect(localStorage, 'localStorage must have metrics').to.have.property('metrics');
+    const cachedMetrics = localStorage.getItem('metrics');
+    if (cachedMetrics == null) { expect(false).to.be.ok; return; }
+    const localStorageMetrics = JSON.parse(cachedMetrics);
+    expect(localStorageMetrics, 'should still be exactly 2 metrics in localStorage').to.have.length(2);
+    expect(localStorageMetrics[0], 'should still be 10 entries in Mood metric in localStorage').to.have.property('entries')
+      .and.to.have.length(10);
 
     // PUT action to finish the saga
-    expect(next, 'must PUT success sync data').to.have.property('value')
-      .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
-    expect(next.value.PUT.action.data[0], 'metrics must be unchanged')
-      .to.have.property('props').and.to.eql(metricsMock[0].props);
-    expect(next.value.PUT.action.data[1]).to.have.property('props')
-      .and.to.eql(metricsMock[1].props);
-    expect(next.value.PUT.action.lastSynced, 'must look like a timestamp')
-      .to.be.a('number');
+    expect(next, 'must PUT success sync data').to.have.deep.property('value.PUT.action.type', 'SUCCESS_SYNC_DATA');
+    expect(next, 'metrics must be unchanged').to.have.deep.property('value.PUT.action.data[0].props').and.to.eql(metricsMock[0].props);
+    expect(next).to.have.deep.property('value.PUT.action.data[1].props').and.to.deep.eql(metricsMock[1].props);
+    expect(next).to.have.deep.property('value.PUT.action.lastSynced').and.to.be.a('number', 'must look like a timestamp');
 
     // And done
     next = generator.next();
@@ -169,10 +165,8 @@ describe('sync data saga', () => {
     let next = generator.next();
 
     // Fetch outhentication state
-    expect(next, 'must fetch authentication state').to.have.property('value')
-      .and.to.have.property('SELECT')
-      .and.to.have.property('selector');
-    const authenticationMock = {
+    expect(next).to.have.deep.property('value.SELECT.selector', getAuthentication);
+    const authenticationMock: TAuthenticationState = {
       isAuthenticated: true,
       isAuthenticating: false,
       accessToken: 'abc2',
@@ -181,30 +175,23 @@ describe('sync data saga', () => {
     expect(next.done).to.not.be.ok;
 
     // We're authenticated, so let's PUT the restore cache action
-    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
-      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.deep.property('value.PUT.action.type', 'REQUEST_RESTORE_CACHE');
     next = generator.next();
 
-
     // Fetch metrics state
-    expect(next, 'must fetch metrics items state').to.have.property('value').and.to.have.property('SELECT')
-      .and.to.have.property('selector');
-    const localMetricsMock = [MoodWithEntries, BurnsWithoutEntries];
+    expect(next, 'must fetch metrics items state').to.have.deep.property('value.SELECT.selector', getMetricsItems);
+    const localMetricsMock: TMetric[] = [MoodWithEntries, BurnsWithoutEntries];
     next = generator.next(localMetricsMock);
 
     // Attempt to download but ERROR file not found
-    expect(next, 'must attempt data file download').to.have.property('value')
-      .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(2);
-    expect(next.value.CALL.args[1]).to.equal(DATA_FILE_PATH);
+    expect(next, 'must attempt data file download').to.have.deep.property('value.CALL.args').and.to.have.length(2);
+    expect(next).to.have.deep.property('value.CALL.args[1]').to.equal(DATA_FILE_PATH);
     next = generator.next({ ok: false, error: 'Error: File not found' });
 
     // Call for upload of local data
-    expect(next, 'must send upload request').to.have.property('value')
-      .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(3);
-    expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH);
-    expect(next.value.CALL.args[2]).to.be.a('array');
+    expect(next, 'must send upload request').to.have.deep.property('value.CALL.args').and.to.have.length(3);
+    expect(next).to.have.deep.property('value.CALL.args[1]').and.to.eql(DATA_FILE_PATH);
+    expect(next).to.have.deep.property('value.CALL.args[2]').and.to.be.a('array');
     const uploadResponseMock = { ok: true };
     next = generator.next(uploadResponseMock);
 
@@ -213,21 +200,19 @@ describe('sync data saga', () => {
     expect(JSON.parse(global.localStorage.metrics)).to.eql(localMetricsMock);
 
     // PUT finish
-    expect(next).to.have.property('value')
-      .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
+    expect(next).to.have.deep.property('value.PUT.action.type', 'SUCCESS_SYNC_DATA');
     next = generator.next();
     expect(next.done, 'generator should be done').to.equal(true);
   });
 
   it('downloads and stores data if no local data exists', () => {
-    const authenticationMock = {
+    const authenticationMock: TAuthenticationState = {
       isAuthenticated: true,
       isAuthenticating: false,
       accessToken: 'abc',
     };
     const localMetricsMock = null;
-    const remoteMetricsMock = [
+    const remoteMetricsMock: TMetric[] = [
       {
         id: 233,
         props: {
@@ -250,47 +235,37 @@ describe('sync data saga', () => {
     let next = generator.next();
 
     // get authentication state -- authenticated
-    expect(next, 'must SELECT authentication state').to.have.property('value')
-      .and.to.have.property('SELECT');
+    expect(next, 'must SELECT authentication state').to.have.deep.property('value.SELECT.selector', getAuthentication);
     next = generator.next(authenticationMock);
 
     // We're authenticated, so let's PUT the restore cache action
-    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
-      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.deep.property('value.PUT.action.type', 'REQUEST_RESTORE_CACHE');
     next = generator.next();
 
-
     // get metrics items -- no metrics
-    expect(next, 'must SELECT metricsItems state').to.have.property('value')
-      .and.to.have.property('SELECT');
+    expect(next, 'must SELECT metricsItems state').to.have.deep.property('value.SELECT.selector').and.to.be.a('function');
     next = generator.next(localMetricsMock);
 
     // download data file
-    expect(next, 'must request data file download').to.have.property('value')
-      .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(2);
-    expect(next.value.CALL.args[1]).to.be.a('string');
+    expect(next, 'must request data file download').to.have.deep.property('value.CALL.args').and.to.have.length(2);
+    expect(next, 'must request data file download').to.have.deep.property('value.CALL.args[1]').and.to.be.a('string');
     next = generator.next(downloadMock);
 
     // set local storage
-    expect(global.localStorage).to.have.property('metrics');
-    expect(JSON.parse(global.localStorage.metrics)).to.eql(remoteMetricsMock);
+    const cachedMetrics = localStorage.getItem('metrics');
+    if (cachedMetrics == null) { expect(false).to.be.ok; return; }
+    expect(JSON.parse(cachedMetrics)).to.eql(remoteMetricsMock);
 
     // upload updated metrics
-    expect(next, 'must request upload').to.have.property('value')
-      .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(3);
-    expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH);
-    expect(next.value.CALL.args[2]).to.be.a('array');
+    expect(next, 'must request upload').to.have.deep.property('value.CALL.args').and.to.have.length(3);
+    expect(next).to.have.deep.property('value.CALL.args[1]').and.to.eql(DATA_FILE_PATH);
+    expect(next).to.have.deep.property('value.CALL.args[2]').and.to.be.a('array');
     next = generator.next({ ok: true });
 
     // PUT success with remote metrics
-    expect(next, 'must PUT success sync data action').to.have.property('value')
-      .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
-    expect(next.value.PUT.action).to.have.property('data')
-      .and.to.deep.equal(remoteMetricsMock);
-    expect(next.value.PUT.action).to.have.property('lastSynced').and.to.be.a('number');
+    expect(next, 'must PUT success sync data action').to.have.deep.property('value.PUT.action.type', 'SUCCESS_SYNC_DATA');
+    expect(next).to.have.deep.property('value.PUT.action.data').and.to.eql(remoteMetricsMock);
+    expect(next).to.have.deep.property('value.PUT.action.lastSynced').and.to.be.a('number');
     next = generator.next();
 
     expect(next.done).to.equal(true);
@@ -301,7 +276,7 @@ describe('sync data saga', () => {
     let next = generator.next();
 
     // fetch authentication state -- authenticated
-    const authenticationMock = {
+    const authenticationMock: TAuthenticationState = {
       isAuthenticated: true,
       isAuthenticating: false,
       accessToken: 'abcabc',
@@ -309,13 +284,12 @@ describe('sync data saga', () => {
     next = generator.next(authenticationMock);
 
     // We're authenticated, so let's PUT the restore cache action
-    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
-      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.deep.property('value.PUT.action.type', 'REQUEST_RESTORE_CACHE');
     next = generator.next();
 
 
     // fetch local metrics items -- metrics present, have some entries
-    const localMetricsMock = [
+    const localMetricsMock: TMetric[] = [
       {
         id: MoodWithEntries.id,
         props: MoodWithEntries.props,
@@ -336,11 +310,9 @@ describe('sync data saga', () => {
     next = generator.next(localMetricsMock);
 
     // download data file from dropbox -- success
-    expect(next, 'must request data file download').to.have.property('value')
-      .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(2);
-    expect(next.value.CALL.args[1]).to.be.a('string');
-    const downloadMock = {
+    expect(next, 'must request data file download').to.have.deep.property('value.CALL.args').and.to.have.length(2);
+    expect(next).to.have.deep.property('value.CALL.args[1]').and.to.be.a('string');
+    const downloadMock: { ok: boolean, data: TMetric[] } = {
       ok: true,
       data: [
         {
@@ -365,19 +337,13 @@ describe('sync data saga', () => {
     expect(JSON.parse(global.localStorage.metrics)).to.eql(mergedMetrics);
 
     // upload the merged metrics
-    expect(next, 'must request data file upload')
-      .to.have.property('value')
-      .and.to.have.property('CALL')
-      .and.to.have.property('args')
-      .and.to.have.length(3);
+    expect(next, 'must request data file upload').to.have.deep.property('value.CALL.args').and.to.have.length(3);
     next = generator.next({ ok: true });
 
     // put success with remote metrics
-    expect(next).to.have.property('value').and.to.have.property('PUT')
-      .and.to.have.property('action')
-      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
-    expect(next.value.PUT.action.data).to.eql(mergedMetrics);
-    expect(next.value.PUT.action.lastSynced).to.be.a('number');
+    expect(next).to.have.deep.property('value.PUT.action.type', 'SUCCESS_SYNC_DATA');
+    expect(next).to.have.deep.property('value.PUT.action.data').and.to.eql(mergedMetrics);
+    expect(next).to.have.deep.property('value.PUT.action.lastSynced').and.to.be.a('number');
     expect(generator.next()).to.have.property('done', true);
   });
 
@@ -388,12 +354,12 @@ describe('sync data saga', () => {
     // fetch authentication state -- authenticated
     next = generator.next(authAuthenticated);
 
-    const localMetricsMock = [
+    const localMetricsMock: TMetric[] = [
       {
         id: 123,
         lastModified: 1234,
         props: {
-          name: 'Metric!',
+          name: 'TMetric!',
           minValue: 1,
           maxValue: 10,
           type: 'int',
@@ -408,14 +374,14 @@ describe('sync data saga', () => {
         entries: [],
       },
     ];
-    const downloadMock = {
+    const downloadMock: { ok: boolean, data: TMetric[] } = {
       ok: true,
       data: [
         {
           id: 123,
           lastModified: 1231,
           props: {
-            name: 'old Metric',
+            name: 'old TMetric',
             minValue: 0,
             maxValue: 10,
             type: 'int',
@@ -432,21 +398,16 @@ describe('sync data saga', () => {
       ] };
 
     // We're authenticated, so let's PUT the restore cache action
-    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
-      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.deep.property('value.PUT.action.type', 'REQUEST_RESTORE_CACHE');
     next = generator.next();
 
     // fetch local metrics items -- metrics present
-    expect(next, 'must fetch metrics items from store')
-      .to.have.property('value')
-      .and.to.have.property('SELECT');
+    expect(next, 'must fetch metrics items from store').to.have.deep.property('value.SELECT.selector');
     next = generator.next(localMetricsMock);
 
     // download data file from dropbox -- success
-    expect(next, 'must request data file download').to.have.property('value')
-      .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(2);
-    expect(next.value.CALL.args[1]).to.be.a('string');
+    expect(next, 'must request data file download').to.have.deep.property('value.CALL.args').and.to.have.length(2);
+    expect(next).to.have.deep.property('value.CALL.args[1]').and.to.be.a('string');
     next = generator.next(downloadMock);
 
     // update localstorage with metrics with local props
@@ -454,20 +415,15 @@ describe('sync data saga', () => {
     expect(JSON.parse(global.localStorage.metrics)).to.eql(localMetricsMock);
 
     // upload updated metrics
-    expect(next, 'must request upload').to.have.property('value')
-      .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(3);
-    expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH);
-    expect(next.value.CALL.args[2]).to.be.a('array');
+    expect(next, 'must request upload').to.have.deep.property('value.CALL.args').and.to.have.length(3);
+    expect(next).to.have.deep.property('value.CALL.args[1]').and.to.eql(DATA_FILE_PATH);
+    expect(next).to.have.deep.property('value.CALL.args[2]').and.to.be.a('array');
     next = generator.next({ ok: true });
 
     // put success with remote metrics
-    expect(next, 'must put success sync data').to.have.property('value')
-      .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
-    expect(next.value.PUT.action)
-      .to.have.property('data').and.to.eql(localMetricsMock);
-    expect(next.value.PUT.action).to.have.property('lastSynced').and.to.be.a('number');
+    expect(next, 'must put success sync data').to.have.deep.property('value.PUT.action.type', 'SUCCESS_SYNC_DATA');
+    expect(next).to.have.deep.property('value.PUT.action.data').and.to.eql(localMetricsMock);
+    expect(next).to.have.deep.property('value.PUT.action.lastSynced').and.to.be.a('number');
     expect(generator.next()).to.have.property('done', true);
   });
 
@@ -478,14 +434,14 @@ describe('sync data saga', () => {
     // fetch authentication state -- authenticated
     next = generator.next(authAuthenticated);
 
-    const downloadMock = {
+    const downloadMock: { ok: boolean, data: TMetric[] } = {
       ok: true,
       data: [
         {
           id: 123,
           lastModified: 1234,
           props: {
-            name: 'Metric!',
+            name: 'TMetric!',
             minValue: 1,
             maxValue: 10,
             type: 'int',
@@ -500,12 +456,12 @@ describe('sync data saga', () => {
           entries: [],
         },
       ] };
-    const localMetricsMock = [
+    const localMetricsMock: TMetric[] = [
       {
         id: 123,
         lastModified: 1231,
         props: {
-          name: 'old Metric',
+          name: 'old TMetric',
           minValue: 0,
           maxValue: 10,
           type: 'int',
@@ -522,21 +478,16 @@ describe('sync data saga', () => {
     ];
 
     // We're authenticated, so let's PUT the restore cache action
-    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
-      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.deep.property('value.PUT.action.type', 'REQUEST_RESTORE_CACHE');
     next = generator.next();
 
     // fetch local metrics items -- metrics present
-    expect(next, 'must fetch metrics items from store')
-      .to.have.property('value')
-      .and.to.have.property('SELECT');
+    expect(next, 'must fetch metrics items from store').to.have.deep.property('value.SELECT.selector');
     next = generator.next(localMetricsMock);
 
     // download data file from dropbox -- success
-    expect(next, 'must request data file download').to.have.property('value')
-      .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(2);
-    expect(next.value.CALL.args[1]).to.be.a('string');
+    expect(next, 'must request data file download').to.have.deep.property('value.CALL.args').and.to.have.length(2);
+    expect(next).to.have.deep.property('value.CALL.args[1]').and.to.be.a('string');
     next = generator.next(downloadMock);
 
     // update localstorage with metrics with downloaded props
@@ -544,20 +495,15 @@ describe('sync data saga', () => {
     expect(JSON.parse(global.localStorage.metrics)).to.eql(downloadMock.data);
 
     // upload updated metrics
-    expect(next, 'must request upload').to.have.property('value')
-      .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(3);
-    expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH);
-    expect(next.value.CALL.args[2]).to.be.a('array');
+    expect(next, 'must request upload').to.have.deep.property('value.CALL.args').and.to.have.length(3);
+    expect(next).to.have.deep.property('value.CALL.args[1]').and.to.eql(DATA_FILE_PATH);
+    expect(next).to.have.deep.property('value.CALL.args[2]').and.to.be.a('array');
     next = generator.next({ ok: true });
 
     // put success with remote metrics
-    expect(next, 'must put success sync data').to.have.property('value')
-      .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
-    expect(next.value.PUT.action)
-      .to.have.property('data').and.to.eql(downloadMock.data);
-    expect(next.value.PUT.action).to.have.property('lastSynced').and.to.be.a('number');
+    expect(next, 'must put success sync data').to.have.deep.property('value.PUT.action.type', 'SUCCESS_SYNC_DATA');
+    expect(next).to.have.deep.property('value.PUT.action.data').and.to.eql(downloadMock.data);
+    expect(next).to.have.deep.property('value.PUT.action.lastSynced').and.to.be.a('number');
     expect(generator.next()).to.have.property('done', true);
   });
 
@@ -568,12 +514,12 @@ describe('sync data saga', () => {
     // fetch authentication state -- authenticated
     next = generator.next(authAuthenticated);
 
-    const downloadMock = {
+    const downloadMock: { ok: boolean, data: TOldMetric[] } = {
       ok: true,
       data: [
         {
           id: 123,
-          name: 'Metric!',
+          name: 'TMetric!',
           minValue: 1,
           maxValue: 10,
           type: 'int',
@@ -591,51 +537,37 @@ describe('sync data saga', () => {
     const localMetricsMock = null;
 
     // We're authenticated, so let's PUT the restore cache action
-    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
-      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+    expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.deep.property('value.PUT.action.type', 'REQUEST_RESTORE_CACHE');
     next = generator.next();
 
     // fetch local metrics items -- no metrics
-    expect(next, 'must fetch metrics items from store')
-      .to.have.property('value')
-      .and.to.have.property('SELECT');
+    expect(next, 'must fetch metrics items from store').to.have.deep.property('value.SELECT.selector');
     next = generator.next(localMetricsMock);
 
     // download data file from dropbox -- success
-    expect(next, 'must request data file download').to.have.property('value')
-      .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(2);
-    expect(next.value.CALL.args[1]).to.be.a('string');
+    expect(next, 'must request data file download').to.have.deep.property('value.CALL.args').and.to.have.length(2);
+    expect(next).to.have.deep.property('value.CALL.args[1]').and.to.be.a('string');
     next = generator.next(downloadMock);
 
     // update localstorage with metrics with local props
     expect(global.localStorage, 'must set metrics in localStorage').to.have.property('metrics');
     expect(JSON.parse(global.localStorage.metrics)).to.have.length(1);
-    expect(JSON.parse(global.localStorage.metrics)[0])
-      .to.have.property('props').and.to.have.property('name', 'Metric!');
+    expect(JSON.parse(global.localStorage.metrics)[0]).to.have.property('props').and.to.have.property('name', 'TMetric!');
     expect(JSON.parse(global.localStorage.metrics)).to.have.length(1);
     expect(JSON.parse(global.localStorage.metrics)[0]).to.have.property('lastModified').and.to.be.a('number');
 
     // upload updated metrics
-    expect(next, 'must request upload').to.have.property('value')
-      .and.to.have.property('CALL')
-      .and.to.have.property('args').and.to.have.length(3);
-    expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH);
-    expect(next.value.CALL.args[2]).to.be.a('array');
+    expect(next, 'must request upload').to.have.deep.property('value.CALL.args').and.to.have.length(3);
+    expect(next).to.have.deep.property('value.CALL.args[1]').to.eql(DATA_FILE_PATH);
+    expect(next).to.have.deep.property('value.CALL.args[2]').to.be.a('array');
     next = generator.next({ ok: true });
 
     // put success with remote metrics
-    expect(next, 'must put success sync data').to.have.property('value')
-      .and.to.have.property('PUT').and.to.have.property('action')
-      .and.to.have.property('type', 'SUCCESS_SYNC_DATA');
-    expect(next.value.PUT.action)
-      .to.have.property('data').and.to.have.length(1);
-    expect(next.value.PUT.action.data[0]).to.have.property('props');
-    expect(next.value.PUT.action.data[0].props)
-      .to.have.property('name', 'Metric!');
-    expect(next.value.PUT.action.data[0].props)
-      .to.have.property('colorGroups').and.to.be.a('array');
-    expect(next.value.PUT.action.lastSynced).to.be.a('number');
+    expect(next, 'must put success sync data').to.have.deep.property('value.PUT.action.type', 'SUCCESS_SYNC_DATA');
+    expect(next).to.have.deep.property('value.PUT.action.data').and.to.have.length(1);
+    expect(next).to.have.deep.property('value.PUT.action.data[0].props.name', 'TMetric!');
+    expect(next).to.have.deep.property('value.PUT.action.data[0].props.colorGroups').and.to.be.a('array');
+    expect(next).to.have.deep.property('value.PUT.action.lastSynced').to.be.a('number');
     expect(generator.next()).to.have.property('done', true);
   });
 
@@ -645,36 +577,28 @@ describe('sync data saga', () => {
       let next = generator.next();
 
       // fetch authentication -- authenticated
-      expect(next, 'must SELECT authentication').to.have.property('value')
-        .and.to.have.property('SELECT');
+      expect(next, 'must SELECT authentication').to.have.deep.property('value.SELECT');
       next = generator.next(authAuthenticated);
 
     // We're authenticated, so let's PUT the restore cache action
-      expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
-      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+      expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.deep.property('value.PUT.action.type', 'REQUEST_RESTORE_CACHE');
       next = generator.next();
 
 
       // fetch metrics items -- has some metrics
-      expect(next, 'must SELECT metrics items').to.have.property('value')
-        .and.to.have.property('SELECT');
+      expect(next, 'must SELECT metrics items').to.have.deep.property('value.SELECT');
       next = generator.next(STATE_WITH_SOME_METRICS.metrics.items);
 
       // attempt data file download -- error
-      expect(next, 'must request data file download')
-        .to.have.property('value').and.to.have.property('CALL')
-        .and.to.have.property('args').and.to.have.length(2);
+      expect(next, 'must request data file download').to.have.deep.property('value.CALL.args').and.to.have.length(2);
       next = generator.next({ ok: false, error: 'Error: Download error' });
 
       // check that local storage is updated
-      expect(global.localStorage, 'must still keep localStorage up-to-date')
-        .to.have.property('metrics');
+      expect(global.localStorage, 'must still keep localStorage up-to-date').to.have.property('metrics');
       expect(JSON.parse(global.localStorage.metrics)).to.eql(STATE_WITH_SOME_METRICS.metrics.items);
 
       // PUT error
-      expect(next, 'must PUT error sync data').to.have.property('value')
-        .and.to.have.property('PUT').and.to.have.property('action')
-        .and.to.have.property('type', 'ERROR_SYNC_DATA');
+      expect(next, 'must PUT error sync data').to.have.deep.property('value.PUT.action.type', 'ERROR_SYNC_DATA');
     });
 
     it('cancels on filesUpload error, but updates localStorage', () => {
@@ -682,115 +606,55 @@ describe('sync data saga', () => {
       let next = generator.next();
 
       // fetch authentication -- authenticated
-      expect(next, 'must SELECT authentication').to.have.property('value')
-        .and.to.have.property('SELECT');
+      expect(next, 'must SELECT authentication').to.have.deep.property('value.SELECT');
       next = generator.next(authAuthenticated);
 
       // We're authenticated, so let's PUT the restore cache action
-      expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.property('value').to.have.property('PUT')
-      .and.to.have.property('action').and.to.have.property('type', 'REQUEST_RESTORE_CACHE');
+      expect(next, 'must PUT REQUEST_RESTORE_CACHE').to.have.deep.property('value.PUT.action.type', 'REQUEST_RESTORE_CACHE');
       next = generator.next();
 
 
       // fetch metrics items -- has some metrics
-      expect(next, 'must SELECT metrics items').to.have.property('value')
-        .and.to.have.property('SELECT');
+      expect(next, 'must SELECT metrics items').to.have.deep.property('value.SELECT');
       next = generator.next(STATE_WITH_SOME_METRICS.metrics.items);
 
       // download file -- SUCCESS
-      expect(next, 'must request data file download').to.have.property('value')
-        .and.to.have.property('CALL')
-        .and.to.have.property('args').and.to.have.length(2);
-      expect(next.value.CALL.args[1]).to.be.a('string');
+      expect(next, 'must request data file download').to.have.deep.property('value.CALL.args').and.to.have.length(2);
+      expect(next).to.have.deep.property('value.CALL.args[1]').and.to.be.a('string');
       next = generator.next({
         ok: true,
         data: STATE_WITH_SOME_METRICS.metrics.items,
       });
 
       // upload data -- ERROR
-      expect(next, 'must request upload').to.have.property('value')
-        .and.to.have.property('CALL')
-        .and.to.have.property('args').and.to.have.length(3);
-      expect(next.value.CALL.args[1]).to.eql(DATA_FILE_PATH);
+      expect(next, 'must request upload').to.have.deep.property('value.CALL.args').and.to.have.length(3);
+      expect(next).to.have.deep.property('value.CALL.args[1]').and.to.eql(DATA_FILE_PATH);
       next = generator.next({ ok: false, error: 'Upload error' });
 
       // check that local storage is updated
-      expect(global.localStorage, 'must still keep localStorage up-to-date')
-        .to.have.property('metrics');
+      expect(global.localStorage, 'must still keep localStorage up-to-date').to.have.property('metrics');
       expect(JSON.parse(global.localStorage.metrics)).to.eql(STATE_WITH_SOME_METRICS.metrics.items);
 
       // PUT error
-      expect(next, 'must PUT error sync data').to.have.property('value')
-        .and.to.have.property('PUT').and.to.have.property('action')
-        .and.to.have.property('type', 'ERROR_SYNC_DATA');
+      expect(next, 'must PUT error sync data').to.have.deep.property('value.PUT.action.type', 'ERROR_SYNC_DATA');
     });
-  });
-});
-
-describe('restore cache saga', () => {
-  it('PUTs error if app state already has data', () => {
-    const metricsState = STATE_WITH_SOME_METRICS.metrics;
-    const generator = restoreCache();
-    let next = generator.next();
-
-    expect(next, 'must fetch metrics state').to.have.property('value').and.to.have.property('SELECT');
-    next = generator.next(metricsState);
-
-    expect(next, 'must PUT errorRestoreCache').to.have.property('value').and.to.have.property('PUT').and.to.have.property('action').and.to.have.property('type', 'ERROR_RESTORE_CACHE');
-    next = generator.next();
-
-    expect(next, 'saga must be finished').to.have.property('done', true);
-  });
-
-  it('loads localStorage data into store if store has no data but cache does', () => {
-    const metrics = null;
-    global.localStorage = { metrics: JSON.stringify(STATE_WITH_SOME_METRICS.metrics.items) };
-    const generator = restoreCache();
-    let next = generator.next();
-
-    expect(next, 'must fetch metrics state').to.have.property('value').and.to.have.property('SELECT');
-    next = generator.next(metrics);
-
-    expect(next, 'must PUT successRestoreCache').to.have.property('value').to.have.property('PUT')
-      .and.to.have.property('action').and.to.have.property('type', 'SUCCESS_RESTORE_CACHE');
-    expect(next.value.PUT.action, 'must pass cached metrics in action')
-      .to.have.property('data').and.to.have.length(2);
-    next = generator.next();
-
-    expect(next, 'saga must be complete').to.have.property('done', true);
-  });
-
-  it('PUTs error if no data cached', () => {
-    const metricsState = INITIAL_STATE.metrics.items;
-    global.localStorage = {};
-    const generator = restoreCache();
-    let next = generator.next();
-
-    expect(next, 'must fetch metrics state').to.have.property('value').and.to.have.property('SELECT');
-    next = generator.next(metricsState);
-
-    expect(next, 'must PUT errorRestoreCache').to.have.property('value').to.have.property('PUT')
-      .and.to.have.property('action').and.to.have.property('type', 'ERROR_RESTORE_CACHE');
-    next = generator.next();
-
-    expect(next, 'saga must be complete').to.have.property('done', true);
   });
 });
 
 describe('executeConfirmModal', () => {
   let generator;
   let next;
-  const modals = [
+  const modals: TModal[] = [
     {
       title: 'the first modal',
       message: '...',
       actions: {
         confirm: {
-          action: { type: 'execute me' },
+          action: { type: 'DELETE_METRIC', metricId: 22 },
           label: 'you clicked me',
         },
         cancel: {
-          action: { type: 'not this one' },
+          action: { type: 'DEFAULT_ACTION' },
           label: 'u did not click here',
         },
       },
@@ -800,11 +664,11 @@ describe('executeConfirmModal', () => {
       message: 'this one dosent matter',
       actions: {
         confirm: {
-          action: { type: 'some evil action' },
+          action: { type: 'DELETE_METRIC', metricId: 22 },
           label: 'don\'t do this one',
         },
         cancel: {
-          action: { type: 'other evil action' },
+          action: { type: 'DEFAULT_ACTION' },
           label: 'also not this one',
         },
       },
@@ -817,24 +681,17 @@ describe('executeConfirmModal', () => {
   });
 
   it('fetches the modals from the store', () => {
-    expect(next).to.have.property('value')
-      .and.to.have.property('SELECT');
+    expect(next).to.have.deep.property('value.SELECT');
     next = generator.next(modals);
   });
 
   it('dispatches the confirm action stored in the modal', () => {
-    expect(next).to.have.property('value')
-      .and.to.have.property('PUT')
-      .and.to.have.property('action')
-      .and.to.eql(modals[0].actions.confirm.action);
+    expect(next).to.have.deep.property('value.PUT.action').and.to.eql(modals[0].actions.confirm.action);
     next = generator.next();
   });
 
   it('dispatches successConfirmModal', () => {
-    expect(next).to.have.property('value')
-      .and.to.have.property('PUT')
-      .and.to.have.property('action')
-      .and.to.eql({ type: 'SUCCESS_CONFIRM_MODAL' });
+    expect(next).to.have.deep.property('value.PUT.action').and.to.eql({ type: 'SUCCESS_CONFIRM_MODAL' });
     next = generator.next();
   });
 });
@@ -842,17 +699,17 @@ describe('executeConfirmModal', () => {
 describe('executeCancelModal', () => {
   let generator;
   let next;
-  const modals = [
+  const modals: TModal[] = [
     {
       title: 'the first modal',
       message: '...',
       actions: {
         confirm: {
-          action: { type: 'not this one' },
+          action: { type: 'DEFAULT_ACTION' },
           label: 'u did not click here',
         },
         cancel: {
-          action: { type: 'execute me' },
+          action: { type: 'DELETE_METRIC', metricId: 22 },
           label: 'you clicked me',
         },
       },
@@ -862,11 +719,11 @@ describe('executeCancelModal', () => {
       message: 'this one dosent matter',
       actions: {
         confirm: {
-          action: { type: 'some evil action' },
+          action: { type: 'REORDER_METRICS', metricId: 2, direction: 'up' },
           label: 'don\'t do this one',
         },
         cancel: {
-          action: { type: 'other evil action' },
+          action: { type: 'STOP_EDITING' },
           label: 'also not this one',
         },
       },
@@ -879,24 +736,17 @@ describe('executeCancelModal', () => {
   });
 
   it('fetches the modals from the store', () => {
-    expect(next).to.have.property('value')
-      .and.to.have.property('SELECT');
+    expect(next).to.have.deep.property('value.SELECT');
     next = generator.next(modals);
   });
 
   it('dispatches the cancel action stored in the modal', () => {
-    expect(next).to.have.property('value')
-      .and.to.have.property('PUT')
-      .and.to.have.property('action')
-      .and.to.eql(modals[0].actions.cancel.action);
+    expect(next).to.have.deep.property('value.PUT.action').and.to.eql(modals[0].actions.cancel.action);
     next = generator.next();
   });
 
   it('dispatches successCancelModal', () => {
-    expect(next).to.have.property('value')
-      .and.to.have.property('PUT')
-      .and.to.have.property('action')
-      .and.to.eql({ type: 'SUCCESS_CANCEL_MODAL' });
+    expect(next).to.have.deep.property('value.PUT.action').and.to.eql({ type: 'SUCCESS_CANCEL_MODAL' });
     next = generator.next();
   });
 });
@@ -906,7 +756,8 @@ describe('executeLogout', () => {
     const generator = executeLogout();
     generator.next();
 
-    expect(global.localStorage).not.to.have.property('accessToken');
+    expect(localStorage.getItem('accessToken')).to.not.be.ok;
+    expect(localStorage.getItem('metrics')).to.not.be.ok;
     expect(generator.next()).to.have.property('done', true);
   });
 
@@ -914,10 +765,93 @@ describe('executeLogout', () => {
     const generator = executeLogout();
     const next = generator.next();
 
-    expect(next).to.have.property('value')
-      .and.to.have.property('PUT')
-      .and.to.have.property('action')
-      .and.to.have.property('type', 'SUCCESS_LOGOUT');
+    expect(next).to.have.deep.property('value.PUT.action.type', 'SUCCESS_LOGOUT');
     expect(generator.next()).to.have.property('done', true);
+  });
+});
+
+describe('restore cache', () => {
+  // Rough outline of what the generator does:
+  // - select metrics->items from store
+  // - If non-null, put error
+  // - Otherwise:
+  //   - If localStorage has valid metrics, put success
+  //   - Otherwise, put error
+  it('fails if there is data in the store, no matter if there is data in localStorage', () => {
+    const generator = restoreCache();
+    let next = generator.next();
+
+    expect(next, 'must get metrics->items').to.have.deep.property('value.SELECT.selector', getMetricsItems);
+    next = generator.next([MoodWithEntries]);
+
+    expect(next, 'must dispatch ERROR_RESTORE_CACHE action').to.have.deep.property('value.PUT.action.type', 'ERROR_RESTORE_CACHE');
+    next = generator.next();
+
+    expect(next).to.have.property('done', true);
+  });
+
+  it('succeeds if data is in localStorage', () => {
+    localStorage.setItem('metrics', JSON.stringify([MoodWithEntries, BurnsWithEntries]));
+    const generator = restoreCache();
+    let next = generator.next();
+
+    expect(next).to.have.deep.property('value.SELECT.selector', getMetricsItems);
+    next = generator.next(null);
+
+    expect(next).to.have.deep.property('value.PUT.action.type', 'SUCCESS_RESTORE_CACHE');
+    expect(next).to.have.deep.property('value.PUT.action.data').and.to.eql([MoodWithEntries, BurnsWithEntries]);
+    next = generator.next();
+
+    expect(next).to.have.property('done', true);
+  });
+
+  it('fails if localStorage data is not valid metrics', () => {
+    localStorage.setItem('metrics', 'huh');
+    const generator = restoreCache();
+    let next = generator.next();
+
+    expect(next).to.have.deep.property('value.SELECT.selector', getMetricsItems);
+    next = generator.next(null);
+
+    expect(next).to.have.deep.property('value.PUT.action.type', 'ERROR_RESTORE_CACHE');
+    next = generator.next();
+
+    expect(next).to.have.property('done', true);
+  });
+});
+
+describe('update metric', () => {
+  // Outline:
+  // - Check if valid TMetricProps.
+  // - PUT success/error with date
+  it('dispatches SUCCESS_UPDATE_METRIC if passed props are valid TMetricProps', () => {
+    const updatedProps: TEditedMetricProps = {
+      ...DEFAULT_METRIC_PROPS,
+      minValue: 2,
+      name: 'Cool',
+    };
+    const generator = updateMetric(requestUpdateMetric(1, updatedProps));
+    let next = generator.next();
+
+    expect(next).to.have.deep.property('value.PUT.action.type', 'SUCCESS_UPDATE_METRIC');
+    expect(next).to.have.deep.property('value.PUT.action.lastModified').and.to.be.a('number');
+    expect(next).to.have.deep.property('value.PUT.action.newProps').and.to.eql(updatedProps);
+    next = generator.next();
+    expect(next).to.have.property('done', true);
+  });
+
+  it('dispatches ERROR_UPDATE_METRIC if passed props are not valid', () => {
+    const updatedProps: TEditedMetricProps = {
+      ...DEFAULT_METRIC_PROPS,
+      minValue: null,
+      colorGroups: [{ minValue: null, maxValue: 4, color: 'green' }],
+    };
+    const generator = updateMetric(requestUpdateMetric(1, updatedProps));
+    let next = generator.next();
+
+    expect(next).to.have.deep.property('value.PUT.action.type', 'ERROR_UPDATE_METRIC');
+    expect(next).to.have.deep.property('value.PUT.action.invalidFields').and.to.eql(['minValue', 'colorGroups/0/minValue']);
+    next = generator.next();
+    expect(next).to.have.property('done', true);
   });
 });

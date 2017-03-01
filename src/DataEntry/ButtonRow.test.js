@@ -1,3 +1,4 @@
+/* @flow */
 /* eslint-env jest */
 /* eslint-disable no-unused-expressions */
 import React from 'react';
@@ -6,7 +7,7 @@ import { shallow, mount } from 'enzyme';
 
 import ButtonRow from './ButtonRow';
 
-describe('Metric-entry button-row', () => {
+describe('TMetric-entry button-row', () => {
   it('renders one button per passed value', () => {
     const component = shallow(<ButtonRow values={[1, 2, 3]} onClick={jest.fn()} colors={[]} />);
     expect(component.find('Button')).to.have.length(3);

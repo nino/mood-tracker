@@ -1,10 +1,15 @@
+// @flow
 import React from 'react';
-import Button from '../components/Button';
+import { Button } from '@blueprintjs/core';
 
-const TextInput = ({ onSubmit }) => {
-  let inputField;
+type TextInputProps = {
+  onSubmit: React.DOM.Event => void,
+};
 
-  function handleSubmit(event) {
+const TextInput = ({ onSubmit }: TextInputProps) => {
+  let inputField: React.DOM.HTMLElement;
+
+  function handleSubmit(event: React.DOM.Event): void {
     event.preventDefault();
     onSubmit(inputField.value);
   }
@@ -12,15 +17,11 @@ const TextInput = ({ onSubmit }) => {
   return (
     <div className="metric-entry-text-input">
       <form onSubmit={handleSubmit}>
-        <input className="metric-entry-text-input" ref={(i) => { inputField = i; }} />
+        <input className="pt-input metric-entry-text-input" ref={(i: React.DOM.HTMLElement) => { inputField = i; }} />
         <Button>Submit</Button>
       </form>
     </div>
   );
-};
-
-TextInput.propTypes = {
-  onSubmit: React.PropTypes.func.isRequired,
 };
 
 export default TextInput;

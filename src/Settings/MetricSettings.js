@@ -1,11 +1,14 @@
+/* @flow */
+/* global SyntheticInputEvent */
 import React from 'react';
 import { connect } from 'react-redux';
 import { Button } from '@blueprintjs/core';
-import { editedMetricShape } from '../types';
+import type { TEditedMetric, TMetric, TNullableMetricProps } from '../types';
+import type { TAction } from '../actionTypes';
 import {
   startEditingMetric,
   updateEditedMetric,
-  updateMetric,
+  requestUpdateMetric,
   reorderMetrics,
   stopEditing,
   deleteMetric,
@@ -14,6 +17,26 @@ import ColorGroupsSettings from './ColorGroupsSettings';
 
 import './MetricSettings.css';
 
+type TMetricSettingsProps = {
+  /**
+   * A tracking metric must be provided.
+   */
+  metric: TEditedMetric | TMetric,
+
+  /**
+   * Setting this to true will enable the form fields
+   * for manipulation by the user.
+   * default value: false.
+   */
+  editing?: boolean,
+
+  /**
+   * Send action to parent.
+   */
+  dispatch: (TAction) => void,
+};
+
+
 /**
  * Settings panel for a single metric, e.g. "Mood" or "Burns depression score".
  * This component displays form fields for all properties of the given metric.
@@ -21,7 +44,7 @@ import './MetricSettings.css';
  * This can be changed by passing the prop editing=true.
  * Clicking the component should activate edit-mode.
  */
-export const MetricSettings = ({ metric, editing, dispatch }) => {
+export const MetricSettings = ({ metric, editing, dispatch }: TMetricSettingsProps) => {
   let ButtonRow;
   if (editing) {
     ButtonRow = (
@@ -49,7 +72,7 @@ export const MetricSettings = ({ metric, editing, dispatch }) => {
         </Button>
         <Button
           className="update-metric-button pt-intent-success pt-icon-tick"
-          onClick={() => dispatch(updateMetric(metric.id, metric.props, (new Date()).getTime()))}
+          onClick={() => dispatch(requestUpdateMetric(metric.id, metric.props))}
         >
           Save
         </Button>
@@ -78,7 +101,7 @@ export const MetricSettings = ({ metric, editing, dispatch }) => {
             className="name-field pt-input"
             disabled={!editing}
             value={metric.props.name || ''}
-            onChange={event => dispatch(updateEditedMetric({ name: event.target.value }))}
+            onChange={(event: SyntheticInputEvent) => dispatch(updateEditedMetric({ name: event.target.value }))}
           />
         </label>
         <label className="pt-label" htmlFor="minValue">
@@ -88,7 +111,7 @@ export const MetricSettings = ({ metric, editing, dispatch }) => {
             className="minValue-field pt-input"
             disabled={!editing}
             value={metric.props.minValue || ''}
-            onChange={event => dispatch(updateEditedMetric({ minValue: event.target.value }))}
+            onChange={(event: SyntheticInputEvent) => dispatch(updateEditedMetric({ minValue: event.target.value }))}
           />
         </label>
         <label className="pt-label" htmlFor="maxValue">
@@ -98,13 +121,13 @@ export const MetricSettings = ({ metric, editing, dispatch }) => {
             className="maxValue-field pt-input"
             disabled={!editing}
             value={metric.props.maxValue || ''}
-            onChange={event => dispatch(updateEditedMetric({ maxValue: event.target.value }))}
+            onChange={(event: SyntheticInputEvent) => dispatch(updateEditedMetric({ maxValue: event.target.value }))}
           />
         </label>
         <ColorGroupsSettings
           colorGroups={metric.props.colorGroups}
-          editing={editing}
-          onUpdate={newProps => dispatch(updateEditedMetric(newProps))}
+          editing={!!editing}
+          onUpdate={(newProps: TNullableMetricProps) => dispatch(updateEditedMetric({ ...newProps }))}
         />
         {ButtonRow}
       </form>
@@ -112,23 +135,6 @@ export const MetricSettings = ({ metric, editing, dispatch }) => {
   );
 };
 
-MetricSettings.propTypes = {
-  /**
-   * A tracking metric must be provided.
-   */
-  metric: editedMetricShape.isRequired,
-
-  /**
-   * Setting this to true will enable the form fields
-   * for manipulation by the user.
-   * default value: false.
-   */
-  editing: React.PropTypes.bool,
-
-  /**
-   * Send action to parent.
-   */
-  dispatch: React.PropTypes.func.isRequired,
-};
+MetricSettings.defaultProps = { editing: false };
 
 export default connect()(MetricSettings);

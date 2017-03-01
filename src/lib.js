@@ -1,6 +1,16 @@
-/* global FileReader */
+/* @flow */
+/* global FileReader, Blob */
+import type { Dropbox } from 'dropbox';
+import type {
+  TMetric,
+  TMetricEntry,
+  TMetricProps,
+  TEditedMetricProps,
+  TColorGroup,
+  TEditedColorGroup,
+} from './types';
 
-function readFileBlobAsJSON(fileBlob) {
+function readFileBlobAsJSON(fileBlob: Blob): Promise<Object | Error> {
   const blobReader = new FileReader();
   return new Promise((resolve, reject) => {
     blobReader.addEventListener('loadend', () => {
@@ -14,90 +24,140 @@ function readFileBlobAsJSON(fileBlob) {
   });
 }
 
-function isValidMetric(metric) {
-  if (typeof metric !== 'object') {
-    return false;
+function asTColorGroups(colorGroups: TEditedColorGroup[]): ?Array<TColorGroup> {
+  const result: TColorGroup[] = [];
+  colorGroups.forEach((colorGroup: TEditedColorGroup) => {
+    if (colorGroup.minValue != null && colorGroup.maxValue != null) {
+      result.push({
+        minValue: colorGroup.minValue,
+        maxValue: colorGroup.maxValue,
+        color: colorGroup.color,
+      });
+    }
+  });
+  if (colorGroups.length === result.length) {
+    return result;
   }
-  if (typeof metric.id !== 'number') {
-    return false;
-  }
-  if (typeof metric.props !== 'object') {
-    return false;
-  }
-  if (typeof metric.props.name !== 'string') {
-    return false;
-  }
-  if (typeof metric.props.maxValue !== 'number') {
-    return false;
-  }
-  if (typeof metric.props.minValue !== 'number') {
-    return false;
-  }
-  if (!(metric.props.colorGroups instanceof Array)) {
-    return false;
-  }
-  if (typeof metric.props.type !== 'string') {
-    return false;
-  }
-  if (typeof metric.lastModified !== 'number') {
-    return false;
-  }
-  if (!(metric.entries instanceof Array)) {
-    return false;
-  }
-  return true;
+  return null;
 }
 
-function upgradeOneMetric(metric) {
+export function asTMetricProps(props: TEditedMetricProps): ?TMetricProps {
+  const colorGroups: ?TColorGroup[] = asTColorGroups(props.colorGroups);
+  if (colorGroups != null && props.name != null && props.maxValue != null && props.minValue != null && props.type != null) {
+    return {
+      name: props.name,
+      minValue: props.minValue,
+      maxValue: props.maxValue,
+      type: props.type,
+      colorGroups,
+    };
+  }
+
+  return null;
+}
+
+export function isValidMetricProps(props: Object): ?TMetricProps {
+  if (typeof props !== 'object') {
+    return null;
+  }
+  if (typeof props.name !== 'string') {
+    return null;
+  }
+  if (typeof props.maxValue !== 'number') {
+    return null;
+  }
+  if (typeof props.minValue !== 'number') {
+    return null;
+  }
+  if (typeof props.type !== 'string') {
+    return null;
+  }
+
+  if (!(props.colorGroups instanceof Array)) {
+    return null;
+  }
+  let allColorGroupsOk: boolean = true;
+  props.colorGroups.forEach((colorGroup: TEditedColorGroup | TColorGroup) => {
+    if (colorGroup.minValue == null || colorGroup.maxValue == null || colorGroup.color == null) {
+      allColorGroupsOk = false;
+    }
+  });
+  if (!allColorGroupsOk) {
+    return null;
+  }
+
+  return props;
+}
+
+function isValidMetric<T: TMetric | Object>(metric: T): ?TMetric {
+  if (typeof metric !== 'object') {
+    return null;
+  }
+  if (typeof metric.id !== 'number') {
+    return null;
+  }
+  if (!isValidMetricProps(metric.props)) {
+    return null;
+  }
+  if (typeof metric.lastModified !== 'number') {
+    return null;
+  }
+  if (!(metric.entries instanceof Array)) {
+    return null;
+  }
+  return metric;
+}
+
+function upgradeOneMetric(metric: Object): TMetric {
   if (isValidMetric(metric)) {
     return metric;
   }
 
-  if (metric.props) {
+  if (typeof metric.props === 'object') {
+    const props = (metric.props: Object);
     return {
-      id: metric.id,
-      lastModified: metric.lastModified ? metric.lastModified : 0,
+      id: metric.id || 1,
+      lastModified: metric.lastModified || 0,
       props: {
-        name: metric.props.name ? metric.props.name : 'Untitled metric',
-        maxValue: metric.props.maxValue ? metric.props.maxValue : 10,
-        minValue: metric.props.minValue ? metric.props.minValue : 1,
-        type: metric.props.type ? metric.props.type : 'int',
-        colorGroups: metric.props.colorGroups ? metric.props.colorGroups : [],
+        name: props.name || 'Untitled metric',
+        maxValue: props.maxValue != null ? props.maxValue : 10,
+        minValue: props.minValue != null ? props.minValue : 1,
+        type: props.type || 'int',
+        colorGroups: props.colorGroups || [],
       },
-      entries: metric.entries ? metric.entries : [],
+      entries: metric.entries || [],
     };
   }
 
   return {
-    id: metric.id,
+    id: metric.id || 1,
     lastModified: 0,
     props: {
-      name: metric.name ? metric.name : 'Untitled metric',
-      maxValue: metric.maxValue ? metric.maxValue : 10,
-      minValue: metric.minValue ? metric.minValue : 1,
-      type: metric.type ? metric.type : 'int',
-      colorGroups: metric.colorGroups ? metric.colorGroups : [],
+      name: metric.name || 'Untitled metric',
+      maxValue: metric.maxValue || 10,
+      minValue: metric.minValue || 1,
+      type: metric.type || 'int',
+      colorGroups: metric.colorGroups || [],
     },
-    entries: metric.entries ? metric.entries : [],
+    entries: metric.entries || [],
   };
 }
 
-
-export function upgradeDataFormat(metrics) {
+export function upgradeDataFormat(metrics: Object[]): TMetric[] {
   if (!metrics.length) {
     return metrics;
   }
   return metrics.map(upgradeOneMetric);
 }
 
-export function isValidMetricsArray(metrics) {
+export function isValidMetricsArray(metrics: Object[]): boolean {
   if (!metrics || !(metrics instanceof Array)) {
     return false;
   }
-  return (metrics.findIndex(m => !isValidMetric(m)) === -1);
+  return (metrics.findIndex((m: Object) => !isValidMetric(m)) === -1);
 }
 
-function removeDuplicateEntries(entries) {
+function removeDuplicateEntries(entries: TMetricEntry[]): TMetricEntry[] {
   const result = [];
   entries.forEach((entry) => {
     const isNewEntry = result.findIndex(e => (
@@ -114,7 +174,7 @@ function removeDuplicateEntries(entries) {
   ));
 }
 
-function concatMergedMetrics(outputMetrics, inputMetrics) {
+function concatMergedMetrics(outputMetrics: TMetric[], inputMetrics: TMetric[]): TMetric[] {
   if (!inputMetrics || inputMetrics.length === 0) {
     return outputMetrics;
   }
@@ -134,7 +194,8 @@ function concatMergedMetrics(outputMetrics, inputMetrics) {
 
   const metricA = outputMetrics[index];
   const metricB = currentMetric;
-  const newerMetric = metricA.lastModified > metricB.lastModified ? metricA : metricB;
+  const newerMetric = (metricA.lastModified && metricB.lastModified && metricA.lastModified > metricB.lastModified)
+    ? metricA : metricB;
   const mergedMetric = {
     id: currentMetric.id,
     lastModified: newerMetric.lastModified,
@@ -147,9 +208,9 @@ function concatMergedMetrics(outputMetrics, inputMetrics) {
   return concatMergedMetrics(newOutputMetrics, inputMetrics.slice(1, inputMetrics.length));
 }
 
-export function mergeMetrics(metrics) {
+export function mergeMetrics(metrics: TMetric[]): TMetric[] {
   if (!metrics || !metrics.length) {
-    return null;
+    return [];
   }
   return concatMergedMetrics([], upgradeDataFormat(metrics));
 }
@@ -158,19 +219,17 @@ function throwError(err) {
   throw Error(err);
 }
 
-export function downloadFileAsJSON(dbx, path) {
-  return (
-    dbx.filesListFolder({ path: '' })
-    .then(response => response.entries.map(e => e.name))
-    .then(fileNames => fileNames.includes(path) || throwError('File not found'))
+export function downloadFileAsJSON(dbx: Dropbox, path: string): Promise<{ ok: true, data: Object } | { ok: false, error: string }> {
+  return dbx.filesListFolder({ path: '' })
+    .then((response: { entries: Array<{ name: string }> }) => response.entries.map(e => e.name))
+    .then((fileNames: string[]) => fileNames.includes(path) || throwError('File not found'))
     .then(() => dbx.filesDownload({ path: `/${path}` }).catch(() => throwError('Download error')))
-    .then(response => readFileBlobAsJSON(response.fileBlob))
-    .then(data => ({ ok: true, data }))
-    .catch(error => ({ ok: false, error: error.toString() }))
-  );
+    .then((response: { fileBlob: Blob }) => readFileBlobAsJSON(response.fileBlob))
+    .then((data: Object) => ({ ok: true, data }))
+    .catch(error => ({ ok: false, error: error.toString() }));
 }
 
-export function uploadAsJSON(dbx, fileName, content) {
+export function uploadAsJSON(dbx: Dropbox, fileName: string, content: TMetric[]): Promise<{ ok: true} | { ok: false, error: string }> {
   const path = `/${fileName}`;
   const stringifiedMetrics = JSON.stringify(content, null, 2);
   const uploadArgs = {

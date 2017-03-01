@@ -1,8 +1,8 @@
+/* @flow */
 import React from 'react';
-import Wrapper from './HeroWrapper';
 
 const LoadingScreen = () => (
-  <Wrapper>Loading ...</Wrapper>
+  <div className="hero-wrapper">Loading ...</div>
 );
 
 export default LoadingScreen;

@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 import { connect } from 'react-redux';
 import './App.css';
@@ -5,14 +6,27 @@ import MainUI from './MainUI';
 import AppHeader from './AppHeader';
 import AppFooter from './AppFooter';
 import LoadingScreen from '../components/LoadingScreen';
-import ErrorMessage from '../components/ErrorMessage';
 import LoginScreen from '../components/LoginScreen';
 import { beginSyncData, beginCheckLogin } from '../actions';
 import Modal from '../Modal';
 import ActivityIndicator from '../ActivityIndicator';
-import { stateShapes } from '../types';
+import type {
+  TApplicationState,
+  TMetricsState,
+  TAuthenticationState,
+} from '../types';
+import type { TAction } from '../actionTypes';
+
+type AppProps = {
+  dispatch: (TAction) => void,
+  metrics: TMetricsState,
+  authentication: TAuthenticationState,
+};
 
 export class App extends React.Component {
+  props: AppProps;
+  state: void;
+
   componentDidMount() {
     const { dispatch, metrics, authentication } = this.props;
     const { isAuthenticated, isAuthenticating } = authentication;
@@ -39,14 +53,14 @@ export class App extends React.Component {
     const { metrics, authentication } = this.props;
     const { isAuthenticated } = authentication;
     const { items } = metrics;
-    let child;
+    let child: React.Element<any> = <div />;
 
     if (!isAuthenticated) {
       child = authentication.error ? <LoginScreen /> : <LoadingScreen />;
     } else if (items) {
       child = <MainUI />;
     } else if (metrics.error) {
-      child = (<ErrorMessage>Could not load data ...</ErrorMessage>);
+      child = (<div className="error-message">Could not load data ...</div>);
     } else {
       child = <LoadingScreen />;
     }
@@ -63,13 +77,7 @@ export class App extends React.Component {
   }
 }
 
-App.propTypes = {
-  dispatch: React.PropTypes.func.isRequired,
-  metrics: stateShapes.metrics,
-  authentication: stateShapes.authentication,
-};
-
-const stateToProps = state => ({
+const stateToProps = (state: TApplicationState) => ({
   authentication: state.authentication,
   metrics: state.metrics,
 });

@@ -1,8 +1,8 @@
+/* @flow */
 /* global window */
 import React from 'react';
 import Dropbox from 'dropbox';
-import Button from './Button';
-import Wrapper from './HeroWrapper';
+import { Button } from '@blueprintjs/core';
 import { CLIENT_ID } from '../constants';
 
 function dropboxAuthRedirect() {
@@ -12,11 +12,11 @@ function dropboxAuthRedirect() {
 }
 
 export const LoginScreen = () => (
-  <Wrapper>
+  <div className="hero-wrapper">
     <Button onClick={dropboxAuthRedirect}>
       Log in using Dropbox
     </Button>
-  </Wrapper>
+  </div>
 );
 
 export default LoginScreen;

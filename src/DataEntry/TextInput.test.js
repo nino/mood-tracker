@@ -1,3 +1,4 @@
+/* @flow */
 /* eslint-env jest */
 /* eslint-disable no-unused-expressions */
 import React from 'react';
@@ -6,7 +7,7 @@ import { expect } from 'chai';
 
 import TextInput from './TextInput';
 
-describe('Metric-entry text-input', () => {
+describe('TMetric-entry text-input', () => {
   describe('sub-components', () => {
     const component = shallow(<TextInput onSubmit={jest.fn()} />);
 
@@ -26,7 +27,7 @@ describe('Metric-entry text-input', () => {
   it('calls onSubmit with the entered number when submitting', () => {
     const onSubmit = jest.fn();
     const component = mount(<TextInput onSubmit={onSubmit} />);
-    component.find('input').get(0).value = '12';
+    (component.find('input').get(0): React.DOM.HTMLElement).value = '12';
     component.find('input').first().simulate('change');
     component.find('form').first().simulate('submit');
     expect(onSubmit.mock.calls).to.have.length(1);

@@ -1,13 +1,22 @@
+/* @flow */
+/* global SyntheticInputEvent */
 import React from 'react';
 import { Button } from '@blueprintjs/core';
-import { nullableColorGroupShape } from '../types';
+import type { TNullableMetricProps, TEditedColorGroup, TNullableColorGroup } from '../types';
 
-export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDelete }) => (
+type TSingleColorGroupSettingsProps = {
+  colorGroup: TEditedColorGroup,
+  onUpdate: (TNullableColorGroup) => void,
+  editing?: boolean,
+  onDelete: (void) => void,
+};
+
+export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDelete }: TSingleColorGroupSettingsProps) => (
   <div className={`single-color-group-${editing ? 'editing' : 'not-editing'}`}>
     <label className="pt-label pt-inline" htmlFor="minValue">
       From
       <input
-        onChange={e => onUpdate({ minValue: e.target.value })}
+        onChange={(e: SyntheticInputEvent) => onUpdate({ minValue: e.target.value })}
         name="minValue"
         className="color-group-minValue-field pt-input"
         disabled={!editing}
@@ -17,7 +26,7 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
     <label className="pt-label pt-inline" htmlFor="maxValue">
       to
       <input
-        onChange={e => onUpdate({ maxValue: e.target.value })}
+        onChange={(e: SyntheticInputEvent) => onUpdate({ maxValue: e.target.value })}
         name="maxValue"
         className="color-group-maxValue-field pt-input"
         disabled={!editing}
@@ -27,7 +36,7 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
     <label className="pt-label pt-inline" htmlFor="color">
       use
       <input
-        onChange={e => onUpdate({ color: e.target.value })}
+        onChange={(e: SyntheticInputEvent) => onUpdate({ color: e.target.value })}
         name="color"
         className="color-group-color-field pt-input"
         disabled={!editing}
@@ -38,48 +47,47 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
       <Button
         onClick={onDelete}
         className="delete-color-group-button pt-icon-delete"
-        style={{
-          height: '1em',
-        }}
+        style={{ height: '1em' }}
       />
-    ) : (null)
+    ) : (<div />)
     }
   </div>
 );
 
-SingleColorGroupSettings.propTypes = {
-  colorGroup: nullableColorGroupShape.isRequired,
-  onUpdate: React.PropTypes.func.isRequired,
-  editing: React.PropTypes.bool,
-  onDelete: React.PropTypes.func.isRequired,
+SingleColorGroupSettings.defaultProps = { editing: false };
+
+type TColorGroupsSettingsProps = {
+  colorGroups: Array<TEditedColorGroup>,
+  onUpdate: (TNullableMetricProps) => void,
+  editing: boolean,
 };
 
-const ColorGroupsSettings = ({ colorGroups, onUpdate, editing }) => {
-  function handleChange(index, updatedField) {
+const ColorGroupsSettings = ({ colorGroups, onUpdate, editing }: TColorGroupsSettingsProps) => {
+  function handleChange(index: number, updatedField: TNullableColorGroup): void {
+    const selectedColorGroup: TEditedColorGroup = colorGroups[index];
+    if (selectedColorGroup == null) { return; }
+    const updatedColorGroup: TNullableColorGroup = { ...selectedColorGroup, ...updatedField };
     onUpdate({
-      colorGroups: colorGroups.slice(0, index).concat(
-        { ...colorGroups[index], ...updatedField },
-        colorGroups.slice(index + 1, colorGroups.length),
-      ),
+      colorGroups: [
+        ...colorGroups.slice(0, index),
+        updatedColorGroup,
+        ...colorGroups.slice(index + 1, colorGroups.length),
+      ],
     });
   }
 
   function handleAddColorGroup() {
-    onUpdate({
-      colorGroups: colorGroups.concat({
-        minValue: null,
-        maxValue: null,
-        color: '',
-      }),
-    });
+    onUpdate({ colorGroups: [...colorGroups, { color: '', minValue: null, maxValue: null }] });
   }
 
-  function handleDeleteColorGroup(idx) {
-    onUpdate({
-      colorGroups: colorGroups.slice(0, idx).concat(colorGroups.slice(idx + 1, colorGroups.length)),
-    });
+  function handleDeleteColorGroup(idx: number): void {
+    const before = colorGroups.slice(0, idx);
+    const after = colorGroups.slice(idx + 1, colorGroups.length);
+    onUpdate({ colorGroups: [...before, ...after] });
   }
 
+  // TODO give eveyrthing an ID
+  /* eslint-disable react/no-array-index-key */
   return (
     <div className={`color-groups-settings-${editing ? 'editing' : 'not-editing'} pt-card`}>
       <h5>Color groups</h5>
@@ -104,10 +112,5 @@ const ColorGroupsSettings = ({ colorGroups, onUpdate, editing }) => {
   );
 };
 
-ColorGroupsSettings.propTypes = {
-  colorGroups: React.PropTypes.arrayOf(nullableColorGroupShape).isRequired,
-  onUpdate: React.PropTypes.func.isRequired,
-  editing: React.PropTypes.bool,
-};
-
 export default ColorGroupsSettings;
+

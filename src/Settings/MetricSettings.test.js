@@ -1,3 +1,4 @@
+/* @flow */
 /* eslint-env jest */
 /* eslint-disable no-unused-expressions */
 import React from 'react';
@@ -12,7 +13,7 @@ describe('MetricSettings', () => {
   describe('sub-components', () => {
     it('renders sub-components if editing', () => {
       const component = shallow(
-        <MetricSettings metric={MoodWithEntries} dispatch={() => null} editing />);
+        <MetricSettings metric={MoodWithEntries} dispatch={jest.fn()} editing />);
 
       const nameField = component.find('.name-field');
       expect(nameField, 'must render name field').to.have.length(1);
@@ -46,7 +47,7 @@ describe('MetricSettings', () => {
 
     it('renders subcomponents if not editing', () => {
       const component = shallow(
-        <MetricSettings metric={MoodWithEntries} dispatch={() => null} />);
+        <MetricSettings metric={MoodWithEntries} dispatch={jest.fn()} />);
 
       const nameField = component.find('.name-field');
       expect(nameField, 'must render name field').to.have.length(1);
@@ -154,7 +155,7 @@ describe('MetricSettings', () => {
       saveButton.simulate('click');
       expect(dispatch.mock.calls.length).to.equal(callsSoFar + 1);
       expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
-        .to.have.property('type', 'UPDATE_METRIC');
+        .to.have.property('type', 'REQUEST_UPDATE_METRIC');
     });
   });
 

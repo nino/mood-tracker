@@ -1,3 +1,11 @@
+// @flow
+import type {
+  TApplicationState,
+  TAuthenticationState,
+  TMetricsState,
+  TModal,
+  TSettingsState,
+} from '../src/types';
 import {
   MoodWithEntries,
   MoodWithoutEntries,
@@ -5,97 +13,78 @@ import {
   BurnsWithoutEntries,
 } from './SampleMetrics';
 
-export const INITIAL_STATE = {
+export const INITIAL_STATE: TApplicationState = {
   metrics: {
     isSyncing: false,
     isSynced: true,
-    lastSynced: null,
     items: [],
-    error: null,
   },
   authentication: {
     isAuthenticated: false,
-    error: null,
-    accessToken: null,
-    lastAuthenticated: null,
     isAuthenticating: false,
   },
   modals: [],
+  charts: [],
   settings: {
-    editedMetric: null,
     isModified: false,
   },
 };
 
-export const STATE_WITH_SOME_METRICS = {
+export const STATE_WITH_SOME_METRICS: TApplicationState = {
   metrics: {
     isSyncing: false,
     isSynced: true,
-    lastSynced: null,
     items: [
       MoodWithEntries,
       BurnsWithoutEntries,
     ],
-    error: null,
   },
   authentication: {
     isAuthenticated: false,
-    error: null,
-    accessToken: null,
-    lastAuthenticated: null,
     isAuthenticating: false,
   },
   modals: [],
+  charts: [],
   settings: {
-    editedMetric: null,
     isModified: false,
   },
 };
 
-export const STATE_WITH_LOTS_OF_METRICS = {
+export const STATE_WITH_LOTS_OF_METRICS: TApplicationState = {
   metrics: {
     isSyncing: false,
     isSynced: true,
-    lastSynced: null,
     items: [
       MoodWithEntries,
       BurnsWithEntries,
     ],
-    error: null,
   },
   authentication: {
     isAuthenticated: false,
-    error: null,
-    accessToken: null,
-    lastAuthenticated: null,
     isAuthenticating: false,
   },
   modals: [],
+  charts: [],
   settings: {
-    editedMetric: null,
     isModified: false,
   },
 };
 
-export const STATE_EDITING_METRIC1_MODIFIED = {
+export const STATE_EDITING_METRIC1_MODIFIED: TApplicationState = {
   metrics: {
     isSyncing: false,
     isSynced: true,
-    lastSynced: null,
     items: [
       MoodWithEntries,
       BurnsWithoutEntries,
     ],
-    error: null,
   },
   authentication: {
     isAuthenticated: false,
-    error: null,
-    accessToken: null,
-    lastAuthenticated: null,
     isAuthenticating: false,
   },
   modals: [],
+  charts: [],
   settings: {
     editedMetric: {
       id: MoodWithEntries.id,
@@ -108,125 +97,102 @@ export const STATE_EDITING_METRIC1_MODIFIED = {
   },
 };
 
-export const STATE_EDITING_METRIC1_NOT_MODIFIED = {
+export const STATE_EDITING_METRIC1_NOT_MODIFIED: TApplicationState = {
   metrics: {
     isSyncing: false,
     isSynced: true,
-    lastSynced: null,
     items: [
       MoodWithEntries,
       BurnsWithoutEntries,
     ],
-    error: null,
   },
   authentication: {
     isAuthenticated: false,
-    error: null,
-    accessToken: null,
-    lastAuthenticated: null,
     isAuthenticating: false,
   },
   modals: [],
+  charts: [],
   settings: {
     editedMetric: {
       id: MoodWithEntries.id,
-      props: MoodWithEntries.props,
+      props: { ...MoodWithEntries.props },
     },
     isModified: false,
   },
 };
 
-export const authSubStates = {
+export const authSubStates: { [string]: TAuthenticationState } = {
   authenticated: {
     isAuthenticated: true,
     isAuthenticating: false,
     accessToken: 'abc',
-    error: null,
     lastAuthenticated: 123,
   },
   authenticating: {
     isAuthenticating: true,
     isAuthenticated: false,
-    accessToken: null,
-    error: null,
     lastAuthenticated: 123,
   },
   notAuthenicatedNotAuthenticating: {
     isAuthenticating: false,
     isAuthenticated: false,
-    accessToken: null,
-    error: null,
     lastAuthenticated: 0,
   },
   withError: {
     isAuthenticating: false,
     isAuthenticated: false,
-    lastAuthenticated: null,
-    accessToken: null,
-    error: { error: 'Could not authenticate' },
+    error: 'Could not authenticate',
   },
 };
 
-export const metricsSubStates = {
+export const metricsSubStates: { [string]: TMetricsState } = {
   notSyncingWithData: {
     isSynced: false,
     isSyncing: false,
-    error: null,
     items: [MoodWithEntries, BurnsWithoutEntries],
     lastSynced: 0,
   },
   notSyncingNoData: {
     isSynced: false,
     isSyncing: false,
-    error: null,
-    lastSynced: null,
-    items: null,
   },
   syncingNoData: {
     isSynced: false,
     isSyncing: true,
-    lastSynced: null,
-    items: null,
-    error: null,
   },
   syncingWithData: {
     isSynced: false,
     isSyncing: true,
     lastSynced: 123,
     items: [MoodWithEntries, BurnsWithoutEntries],
-    error: null,
   },
   syncedMetricsWithEntries: {
     isSynced: true,
     isSyncing: false,
     lastSynced: 123,
     items: [MoodWithEntries, BurnsWithEntries],
-    error: null,
   },
   syncedMetricsWithoutEntries: {
     isSynced: true,
     isSyncing: false,
     lastSynced: 123,
     items: [MoodWithoutEntries, BurnsWithoutEntries],
-    error: null,
   },
   withErrorWithData: {
     isSynced: false,
     isSyncing: false,
     lastSynced: 123,
     items: [MoodWithoutEntries, BurnsWithoutEntries],
-    error: { error: 'Sync error' },
+    error: 'Sync error',
   },
   withErrorNoData: {
     isSynced: false,
     isSyncing: false,
-    lastSynced: null,
-    items: null,
-    error: { error: 'Sync error' },
+    error: 'Sync error',
   },
 };
 
-export const modalsSubStates = {
+export const modalsSubStates: { [string]: TModal[] } = {
   noModals: [],
   oneModal: [{
     title: 'Test modal',
@@ -235,11 +201,11 @@ export const modalsSubStates = {
     actions: {
       confirm: {
         label: 'Yes',
-        action: { type: 'test confirm ' },
+        action: { type: 'DELETE_METRIC', metricId: 1 },
       },
       cancel: {
         label: 'No',
-        action: { type: 'test cancel' },
+        action: { type: 'DEFAULT_ACTION' },
       },
     },
   }],
@@ -251,11 +217,11 @@ export const modalsSubStates = {
       actions: {
         confirm: {
           label: 'Yes',
-          action: { type: 'test confirm ' },
+          action: { type: 'DELETE_METRIC', metricId: 1 },
         },
         cancel: {
           label: 'No',
-          action: { type: 'test cancel' },
+          action: { type: 'DEFAULT_ACTION' },
         },
       },
     },
@@ -266,11 +232,11 @@ export const modalsSubStates = {
       actions: {
         confirm: {
           label: 'Yes',
-          action: { type: 'test confirm ' },
+          action: { type: 'REORDER_METRICS', metricId: 2, direction: 'down' },
         },
         cancel: {
           label: 'No',
-          action: { type: 'test cancel' },
+          action: { type: 'DEFAULT_ACTION' },
         },
       },
     },
@@ -281,33 +247,38 @@ export const modalsSubStates = {
       actions: {
         confirm: {
           label: 'Yes',
-          action: { type: 'test confirm ' },
+          action: { type: 'DELETE_METRIC', metricId: 1 },
         },
         cancel: {
           label: 'No',
-          action: { type: 'test cancel' },
+          action: { type: 'DEFAULT_ACTION' },
         },
       },
     },
   ],
 };
 
-export const settingsSubStates = {
+export const settingsSubStates: { [string]: TSettingsState } = {
   notEditing: {
-    editedMetric: null,
     isModified: false,
   },
   editingNotModified: {
     editedMetric: {
       id: 1,
-      props: MoodWithEntries.props,
+      props: { ...MoodWithEntries.props },
     },
     isModified: false,
   },
   editingAndModified: {
     editedMetric: {
       id: 1,
-      props: MoodWithEntries.props,
+      props: {
+        name: MoodWithEntries.props.name,
+        type: MoodWithEntries.props.type,
+        colorGroups: MoodWithEntries.props.colorGroups,
+        minValue: MoodWithEntries.props.minValue,
+        maxValue: MoodWithEntries.props.maxValue,
+      },
     },
     isModified: true,
   },

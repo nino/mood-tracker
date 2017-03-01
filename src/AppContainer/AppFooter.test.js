@@ -1,3 +1,4 @@
+/* @flow */
 /* eslint-env jest */
 /* eslint-disable no-unused-expressions */
 /* global wrapComponent */
@@ -6,6 +7,7 @@ import { expect } from 'chai';
 import { mount } from 'enzyme';
 import { AppFooter } from './AppFooter';
 
+declare var wrapComponent: (any) => any;
 const ComponentWrapper = wrapComponent(AppFooter);
 
 describe('AppFooter', () => {
