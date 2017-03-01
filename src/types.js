@@ -45,6 +45,7 @@ export type TMetricProps = {
   +name: string,
   +maxValue: number,
   +minValue: number,
+  // $FlowFixMe
   +colorGroups: TColorGroup[],
   +type: TMetricType,
 };
