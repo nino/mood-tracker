@@ -1,7 +1,8 @@
 // @flow
 import React from 'react';
+import Radium, { Style } from 'radium';
+import normalize from 'radium-normalize';
 import { connect } from 'react-redux';
-import './App.css';
 import MainUI from './MainUI';
 import AppHeader from './AppHeader';
 import AppFooter from './AppFooter';
@@ -16,6 +17,7 @@ import type {
   TAuthenticationState,
 } from '../types';
 import type { TAction } from '../actionTypes';
+import rootStyles from '../rootStyles';
 
 type AppProps = {
   dispatch: (TAction) => void,
@@ -67,6 +69,8 @@ export class App extends React.Component {
 
     return (
       <div id="app-root">
+        <Style rules={normalize} />
+        <Style rules={rootStyles} />
         <AppHeader />
         {child}
         <AppFooter />
@@ -82,4 +86,5 @@ const stateToProps = (state: TApplicationState) => ({
   metrics: state.metrics,
 });
 
-export default connect(stateToProps)(App);
+export default connect(stateToProps)(Radium(App));
+

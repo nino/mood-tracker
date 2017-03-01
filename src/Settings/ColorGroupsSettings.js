@@ -1,6 +1,7 @@
 /* @flow */
 /* global SyntheticInputEvent */
 import React from 'react';
+import Radium from 'radium';
 import { Button } from '@blueprintjs/core';
 import type { TNullableMetricProps, TEditedColorGroup, TNullableColorGroup } from '../types';
 
@@ -12,8 +13,18 @@ type TSingleColorGroupSettingsProps = {
 };
 
 export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDelete }: TSingleColorGroupSettingsProps) => (
-  <div className={`single-color-group-${editing ? 'editing' : 'not-editing'}`}>
-    <label className="pt-label pt-inline" htmlFor="minValue">
+  <div
+    className={`single-color-group-${editing ? 'editing' : 'not-editing'}`}
+    style={{
+      display: 'flex',
+      flexWrap: 'wrap',
+    }}
+  >
+    <label
+      className="pt-label pt-inline"
+      htmlFor="minValue"
+      style={{ marginRight: '1ex' }}
+    >
       From
       <input
         onChange={(e: SyntheticInputEvent) => onUpdate({ minValue: e.target.value })}
@@ -21,9 +32,14 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
         className="color-group-minValue-field pt-input"
         disabled={!editing}
         value={colorGroup.minValue || ''}
+        style={{ width: '8ex' }}
       />
     </label>
-    <label className="pt-label pt-inline" htmlFor="maxValue">
+    <label
+      className="pt-label pt-inline"
+      htmlFor="maxValue"
+      style={{ marginRight: '1ex' }}
+    >
       to
       <input
         onChange={(e: SyntheticInputEvent) => onUpdate({ maxValue: e.target.value })}
@@ -31,6 +47,7 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
         className="color-group-maxValue-field pt-input"
         disabled={!editing}
         value={colorGroup.maxValue || ''}
+        style={{ width: '8ex' }}
       />
     </label>
     <label className="pt-label pt-inline" htmlFor="color">
@@ -41,6 +58,7 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
         className="color-group-color-field pt-input"
         disabled={!editing}
         value={colorGroup.color || ''}
+        style={{ width: '16ex' }}
       />
     </label>
     { editing ? (
@@ -89,7 +107,9 @@ const ColorGroupsSettings = ({ colorGroups, onUpdate, editing }: TColorGroupsSet
   // TODO give eveyrthing an ID
   /* eslint-disable react/no-array-index-key */
   return (
-    <div className={`color-groups-settings-${editing ? 'editing' : 'not-editing'} pt-card`}>
+    <div
+      className={`color-groups-settings-${editing ? 'editing' : 'not-editing'} pt-card`}
+    >
       <h5>Color groups</h5>
       {colorGroups.map((colorGroup, idx) => (
         <SingleColorGroupSettings
@@ -112,5 +132,5 @@ const ColorGroupsSettings = ({ colorGroups, onUpdate, editing }: TColorGroupsSet
   );
 };
 
-export default ColorGroupsSettings;
+export default Radium(ColorGroupsSettings);
 

@@ -1,5 +1,6 @@
 /* @flow */
 import React from 'react';
+import Radium from 'radium';
 import Measure from 'react-measure';
 import Draggable, { type DraggableData } from 'react-draggable';
 import moment from 'moment';
@@ -8,7 +9,6 @@ import { Button } from '@blueprintjs/core';
 import ScrollBar from './ScrollBar';
 import { FOUR_WEEKS, LINE_COLORS } from '../constants';
 import Line from './Line';
-// import './Chart.css';
 import ChartGrid from './ChartGrid';
 import Legend from './Legend';
 
@@ -141,11 +141,11 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
   );
 };
 
-export default (props: TChartProps) => (
+export default Radium((props: TChartProps) => (
   <Measure>
     {(dimensions: TDimensions) => (
       <ChartMeasured metrics={props.metrics} chart={props.chart} dispatch={props.dispatch} dimensions={dimensions} />
     )}
   </Measure>
-);
+));
 

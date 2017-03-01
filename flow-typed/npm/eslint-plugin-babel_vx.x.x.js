@@ -1,4 +1,4 @@
-// flow-typed signature: ccf2ca3dab339bcf50084a5018893681
+// flow-typed signature: cdf2db55cdca44559b8451b1b7460a85
 // flow-typed version: <<STUB>>/eslint-plugin-babel_v^4.0.1/flow_v0.38.0
 
 /**
@@ -66,6 +66,10 @@ declare module 'eslint-plugin-babel/rules/object-shorthand' {
   declare module.exports: any;
 }
 
+declare module 'eslint-plugin-babel/rules/semi' {
+  declare module.exports: any;
+}
+
 // Filename aliases
 declare module 'eslint-plugin-babel/ast-utils.js' {
   declare module.exports: $Exports<'eslint-plugin-babel/ast-utils'>;
@@ -105,4 +109,7 @@ declare module 'eslint-plugin-babel/rules/object-curly-spacing.js' {
 }
 declare module 'eslint-plugin-babel/rules/object-shorthand.js' {
   declare module.exports: $Exports<'eslint-plugin-babel/rules/object-shorthand'>;
+}
+declare module 'eslint-plugin-babel/rules/semi.js' {
+  declare module.exports: $Exports<'eslint-plugin-babel/rules/semi'>;
 }

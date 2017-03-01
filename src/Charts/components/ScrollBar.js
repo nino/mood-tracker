@@ -1,7 +1,7 @@
 /* @flow */
 import React from 'react';
+import Radium from 'radium';
 import Draggable, { type DraggableData } from 'react-draggable';
-import './ScrollBar.css';
 
 type TScrollBarProps = {
   /**
@@ -28,7 +28,13 @@ type TScrollBarProps = {
 const ScrollBar = ({ width, viewRange, dateRange, scrollBy }: TScrollBarProps) => (
   <div
     className="chart-scrollbar-container"
-    style={{ display: 'block', overflow: 'hidden' }}
+    style={{
+      display: 'block',
+      width: '100%',
+      height: '1ex',
+      backgroundColor: '#eee',
+      overflow: 'hidden',
+    }}
   >
     <Draggable
       axis="x"
@@ -43,6 +49,8 @@ const ScrollBar = ({ width, viewRange, dateRange, scrollBy }: TScrollBarProps) =
         style={{
           display: 'block',
           position: 'relative',
+          height: '100%',
+          backgroundColor: 'grey',
           width: `${((viewRange[1] - viewRange[0]) / (dateRange[1] - dateRange[0])) * width}px`,
         }}
       />
@@ -50,4 +58,4 @@ const ScrollBar = ({ width, viewRange, dateRange, scrollBy }: TScrollBarProps) =
   </div>
 );
 
-export default ScrollBar;
+export default Radium(ScrollBar);

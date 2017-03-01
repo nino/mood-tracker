@@ -32,6 +32,9 @@ export const Settings = ({ metrics, editedMetric, addMetric }: TSettingsProps) =
       id="add-metric-button"
       disabled={!!editedMetric}
       className="pt-icon-add"
+      style={{
+        marginTop: '2ex',
+      }}
     >
       Add metric
     </Button>
