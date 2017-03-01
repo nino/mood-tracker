@@ -117,7 +117,7 @@ describe('reducer', () => {
       expect(newState.modals[0].actions.confirm).to.have.property('label');
       expect(newState.modals[0].actions).to.have.property('cancel');
       expect(newState.modals[0].actions.cancel).to.have.property('action');
-      expect(newState.modals[0].actions.cancel.action).to.eql({ type: 'default action' });
+      expect(newState.modals[0].actions.cancel.action).to.eql({ type: 'DEFAULT_ACTION' });
       expect(newState.modals[0].actions.cancel).to.have.property('label');
       expect(newState.modals[0]).to.have.property('userResponse', null);
     });
@@ -227,7 +227,7 @@ describe('reducer', () => {
       expect(newState.modals[0]).to.have.property('actions');
       const { actions } = newState.modals[0];
       expect(actions.confirm).to.have.property('action').and.to.eql(stopEditing(true));
-      expect(actions.cancel).to.have.property('action').and.to.eql({ type: 'default action' });
+      expect(actions.cancel).to.have.property('action').and.to.eql({ type: 'DEFAULT_ACTION' });
       expect(newState.modals[0]).to.have.property('userResponse', null);
     });
 
@@ -238,7 +238,6 @@ describe('reducer', () => {
       );
       expect(newState).to.have.property('settings')
         .and.to.eql({
-          editedMetric: null,
           isModified: false,
         });
       expect(newState).to.have.property('modals').and.to.have.length(0);
@@ -265,7 +264,7 @@ describe('reducer', () => {
       expect(props).to.have.property('colorGroups').and.to.eql([]);
       expect(props).to.have.property('type', 'int');
       expect(items[2]).to.have.property('entries').and.to.have.length(0);
-      expect(items[2]).to.have.property('lastModified', null);
+      expect(items[2]).to.not.have.property('lastModified');
     });
 
     it('starts editing the new metric', () => {
@@ -296,7 +295,7 @@ describe('reducer', () => {
       expect(newState.modals[0].actions.cancel)
         .to.have.property('label').and.to.include('Continue');
       expect(newState.modals[0].actions.cancel)
-        .to.have.property('action').and.to.eql({ type: 'default action' });
+        .to.have.property('action').and.to.eql({ type: 'DEFAULT_ACTION' });
       expect(newState.modals[0]).to.have.property('title').and.to.include('changes');
       expect(newState.modals[0]).to.have.property('message').and.to.include('unsaved');
       expect(newState.modals[0]).to.have.property('userResponse', null);
@@ -309,7 +308,7 @@ describe('reducer', () => {
       );
       expect(newState).to.have.property('metrics');
       expect(newState.metrics).to.have.property('items');
-      expect(newState.metrics).to.have.length(3);
+      expect(newState.metrics.items).to.have.length(3);
       expect(newState).to.have.property('settings');
       expect(newState.settings).to.have.property('editedMetric');
       expect(newState.settings.editedMetric).to.have.property('props');
@@ -498,7 +497,7 @@ describe('reducer', () => {
         deleteMetric(2, true),
       );
 
-      expect(newState).to.have.property('settings').and.to.have.property('editedMetric', null);
+      expect(newState).to.have.property('settings').and.not.to.have.property('editedMetric');
       expect(newState).to.have.property('settings').and.to.have.property('isModified', false);
     });
 
@@ -558,7 +557,7 @@ describe('reducer', () => {
       expect(actions).to.have.property('cancel');
       expect(actions.cancel).to.have.property('label').and.to.include('not');
       expect(actions.cancel).to.have.property('action')
-        .and.to.eql({ type: 'default action' }); // TODO WHY DOES THIS NOT COMPLAIN?
+        .and.to.eql({ type: 'DEFAULT_ACTION' });
       expect(newState.modals[0]).to.have.property('userResponse', null);
     });
 
@@ -578,7 +577,7 @@ describe('reducer', () => {
       expect(newState).to.have.property('settings');
       expect(newState.settings).to.have.property('editedMetric');
       expect(newState.settings.editedMetric).to.have.deep.property('props.name', 'mood55');
-      expect(newState.settings.editedMetric).to.have.property('isModified', true);
+      expect(newState.settings).to.have.property('isModified', true);
     });
 
     it('updates the minValue of the currently edited metric', () => {
@@ -897,8 +896,8 @@ describe('reducer', () => {
       expect(newState.metrics).to.have.property('isSynced', true);
     });
 
-    it('sets metrics.error to null', () => {
-      expect(newState.metrics).to.have.property('error', null);
+    it('does not set metrics.error', () => {
+      expect(newState.metrics).to.not.have.property('error');
     });
   });
 
@@ -926,7 +925,7 @@ describe('reducer', () => {
     });
 
     it('leaves lastSynced as it is', () => {
-      expect(newState).to.have.deep.property('metrics.lastSynced', null);
+      expect(newState).to.not.have.deep.property('metrics.lastSynced');
     });
   });
 
