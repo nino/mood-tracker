@@ -47,6 +47,7 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
       <Button
         onClick={onDelete}
         className="delete-color-group-button pt-icon-delete"
+        style={{ height: '1em' }}
       />
     ) : (<div />)
     }
@@ -56,7 +57,7 @@ export const SingleColorGroupSettings = ({ colorGroup, onUpdate, editing, onDele
 SingleColorGroupSettings.defaultProps = { editing: false };
 
 type TColorGroupsSettingsProps = {
-  colorGroups: TEditedColorGroup[],
+  colorGroups: Array<TEditedColorGroup>,
   onUpdate: (TNullableMetricProps) => void,
   editing: boolean,
 };
@@ -112,3 +113,4 @@ const ColorGroupsSettings = ({ colorGroups, onUpdate, editing }: TColorGroupsSet
 };
 
 export default ColorGroupsSettings;
+

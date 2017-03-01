@@ -75,7 +75,7 @@ describe('ColorGroupsSettings', () => {
   it('renders 4 SingleColorGroupSettings', () => {
     const component = shallow(
       <ColorGroupsSettings colorGroups={MoodWithEntries.props.colorGroups} onUpdate={jest.fn()} editing />);
-    expect(component.find('SingleColorGroupSettings')).to.have.length(4);
+    expect(component.find(SingleColorGroupSettings)).to.have.length(4);
   });
 
   it('renders a "new color group" button if editing', () => {
@@ -126,3 +126,4 @@ describe('ColorGroupsSettings', () => {
     expect(onUpdate.mock.calls[0][0]).to.have.property('colorGroups').and.to.have.length(5);
   });
 });
+
