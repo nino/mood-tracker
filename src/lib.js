@@ -220,15 +220,13 @@ function throwError(err) {
 }
 
 export function downloadFileAsJSON(dbx: Dropbox, path: string): Promise<{ ok: true, data: Object } | { ok: false, error: string }> {
-  return (
-    dbx.filesListFolder({ path: '' })
-      .then((response: { entries: Array<{ name: string }> }) => response.entries.map(e => e.name))
-      .then((fileNames: string[]) => fileNames.includes(path) || throwError('File not found'))
-      .then(() => dbx.filesDownload({ path: `/${path}` }).catch(() => throwError('Download error')))
-      .then((response: { fileBlob: Blob }) => readFileBlobAsJSON(response.fileBlob))
-      .then((data: Object) => ({ ok: true, data }))
-      .catch(error => ({ ok: false, error: error.toString() }))
-  );
+  return dbx.filesListFolder({ path: '' })
+    .then((response: { entries: Array<{ name: string }> }) => response.entries.map(e => e.name))
+    .then((fileNames: string[]) => fileNames.includes(path) || throwError('File not found'))
+    .then(() => dbx.filesDownload({ path: `/${path}` }).catch(() => throwError('Download error')))
+    .then((response: { fileBlob: Blob }) => readFileBlobAsJSON(response.fileBlob))
+    .then((data: Object) => ({ ok: true, data }))
+    .catch(error => ({ ok: false, error: error.toString() }));
 }
 
 export function uploadAsJSON(dbx: Dropbox, fileName: string, content: TMetric[]): Promise<{ ok: true} | { ok: false, error: string }> {
