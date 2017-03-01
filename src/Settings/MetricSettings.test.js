@@ -155,7 +155,7 @@ describe('MetricSettings', () => {
       saveButton.simulate('click');
       expect(dispatch.mock.calls.length).to.equal(callsSoFar + 1);
       expect(dispatch.mock.calls[dispatch.mock.calls.length - 1][0])
-        .to.have.property('type', 'UPDATE_METRIC');
+        .to.have.property('type', 'REQUEST_UPDATE_METRIC');
     });
   });
 
