@@ -6,10 +6,26 @@ import {
   rangeRight,
   range,
   filter,
-  findLast,
+  find,
 } from 'lodash/fp';
 import moment from 'moment';
 import type { TRange, TAxisTick, TChartPadding } from './types';
+
+export function yValueToPixels(value: number, valueRange: TRange, chartHeight: number, padding: TChartPadding): number {
+  const paddingTop = padding.top || 0;
+  const paddingBottom = padding.bottom || 0;
+  const pixelDiff = chartHeight - (paddingTop + paddingBottom);
+  const valueDiff = valueRange[1] - valueRange[0];
+  return paddingTop + (((valueRange[1] - value) / valueDiff) * pixelDiff);
+}
+
+export function xValueToPixels(date: number, dateRange: TRange, chartWidth: number, padding: TChartPadding): number {
+  const paddingLeft = padding.left || 0;
+  const paddingRight = padding.right || 0;
+  const pixelDiff = chartWidth - (paddingLeft + paddingRight);
+  const dateDiff = dateRange[1] - dateRange[0];
+  return paddingLeft + (((date - dateRange[0]) / dateDiff) * pixelDiff);
+}
 
 /**
  * Gets the height of the chart and the range of allowed values
@@ -18,14 +34,13 @@ import type { TRange, TAxisTick, TChartPadding } from './types';
  */
 export function getYAxisTicks(chartHeight: number, valueRange: TRange, padding: TChartPadding): TAxisTick[] {
   const stepSize = Math.round((valueRange[1] - valueRange[0]) / 5);
-  const paddingTop = padding.top || 0;
-  const paddingBot = padding.bottom || 0;
-  const drawingHeight = chartHeight - paddingBot - paddingTop;
-  const pixelStepSize = Math.round(drawingHeight / 5);
-  return map((idx: number) => ({
-    label: `${valueRange[1] - (idx * stepSize)}`,
-    position: paddingTop + (idx * pixelStepSize),
-  }))(rangeRight(0, 5));
+  return flow([
+    map((idx: number) => valueRange[1] - (idx * stepSize)),
+    map((value: number) => ({
+      label: `${value}`,
+      position: yValueToPixels(value, valueRange, chartHeight, padding),
+    })),
+  ])(rangeRight(0, 5));
 }
 
 type TMomentAxisTick = { date: moment$Moment, label: string };
@@ -234,11 +249,6 @@ export function getAllMinutes(boundaries: [moment$Moment, moment$Moment]): TMome
 
 export function getXAxisTicks(chartWidth: number, dateRange: TRange, padding: TChartPadding): TAxisTick[] {
   const dateDiff = dateRange[1] - dateRange[0];
-  const paddingLeft = padding.left || 0;
-  const paddingRight = padding.right || 0;
-  const pixelRange = [paddingLeft, chartWidth - paddingRight];
-  const pixelDiff = pixelRange[1] - pixelRange[0];
-  const dateToPixel: (date: number) => number = date => paddingLeft + (((date - dateRange[0]) / dateDiff) * pixelDiff);
 
   const dateTickLevels: { threshold: moment$MomentDuration, selector: TTicksSelectorFunction }[] = [{
     threshold: moment.duration(10, 'years'),
@@ -293,14 +303,15 @@ export function getXAxisTicks(chartWidth: number, dateRange: TRange, padding: TC
     selector: getAllMinutes,
   }];
 
-  const currentLevel = findLast(
-    (level: { threshold: moment$MomentDuration, selector: TTicksSelectorFunction }) => (level.threshold.as('milliseconds') >= dateDiff),
+  const currentLevel = find(
+    (level: { threshold: moment$MomentDuration, selector: TTicksSelectorFunction }) => (
+      level.threshold.as('milliseconds') <= dateDiff),
     dateTickLevels,
   );
   const momentTicks: TMomentAxisTick[] = currentLevel.selector([moment(dateRange[0]), moment(dateRange[1])]);
   const finalTicks: TAxisTick[] = map((momentTick: TMomentAxisTick) => ({
     label: momentTick.label,
-    position: dateToPixel(+moment(momentTick.date)),
+    position: xValueToPixels(+moment(momentTick.date), dateRange, chartWidth, padding),
   }))(momentTicks);
   return finalTicks;
 }

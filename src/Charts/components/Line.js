@@ -1,5 +1,5 @@
 /* @flow */
-import { createElement as c } from 'react';
+import React from 'react';
 import _ from 'lodash';
 import type { TLinePoint } from '../types';
 
@@ -33,14 +33,21 @@ type TLineProps = {
   className?: string,
 };
 
-const Line = ({ points, width = 1, color = 'black', className = '' }: TLineProps) => c(
-  'path', {
-    d: pathString(points),
-    stroke: color,
-    strokeWidth: width,
-    ...(className === '' ? {} : { className }),
-  },
+const Line = ({ points, width, color, className }: TLineProps) => (
+  <path
+    d={pathString(points)}
+    stroke={color}
+    strokeWidth={width}
+    {...(className === '' ? {} : { className })}
+    fill="none"
+  />
 );
+
+Line.defaultProps = {
+  width: 2,
+  color: 'black',
+  className: '',
+};
 
 export default Line;
 

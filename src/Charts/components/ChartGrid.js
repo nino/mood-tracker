@@ -1,9 +1,10 @@
 /* @flow */
 import React from 'react';
+import { map } from 'lodash';
 import type { TColorGroup } from '../../types';
 import type { TChartPadding, TDimensions, TRange } from '../types';
 import Axis from './Axis';
-import { getXAxisTicks, getYAxisTicks } from '../svg-utils';
+import { getXAxisTicks, getYAxisTicks, yValueToPixels } from '../svg-utils';
 
 type TColorGroupRectProps = {
   colorGroup: TColorGroup,
@@ -13,11 +14,11 @@ type TColorGroupRectProps = {
 };
 
 export const ColorGroupRect = ({ colorGroup, dimensions, valueRange, padding }: TColorGroupRectProps) => {
-  const paddingTop = padding.top || 0;
-  const paddingBottom = padding.bottom || 0;
-  const drawingHeight = dimensions.height - (paddingTop + paddingBottom);
-  const topEdge = paddingTop + (((valueRange[1] - colorGroup.maxValue) / (valueRange[1] - valueRange[0])) * drawingHeight);
-  const bottomEdge = paddingTop + (((valueRange[1] - colorGroup.minValue) / (valueRange[1] - valueRange[0])) * drawingHeight);
+  if (dimensions.width <= 0 || dimensions.height <= 0) {
+    return null;
+  }
+  const topEdge = yValueToPixels(colorGroup.maxValue + 1, valueRange, dimensions.height, padding);
+  const bottomEdge = yValueToPixels(colorGroup.minValue + 1, valueRange, dimensions.height, padding);
   return (
     <rect
       className="chart-background-rect"
@@ -59,9 +60,9 @@ type TChartGridProps = {
  */
 const ChartGrid = ({ dimensions, dateRange, valueRange, colorGroups }: TChartGridProps) => (
   <g className="chart-grid">
-    {colorGroups.map((colorGroup: TColorGroup, idx: number) => (
+    {map(colorGroups, (colorGroup: TColorGroup) => (
       <ColorGroupRect
-        key={idx}
+        key={JSON.stringify(colorGroup)}
         dimensions={dimensions}
         valueRange={valueRange}
         colorGroup={colorGroup}

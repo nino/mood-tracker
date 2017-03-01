@@ -8,7 +8,7 @@ import { getChart } from './selectors';
 
 export function* animateZoom(action: TRequestZoomAction): Generator<any, any, any> {
   const animationDuration = 200; // ms
-  const delayDuration = 10; // ms between animation frames
+  const delayDuration = 6; // ms between animation frames
   const chart: ?TChart = yield* select(getChart, action.chartId);
   if (chart == null) {
     yield* put(finishZoom(action.chartId));
@@ -21,15 +21,16 @@ export function* animateZoom(action: TRequestZoomAction): Generator<any, any, an
     : chart.zoomFactor * action.zoomFactor;
   yield* put(beginZoom(action.chartId, finishTime, targetZoomFactor));
 
-  const totalZoomFactorDiff = targetZoomFactor - chart.zoomFactor;
+  const startTime = (new Date()).getTime();
+  const initialZoomFactor = chart.zoomFactor;
   let currentZoomFactor = chart.zoomFactor;
-  let stepsLeft = animationDuration / delayDuration;
   let fractionOfAnimationLeft = 1;
+  let fractionOfAnimationCompleted = 0;
   for (let currentTime = (new Date()).getTime(); currentTime < finishTime; currentTime = (new Date()).getTime()) {
-    fractionOfAnimationLeft = (targetZoomFactor - currentZoomFactor) / totalZoomFactorDiff;
-    stepsLeft = (animationDuration / delayDuration) * fractionOfAnimationLeft;
-    currentZoomFactor += fractionOfAnimationLeft / stepsLeft;
-    yield* put(setZoomFactor(action.chartId, currentZoomFactor));
+    fractionOfAnimationLeft = (finishTime - currentTime) / (finishTime - startTime);
+    fractionOfAnimationCompleted = 1 - fractionOfAnimationLeft;
+    currentZoomFactor = (fractionOfAnimationLeft * initialZoomFactor) + (fractionOfAnimationCompleted * targetZoomFactor);
+    yield put(setZoomFactor(action.chartId, currentZoomFactor));
     yield delay(delayDuration);
   }
   yield* put(setZoomFactor(action.chartId, targetZoomFactor));

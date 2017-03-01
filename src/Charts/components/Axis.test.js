@@ -78,12 +78,12 @@ describe('YAxis', () => {
     expect(ticks.get(1)).to.have.deep.property('props.points[1].x', 100);
     expect(ticks.get(2)).to.have.deep.property('props.points[1].x', 100);
 
-    expect(ticks.get(0)).to.have.deep.property('props.points[0].y', 18.75);
-    expect(ticks.get(0)).to.have.deep.property('props.points[1].y', 18.75);
-    expect(ticks.get(1)).to.have.deep.property('props.points[0].y', 30);
-    expect(ticks.get(1)).to.have.deep.property('props.points[1].y', 30);
-    expect(ticks.get(2)).to.have.deep.property('props.points[0].y', 37.5);
-    expect(ticks.get(2)).to.have.deep.property('props.points[1].y', 37.5);
+    expect(ticks.get(0)).to.have.deep.property('props.points[0].y', 25);
+    expect(ticks.get(0)).to.have.deep.property('props.points[1].y', 25);
+    expect(ticks.get(1)).to.have.deep.property('props.points[0].y', 40);
+    expect(ticks.get(1)).to.have.deep.property('props.points[1].y', 40);
+    expect(ticks.get(2)).to.have.deep.property('props.points[0].y', 50);
+    expect(ticks.get(2)).to.have.deep.property('props.points[1].y', 50);
   });
 
   it('renders a text for each tick', () => {
@@ -95,14 +95,14 @@ describe('YAxis', () => {
     expect(labels.get(0)).to.have.deep.property('props.x');
     expect(labels.get(1)).to.have.deep.property('props.x');
     expect(labels.get(2)).to.have.deep.property('props.x');
-    expect(labels.get(0)).to.have.deep.property('props.y', 18.75);
-    expect(labels.get(1)).to.have.deep.property('props.y', 30);
-    expect(labels.get(2)).to.have.deep.property('props.y', 37.5);
+    expect(labels.get(0)).to.have.deep.property('props.y', 25);
+    expect(labels.get(1)).to.have.deep.property('props.y', 40);
+    expect(labels.get(2)).to.have.deep.property('props.y', 50);
     expect(labels.get(0)).to.have.deep.property('props.textAnchor', 'left');
     expect(labels.get(1)).to.have.deep.property('props.textAnchor', 'left');
     expect(labels.get(2)).to.have.deep.property('props.textAnchor', 'left');
-    expect(labels.get(0)).to.have.deep.property('props.alignmentBaseline', 'baseline');
-    expect(labels.get(1)).to.have.deep.property('props.alignmentBaseline', 'baseline');
-    expect(labels.get(2)).to.have.deep.property('props.alignmentBaseline', 'baseline');
+    expect(labels.get(0)).to.have.deep.property('props.alignmentBaseline', 'hanging');
+    expect(labels.get(1)).to.have.deep.property('props.alignmentBaseline', 'hanging');
+    expect(labels.get(2)).to.have.deep.property('props.alignmentBaseline', 'hanging');
   });
 });

@@ -33,7 +33,10 @@ const ScrollBar = ({ width, viewRange, dateRange, scrollBy }: TScrollBarProps) =
     <Draggable
       axis="x"
       onDrag={(event: Event, data: DraggableData) => scrollBy(data.deltaX)}
-      position={{ x: ((viewRange[0] - dateRange[0]) / (dateRange[1] - dateRange[0])) * width, y: 0 }}
+      position={{
+        x: ((viewRange[0] - dateRange[0]) / (dateRange[1] - dateRange[0])) * width,
+        y: 0,
+      }}
     >
       <div
         className="chart-scrollbar"
