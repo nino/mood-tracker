@@ -140,6 +140,7 @@ export function* executeCancelModal(): Generator<any, any, any> {
 
 export function* executeLogout(): Generator<any, any, any> {
   localStorage.removeItem('accessToken');
+  localStorage.removeItem('metrics');
   yield* put(successLogout());
 }
 

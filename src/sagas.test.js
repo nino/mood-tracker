@@ -757,6 +757,7 @@ describe('executeLogout', () => {
     generator.next();
 
     expect(localStorage.getItem('accessToken')).to.not.be.ok;
+    expect(localStorage.getItem('metrics')).to.not.be.ok;
     expect(generator.next()).to.have.property('done', true);
   });
 

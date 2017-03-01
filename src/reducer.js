@@ -647,6 +647,10 @@ export function reducer(state: TApplicationState = INITIAL_STATE, action?: TActi
           isAuthenticated: false,
           isAuthenticating: false,
         },
+        metrics: {
+          isSynced: false,
+          isSyncing: false,
+        },
       };
     case 'REQUEST_SYNC':
       return state;
