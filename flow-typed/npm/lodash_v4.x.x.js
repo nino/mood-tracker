@@ -595,10 +595,10 @@ declare module 'lodash/fp' {
     dropWhile<T>(predicate?: Predicate<T>): (array: ?Array<T>) => Array<T>;
     fill<T, U>(value: U, start?: number, end?: number, array: ?Array<T>): Array<T|U>;
     fill<T, U>(value: U, start?: number, end?: number): (array: ?Array<T>) => Array<T|U>;
-    findIndex<T>(predicate?: Predicate<T>, array: ?Array<T>): number;
     findIndex<T>(predicate?: Predicate<T>): (array: ?Array<T>) => number;
-    findLastIndex<T>(predicate?: Predicate<T>, array: ?Array<T>): number;
+    findIndex<T>(predicate?: Predicate<T>, array: ?Array<T>): number;
     findLastIndex<T>(predicate?: Predicate<T>): (array: ?Array<T>) => number;
+    findLastIndex<T>(predicate?: Predicate<T>, array: ?Array<T>): number;
     // alias of _.head
     first<T>(array: ?Array<T>): T;
     flatten<T,X>(array: Array<Array<T>|X>): Array<T|X>;
@@ -636,8 +636,8 @@ declare module 'lodash/fp' {
     remove<T>(predicate?: Predicate<T>, array: ?Array<T>): Array<T>;
     remove<T>(predicate?: Predicate<T>): (array: ?Array<T>) => Array<T>;
     reverse<T>(array: ?Array<T>): Array<T>;
-    slice<T>(start?: number, end?: number, array: ?Array<T>): Array<T>;
     slice<T>(start?: number, end?: number): (array: ?Array<T>) => Array<T>;
+    slice<T>(start?: number, end?: number, array: ?Array<T>): Array<T>;
     sortedIndex<T>(value: T, array: ?Array<T>): number;
     sortedIndex<T>(value: T): (array: ?Array<T>) => number;
     sortedIndexBy<T>(value: T, iteratee?: Iteratee<T>, array: ?Array<T>): number;
