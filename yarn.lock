@@ -4777,6 +4777,10 @@ querystringify@0.0.x:
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/querystringify/-/querystringify-0.0.4.tgz#0cf7f84f9463ff0ae51c4c4b142d95be37724d9c"
 
+radium-normalize@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/radium-normalize/-/radium-normalize-2.0.5.tgz#abe8ea61c466933e0bfb6b9370a7b922fe50b4f0"
+
 radium@^0.18.1:
   version "0.18.1"
   resolved "https://registry.yarnpkg.com/radium/-/radium-0.18.1.tgz#a01db9b4c6e6364de3b02d5976adf28d0b98351d"
