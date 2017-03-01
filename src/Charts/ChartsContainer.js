@@ -1,5 +1,6 @@
 // @flow
 import React from 'react';
+import Radium from 'radium';
 import { connect } from 'react-redux';
 import type {
   TMetric,
@@ -8,7 +9,6 @@ import type {
 } from '../types';
 import type { TAction } from '../actionTypes';
 import { createCharts } from './actions';
-import './ChartsContainer.css';
 import Chart from './components/Chart';
 
 type TChartsContainerProps = {
@@ -34,7 +34,18 @@ export class ChartsContainer extends React.Component { // eslint-disable-line re
     }
 
     return (
-      <div className="charts-container">
+      <div
+        className="charts-container"
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          flexGrow: '1',
+          flexShrink: '1',
+          overflow: 'hidden',
+          border: '2px solid blue',
+          justifyContent: 'center',
+        }}
+      >
         {charts.map((chart, idx) => (
           <Chart
             metrics={[metrics[metrics.findIndex(m => m.id === charts[idx].lines[0].metricId)]]}
@@ -53,4 +64,4 @@ const stateToProps = (state: TApplicationState) => ({
   charts: state.charts,
 });
 
-export default connect(stateToProps)(ChartsContainer);
+export default connect(stateToProps)(Radium(ChartsContainer));

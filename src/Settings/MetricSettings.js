@@ -1,6 +1,7 @@
 /* @flow */
 /* global SyntheticInputEvent */
 import React from 'react';
+import Radium from 'radium';
 import { connect } from 'react-redux';
 import { Button } from '@blueprintjs/core';
 import type { TEditedMetric, TMetric, TNullableMetricProps } from '../types';
@@ -14,8 +15,6 @@ import {
   deleteMetric,
 } from '../actions';
 import ColorGroupsSettings from './ColorGroupsSettings';
-
-import './MetricSettings.css';
 
 type TMetricSettingsProps = {
   /**
@@ -48,7 +47,13 @@ export const MetricSettings = ({ metric, editing, dispatch }: TMetricSettingsPro
   let ButtonRow;
   if (editing) {
     ButtonRow = (
-      <div className="metric-settings-button-row">
+      <div
+        className="metric-settings-button-row"
+        style={{
+          textAlign: 'right',
+          marginTop: '2ex',
+        }}
+      >
         <Button
           className="move-metric-up-button pt-icon-arrow-up"
           onClick={() => dispatch(reorderMetrics(metric.id, 'up'))}
@@ -60,6 +65,7 @@ export const MetricSettings = ({ metric, editing, dispatch }: TMetricSettingsPro
         <Button
           className="delete-metric-button pt-icon-delete pt-intent-danger"
           onClick={() => dispatch(deleteMetric(metric.id))}
+          style={{ float: 'left' }}
         >
           Delete metric
         </Button>
@@ -80,7 +86,13 @@ export const MetricSettings = ({ metric, editing, dispatch }: TMetricSettingsPro
     );
   } else {
     ButtonRow = (
-      <div className="metric-settings-button-row">
+      <div
+        className="metric-settings-button-row"
+        style={{
+          textAlign: 'right',
+          marginTop: '2ex',
+        }}
+      >
         <Button
           className="start-editing-button pt-icon-edit"
           onClick={() => dispatch(startEditingMetric(metric.id))}
@@ -93,6 +105,13 @@ export const MetricSettings = ({ metric, editing, dispatch }: TMetricSettingsPro
 
   return (
     <div className="metric-settings pt-card">
+      <Radium.Style
+        rules={{
+          '.metric-settings + .metric-settings': {
+            marginTop: '2em',
+          },
+        }}
+      />
       <form id={`metric-settings-form-${metric.id}`}>
         <label className="pt-label" htmlFor="name">
           Name
@@ -137,4 +156,4 @@ export const MetricSettings = ({ metric, editing, dispatch }: TMetricSettingsPro
 
 MetricSettings.defaultProps = { editing: false };
 
-export default connect()(MetricSettings);
+export default connect()(Radium(MetricSettings));

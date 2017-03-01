@@ -7,9 +7,6 @@ import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import createSagaMiddleware from 'redux-saga';
 import App from './AppContainer/App';
-import './index.css';
-// $FlowFixMe
-import '../node_modules/normalize.css/normalize.css';
 // $FlowFixMe
 import '../node_modules/@blueprintjs/core/dist/blueprint.css';
 import { watcherSaga } from './sagas';

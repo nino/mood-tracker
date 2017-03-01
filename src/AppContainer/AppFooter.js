@@ -1,16 +1,23 @@
 // @flow
 import React from 'react';
+import Radium from 'radium';
 import { connect } from 'react-redux';
 import { Button } from '@blueprintjs/core';
 import { requestLogout } from '../actions';
 import type { TApplicationState } from '../types';
 import type { TAction } from '../actionTypes';
-import './AppFooter.css';
 
 type LogoutButtonProps = { logoutClick: (void) => void };
 
 const LogoutButton = ({ logoutClick }: LogoutButtonProps) => (
-  <Button onClick={logoutClick} className="logout-button pt-icon-log-out">
+  <Button
+    onClick={logoutClick}
+    className="logout-button pt-icon-log-out"
+    style={{
+      float: 'right',
+      marginBottom: '2ex',
+    }}
+  >
     Log out
   </Button>
 );
@@ -37,4 +44,4 @@ const dispatchToProps = (dispatch: TAction => void) => ({
   logoutClick: () => dispatch(requestLogout()),
 });
 
-export default connect(stateToProps, dispatchToProps)(AppFooter);
+export default connect(stateToProps, dispatchToProps)(Radium(AppFooter));

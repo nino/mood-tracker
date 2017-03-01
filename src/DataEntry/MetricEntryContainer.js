@@ -1,10 +1,10 @@
 // @flow
 import React from 'react';
+import Radium, { Style } from 'radium';
 import { connect } from 'react-redux';
 import type { TMetric, TColorGroup } from '../types';
 import type { TAction } from '../actionTypes';
 import { logMetric } from '../actions';
-import './MetricEntryContainer.css';
 
 import ButtonRow from './ButtonRow';
 import TextInput from './TextInput';
@@ -53,11 +53,22 @@ export const MetricEntryContainer = ({ metric, dispatch }: MetricEntryContainerP
   }
 
   return (
-    <div className="metric-entry-container">
+    <div
+      className="metric-entry-container"
+      style={{
+        marginBottom: '1em',
+      }}
+    >
+      <Style
+        scopeSelector=".metric-entry-container + .metric-entry-container"
+        rules={{
+          marginTop: '1.6em',
+        }}
+      />
       <h4>{metric.props.name}</h4>
       {entryComponent}
     </div>
   );
 };
 
-export default connect()(MetricEntryContainer);
+export default connect()(Radium(MetricEntryContainer));
