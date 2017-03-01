@@ -88,10 +88,10 @@ describe('lib', () => {
     });
 
     it('deletes corrupt metric entries', () => {
-      const input = (JSON.parse(`[
+      const input = [
         {
           id: 3,
-          props: {},
+          props: { ...MoodWithEntries.props },
           lastModified: 10,
           entries: [
             { date: '2016-12-21T11:52:24.949Z', value: 4 },
@@ -100,14 +100,15 @@ describe('lib', () => {
         },
         {
           id: 3,
-          props: {},
+          props: { ...MoodWithEntries.props },
           lastModified: 10,
           entries: [
             { date: '2016-12-21T11:52:24.949Z', value: 6 },
+            // $FlowFixMe
             { date: 'asrcdi.', value: 'hu' },
           ],
         },
-      ]`): TMetric[]);
+      ];
       const result = mergeMetrics(input);
       expect(result).to.have.length(1);
       expect(result[0]).to.have.property('entries').and.to.have.length(2);
