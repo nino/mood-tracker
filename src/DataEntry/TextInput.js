@@ -17,11 +17,17 @@ const TextInput = ({ onSubmit }: TextInputProps) => {
   return (
     <div className="metric-entry-text-input">
       <form onSubmit={handleSubmit}>
-        <input className="pt-input metric-entry-text-input" ref={(i: React.DOM.HTMLElement) => { inputField = i; }} />
-        <Button>Submit</Button>
+        <div className="pt-control-group">
+          <input
+            className="pt-input pt-fill metric-entry-text-input"
+            ref={(i: React.DOM.HTMLElement) => { inputField = i; }}
+          />
+          <Button>Submit</Button>
+        </div>
       </form>
     </div>
   );
 };
 
 export default TextInput;
+
