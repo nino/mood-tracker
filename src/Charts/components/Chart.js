@@ -7,7 +7,7 @@ import moment from 'moment';
 import { min, max, map, flow, slice, findIndex, findLastIndex } from 'lodash/fp';
 import { Button } from '@blueprintjs/core';
 import ScrollBar from './ScrollBar';
-import { FOUR_WEEKS, LINE_COLORS } from '../constants';
+import { FOUR_WEEKS, LINE_COLORS, CHART_PADDING } from '../constants';
 import Line from './Line';
 import ChartGrid from './ChartGrid';
 import Legend from './Legend';
@@ -101,15 +101,15 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
             dateRange={[viewRangeBegin, viewRangeEnd]}
             dimensions={dimensions}
             valueRange={[metrics[0].props.minValue, metrics[0].props.maxValue]}
-            padding={{ bottom: 20 }}
+            padding={CHART_PADDING}
           />
           {map((metric: TMetric) => (
             <Line
               key={metric.id}
               points={flow(
                 map((entry: TMetricEntry) => ({
-                  x: xValueToPixels(+moment(entry.date), [viewRangeBegin, viewRangeEnd], dimensions.width, { bottom: 20 }),
-                  y: yValueToPixels(entry.value, [metric.props.minValue, metric.props.maxValue], dimensions.height, { bottom: 20 }),
+                  x: xValueToPixels(+moment(entry.date), [viewRangeBegin, viewRangeEnd], dimensions.width, CHART_PADDING),
+                  y: yValueToPixels(entry.value, [metric.props.minValue, metric.props.maxValue], dimensions.height, CHART_PADDING),
                 })),
                 (ary: TLinePoint[]) => slice(
                   max([findLastIndex(item => item.x < 0)(ary), 0]),

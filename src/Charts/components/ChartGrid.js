@@ -5,6 +5,7 @@ import type { TColorGroup } from '../../types';
 import type { TChartPadding, TDimensions, TRange } from '../types';
 import Axis from './Axis';
 import { getXAxisTicks, getYAxisTicks, yValueToPixels } from '../svg-utils';
+import { CHART_PADDING } from '../constants';
 
 type TColorGroupRectProps = {
   colorGroup: TColorGroup,
@@ -66,19 +67,19 @@ const ChartGrid = ({ dimensions, dateRange, valueRange, colorGroups }: TChartGri
         dimensions={dimensions}
         valueRange={valueRange}
         colorGroup={colorGroup}
-        padding={{ bottom: 20 }}
+        padding={CHART_PADDING}
       />
     ))}
     <Axis
-      vertical
       dimensions={dimensions}
-      ticks={getYAxisTicks(dimensions.height, valueRange, { bottom: 20 })}
-      padding={{ bottom: 20 }}
+      ticks={getXAxisTicks(dimensions.width, dateRange, CHART_PADDING)}
+      padding={CHART_PADDING}
     />
     <Axis
+      vertical
       dimensions={dimensions}
-      ticks={getXAxisTicks(dimensions.width, dateRange, { bottom: 20 })}
-      padding={{ bottom: 20 }}
+      ticks={getYAxisTicks(dimensions.height, valueRange, CHART_PADDING)}
+      padding={CHART_PADDING}
     />
   </g>
 );
