@@ -68,25 +68,32 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
       className="chart"
       onWheel={handleWheel}
       style={{
-        height: '200px',
+        height: '240px',
         overflow: 'hidden',
         width: '100%',
         position: 'relative',
+        borderRadius: '4',
+        border: '1px solid #dadada',
+        boxShadow: '0px 1px 0px rgba(0, 0, 0, 0.1)',
       }}
     >
-      <div className="chart-buttons">
+      <div
+        className="chart-buttons pt-button-group"
+        style={{
+          position: 'absolute',
+          top: '8px',
+          right: '8px',
+          zIndex: '10',
+        }}
+      >
         <Button
           onClick={() => dispatch(requestZoom(chart.id, 1.2))}
-          className="chart-zoom-in-button"
-        >
-          +
-        </Button>
+          className="chart-zoom-in-button pt-icon-small-plus"
+        />
         <Button
           onClick={() => dispatch(requestZoom(chart.id, 0.8))}
-          className="chart-zoom-out-button"
-        >
-          –
-        </Button>
+          className="chart-zoom-out-button pt-icon-small-minus"
+        />
       </div>
       <Draggable onDrag={(event: Event, data: DraggableData) => dispatch(scrollBy(chart.id, -data.deltaX))}>
         <svg
@@ -94,6 +101,7 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
           style={{
             width: dimensions.width,
             height: dimensions.height,
+            backgroundColor: '#f2f5f8',
           }}
         >
           <ChartGrid
@@ -145,7 +153,7 @@ export default Radium((props: TChartProps) => (
     className="outer-chart-container"
     style={{
       margin: '16px',
-      maxWidth: '500px',
+      maxWidth: '600px',
       minWidth: '200px',
       flexGrow: '1',
     }}

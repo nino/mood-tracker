@@ -31,26 +31,32 @@ const ScrollBar = ({ width, viewRange, dateRange, scrollBy }: TScrollBarProps) =
     style={{
       display: 'block',
       width: '100%',
-      height: '1ex',
+      height: '8px',
       backgroundColor: '#eee',
       overflow: 'hidden',
+      zIndex: '5',
+      position: 'absolute',
+      bottom: '0px',
     }}
   >
     <Draggable
       axis="x"
       onDrag={(event: Event, data: DraggableData) => scrollBy(data.deltaX)}
       position={{
-        x: ((viewRange[0] - dateRange[0]) / (dateRange[1] - dateRange[0])) * width,
+        x: 0,
         y: 0,
       }}
     >
       <div
         className="chart-scrollbar"
         style={{
+          left: ((viewRange[0] - dateRange[0]) / (dateRange[1] - dateRange[0])) * width,
           display: 'block',
           position: 'relative',
-          height: '100%',
-          backgroundColor: 'grey',
+          height: '5px',
+          margin: 'auto 0px',
+          borderRadius: '4px',
+          backgroundColor: '#AAA',
           width: `${((viewRange[1] - viewRange[0]) / (dateRange[1] - dateRange[0])) * width}px`,
         }}
       />
@@ -59,3 +65,4 @@ const ScrollBar = ({ width, viewRange, dateRange, scrollBy }: TScrollBarProps) =
 );
 
 export default Radium(ScrollBar);
+
