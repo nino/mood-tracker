@@ -70,9 +70,8 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
       style={{
         height: '200px',
         overflow: 'hidden',
-        minWidth: '200px',
-        maxWidth: '600px',
-        margin: '32px',
+        width: '100%',
+        position: 'relative',
       }}
     >
       <div className="chart-buttons">
@@ -142,10 +141,20 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
 };
 
 export default Radium((props: TChartProps) => (
-  <Measure>
-    {(dimensions: TDimensions) => (
-      <ChartMeasured metrics={props.metrics} chart={props.chart} dispatch={props.dispatch} dimensions={dimensions} />
-    )}
-  </Measure>
+  <div
+    className="outer-chart-container"
+    style={{
+      margin: '16px',
+      maxWidth: '500px',
+      minWidth: '200px',
+      flexGrow: '1',
+    }}
+  >
+    <Measure>
+      {(dimensions: TDimensions) => (
+        <ChartMeasured metrics={props.metrics} chart={props.chart} dispatch={props.dispatch} dimensions={dimensions} />
+      )}
+    </Measure>
+  </div>
 ));
 

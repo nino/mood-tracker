@@ -37,13 +37,12 @@ export class ChartsContainer extends React.Component { // eslint-disable-line re
       <div
         className="charts-container"
         style={{
+          overflow: 'hidden',
           display: 'flex',
           flexWrap: 'wrap',
-          flexGrow: '1',
-          flexShrink: '1',
-          overflow: 'hidden',
-          border: '2px solid blue',
-          justifyContent: 'center',
+          justifyContent: 'space-around',
+          alignItems: 'stretch',
+          alignContent: 'stretch',
         }}
       >
         {charts.map((chart, idx) => (
@@ -65,3 +64,4 @@ const stateToProps = (state: TApplicationState) => ({
 });
 
 export default connect(stateToProps)(Radium(ChartsContainer));
+
