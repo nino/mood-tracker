@@ -1,5 +1,13 @@
 /* @flow */
-import _ from 'lodash';
+import {
+  values,
+  map,
+  flattenDeep,
+  groupBy,
+  omit,
+  min,
+  max,
+} from 'lodash';
 import type {
   TBeginZoomAction,
   TSetZoomFactorAction,
@@ -81,25 +89,30 @@ function cycleMode(state: TChartsState, action: TCycleModeAction): TChartsState 
 
 function scrollBy(state: TChartsState, action: TScrollByAction): TChartsState {
   const index = state.findIndex((chart: TChart) => chart.id === action.chartId);
-  if (index === -1) { return state; }
+  if (index === -1) {
+    return state;
+  }
   const chart: TChart = state[index];
-  const scrollDistance: number = (action.deltaX / chart.zoomFactor) * MS_PER_PX;
+  const scrollDistance: number = action.deltaX * (chart.zoomFactor * MS_PER_PX);
   return [
     ...state.slice(0, index),
-    { ...chart, viewCenter: chart.viewCenter + scrollDistance },
+    {
+      ...chart,
+      viewCenter: chart.viewCenter + scrollDistance,
+    },
     ...state.slice(index + 1, state.length),
   ];
 }
 
 function createCharts(state: TChartsState, action: TCreateChartsAction): TChartsState {
   const { metrics } = action;
-  const metricGroups: TMetric[][] = _.values(_.groupBy(metrics, m => JSON.stringify(_.omit(m.props, 'name'))));
-  return _.map(metricGroups, (metricGroup, index) => {
-    const allEntryDates: number[] = _.flattenDeep(_.map(metricGroup, metric => _.map(metric.entries, entry => (new Date(entry.date)).getTime())));
+  const metricGroups: TMetric[][] = values(groupBy(metrics, m => JSON.stringify(omit(m.props, 'name'))));
+  return map(metricGroups, (metricGroup, index) => {
+    const allEntryDates: number[] = flattenDeep(map(metricGroup, metric => map(metric.entries, entry => (new Date(entry.date)).getTime())));
     let zoomFactor: number = 1;
     let viewCenter: number = 0;
     if (allEntryDates.length > 1) {
-      const dateRange: [number, number] = [_.min(allEntryDates), _.max(allEntryDates)];
+      const dateRange: [number, number] = [min(allEntryDates), max(allEntryDates)];
       if (dateRange[1] - dateRange[0] > FOUR_WEEKS) {
         viewCenter = dateRange[1] - (FOUR_WEEKS / 2);
       } else {
@@ -110,7 +123,7 @@ function createCharts(state: TChartsState, action: TCreateChartsAction): TCharts
 
     return {
       id: index,
-      lines: _.map(metricGroup, metric => ({ metricId: metric.id, mode: 'on', color: LINE_COLORS[metric.id % LINE_COLORS.length] })),
+      lines: map(metricGroup, metric => ({ metricId: metric.id, mode: 'on', color: LINE_COLORS[metric.id % LINE_COLORS.length] })),
       viewCenter,
       zoomFactor,
     };
@@ -143,3 +156,4 @@ export default function reducer(state: TChartsState = INITIAL_STATE, action?: TA
       return state;
   }
 }
+
