@@ -70,9 +70,11 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
       style={{
         height: '200px',
         overflow: 'hidden',
-        minWidth: '200px',
-        maxWidth: '600px',
-        margin: '32px',
+        width: '100%',
+        position: 'relative',
+        borderRadius: '4px',
+        border: '1px solid #dadada',
+        boxShadow: '0px 1px 0px rgba(0, 0, 0, 0.1)',
       }}
     >
       <div className="chart-buttons">
@@ -89,7 +91,9 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
           –
         </Button>
       </div>
-      <Draggable onDrag={(event: Event, data: DraggableData) => dispatch(scrollBy(chart.id, -data.deltaX))}>
+      <Draggable
+        onDrag={(event: Event, data: DraggableData) => dispatch(scrollBy(chart.id, -data.deltaX))}
+      >
         <svg
           className="chart"
           style={{
