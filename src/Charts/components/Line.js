@@ -34,7 +34,7 @@ type TLineProps = {
 };
 
 const Line = ({ points, width, color, className }: TLineProps) => {
-  if (points.length > 2) {
+  if (points.length > 1) {
     return (
       <path
         d={pathString(points)}
