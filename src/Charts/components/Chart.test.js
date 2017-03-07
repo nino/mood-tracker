@@ -6,7 +6,8 @@ import { expect } from 'chai';
 import moment from 'moment';
 import { shallow, mount } from 'enzyme';
 import { MoodWithEntries, BurnsWithEntries } from '../../../test/SampleMetrics';
-import { LINE_COLORS, FOUR_WEEKS } from '../constants';
+import { LINE_COLORS, FOUR_WEEKS, MS_PER_PX, CHART_PADDING } from '../constants';
+import type { TChart } from '../../types';
 
 import { ChartMeasured as Chart } from './Chart';
 import Line from './Line';
@@ -14,15 +15,19 @@ import ChartGrid from './ChartGrid';
 import Legend from './Legend';
 import ScrollBar from './ScrollBar';
 
-const chart1 = {
+const chart1: TChart = {
   id: 1,
   lines: [{
     metricId: 1,
     mode: 'on',
     color: LINE_COLORS[1],
   }],
-  zoomFactor: 1,
+  dateRange: [
+    +moment('2016-11-21T23:23').subtract(5, 'weeks'),
+    +moment('2016-11-21T23:23').add(3, 'weeks'),
+  ],
   viewCenter: +moment('2016-11-21T23:23'),
+  msPerPx: MS_PER_PX,
 };
 
 const dispatch = jest.fn();
@@ -37,15 +42,19 @@ const mounted = mount(
     }}
   />);
 
-const chart2 = {
+const chart2: TChart = {
   id: 2,
   lines: [{
     metricId: 2,
     mode: 'on',
     color: LINE_COLORS[2],
   }],
-  zoomFactor: 2,
+  dateRange: [
+    +moment('2017-01-24T12:45').subtract(3, 'weeks'),
+    +moment('2017-01-24T12:45').add(2, 'weeks'),
+  ],
   viewCenter: +moment('2017-01-24T12:45'),
+  msPerPx: moment.duration(2, 'weeks').as('ms') / 400,
 };
 
 const component = shallow(
@@ -72,8 +81,10 @@ describe('Chart', () => {
     const scrollBar = component.find(ScrollBar);
     expect(scrollBar).to.have.length(1);
     const props = scrollBar.get(0).props;
-    expect(props).to.have.deep.property('viewRange[0]').and.to.be.closeTo(+moment('2017-01-24T12:45') - (FOUR_WEEKS / 2), 10);
-    expect(props).to.have.deep.property('viewRange[1]').and.to.be.closeTo(+moment('2017-01-24T12:45') + (FOUR_WEEKS / 2), 10);
+    expect(props).to.have.deep.property('viewRange[0]');
+    expect(props.viewRange[0]).to.be.closeTo(+moment('2017-01-24T12:45').subtract(1, 'week'), 10);
+    expect(props).to.have.deep.property('viewRange[1]');
+    expect(props.viewRange[1]).to.be.closeTo(+moment('2017-01-24T12:45').add(1, 'week'), 10);
     expect(props).to.have.property('width', 400);
   });
 
@@ -82,9 +93,9 @@ describe('Chart', () => {
     expect(chartGrid, 'must render ChartGrid').to.have.length(1);
     expect(chartGrid.get(0)).to.have.deep.property('props.dimensions.width', 400);
     expect(chartGrid.get(0)).to.have.deep.property('props.dimensions.height', 200);
-    expect(chartGrid.get(0)).to.have.deep.property('props.padding.bottom', 20);
-    expect(chartGrid.get(0)).to.have.deep.property('props.dateRange[0]').and.to.be.closeTo(+moment('2017-01-24T12:45') - (FOUR_WEEKS / 2), 10);
-    expect(chartGrid.get(0)).to.have.deep.property('props.dateRange[1]').and.to.be.closeTo(+moment('2017-01-24T12:45') + (FOUR_WEEKS / 2), 10);
+    expect(chartGrid.get(0).props.padding).to.eql(CHART_PADDING);
+    expect(chartGrid.get(0)).to.have.deep.property('props.dateRange[0]').and.to.be.closeTo(+moment('2017-01-24T12:45').subtract(1, 'week'), 10);
+    expect(chartGrid.get(0)).to.have.deep.property('props.dateRange[1]').and.to.be.closeTo(+moment('2017-01-24T12:45').add(1, 'week'), 10);
     expect(chartGrid.get(0)).to.have.deep.property('props.valueRange[0]', 0);
     expect(chartGrid.get(0)).to.have.deep.property('props.valueRange[1]', 100);
   });
@@ -131,14 +142,18 @@ describe('Chart', () => {
             mode: 'on',
             color: LINE_COLORS[MoodWithEntries.id % LINE_COLORS.length],
           }],
-          viewCenter: +moment('2013-04-17T23:23'),
-          zoomFactor: 2, // see a bit more than 2 days -- TODO check that this is the correct number
+          dateRange: [
+            +moment('2013-04-14T23:23'),
+            +moment('2013-04-20T23:23'),
+          ],
+          viewCenter: +moment('2013-04-17T23:42'),
+          msPerPx: +moment.duration(2.2, 'days').as('ms') / 400,
         }}
         dispatch={jest.fn()}
         dimensions={{ width: 400, height: 200 }}
       />);
     const line = component2.find(Line).get(0);
-    expect(line.props, JSON.stringify(line.props.points)).to.have.property('points').and.to.have.length(5);
+    expect(line.props).to.have.property('points').and.to.have.length(5);
   });
 
   it('renders two zoom buttons', () => {
@@ -177,12 +192,12 @@ describe('Chart', () => {
     expect(dispatch.mock.calls).to.have.length(dispatchCalls + 2);
     expect(dispatch.mock.calls[dispatchCalls]).to.eql([{
       type: 'charts/REQUEST_ZOOM',
-      zoomFactor: 1.2,
+      factor: 1.2,
       chartId: 1,
     }]);
     expect(dispatch.mock.calls[dispatchCalls + 1]).to.eql([{
       type: 'charts/REQUEST_ZOOM',
-      zoomFactor: 0.8,
+      factor: 0.8,
       chartId: 1,
     }]);
   });

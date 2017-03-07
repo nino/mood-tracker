@@ -1,6 +1,7 @@
 /* @flow */
 /* eslint-env jest */
 /* eslint-disable no-unused-expressions */
+/* TODO Find out why the axis lines are broken */
 import React from 'react';
 import { shallow } from 'enzyme';
 import moment from 'moment';

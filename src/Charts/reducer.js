@@ -5,12 +5,13 @@ import {
   flattenDeep,
   groupBy,
   omit,
-  min,
-  max,
+  clamp,
+  first,
+  last,
 } from 'lodash';
 import type {
   TBeginZoomAction,
-  TSetZoomFactorAction,
+  TSetMsPerPxAction,
   TFinishZoomAction,
   TCycleModeAction,
   TScrollByAction,
@@ -36,21 +37,21 @@ function beginZoom(state: TChartsState, action: TBeginZoomAction): TChartsState 
       ...state[index],
       animation: {
         finishTime: action.finishTime,
-        target: { zoomFactor: action.targetZoomFactor },
+        target: { msPerPx: action.targetMsPerPx },
       },
     },
     ...state.slice(index + 1, state.length),
   ];
 }
 
-function setZoomFactor(state: TChartsState, action: TSetZoomFactorAction): TChartsState {
+function setMsPerPx(state: TChartsState, action: TSetMsPerPxAction): TChartsState {
   const index = state.findIndex((chart: TChart) => chart.id === action.chartId);
   if (index === -1) {
     return state;
   }
   return [
     ...state.slice(0, index),
-    { ...state[index], zoomFactor: action.zoomFactor },
+    { ...state[index], msPerPx: action.msPerPx },
     ...state.slice(index + 1, state.length),
   ];
 }
@@ -93,12 +94,16 @@ function scrollBy(state: TChartsState, action: TScrollByAction): TChartsState {
     return state;
   }
   const chart: TChart = state[index];
-  const scrollDistance: number = action.deltaX * (chart.zoomFactor * MS_PER_PX);
+  const scrollDistance: number = action.deltaX * chart.msPerPx;
   return [
     ...state.slice(0, index),
     {
       ...chart,
-      viewCenter: chart.viewCenter + scrollDistance,
+      viewCenter: clamp(
+        chart.viewCenter + scrollDistance,
+        chart.dateRange[0],
+        chart.dateRange[1],
+      ),
     },
     ...state.slice(index + 1, state.length),
   ];
@@ -109,23 +114,27 @@ function createCharts(state: TChartsState, action: TCreateChartsAction): TCharts
   const metricGroups: TMetric[][] = values(groupBy(metrics, m => JSON.stringify(omit(m.props, 'name'))));
   return map(metricGroups, (metricGroup, index) => {
     const allEntryDates: number[] = flattenDeep(map(metricGroup, metric => map(metric.entries, entry => (new Date(entry.date)).getTime())));
-    let zoomFactor: number = 1;
-    let viewCenter: number = 0;
-    if (allEntryDates.length > 1) {
-      const dateRange: [number, number] = [min(allEntryDates), max(allEntryDates)];
-      if (dateRange[1] - dateRange[0] > FOUR_WEEKS) {
-        viewCenter = dateRange[1] - (FOUR_WEEKS / 2);
-      } else {
-        viewCenter = (dateRange[1] + dateRange[0]) / 2;
-        zoomFactor = MS_PER_PX / (dateRange[1] - dateRange[0]);
-      }
-    }
+    const dateRange = allEntryDates.length > 1
+      ? [first(allEntryDates), last(allEntryDates)]
+      : [0, 6e6];
+    const viewCenter: number = last(allEntryDates);
+    const msPerPx = dateRange[1] - dateRange[0] > FOUR_WEEKS
+      ? MS_PER_PX
+      : (dateRange[1] - dateRange[0]) / 200;
 
     return {
       id: index,
-      lines: map(metricGroup, metric => ({ metricId: metric.id, mode: 'on', color: LINE_COLORS[metric.id % LINE_COLORS.length] })),
+      lines: map(
+        metricGroup,
+        metric => ({
+          metricId: metric.id,
+          mode: 'on',
+          color: LINE_COLORS[metric.id % LINE_COLORS.length],
+        }),
+      ),
       viewCenter,
-      zoomFactor,
+      msPerPx,
+      dateRange,
     };
   });
 }
@@ -142,8 +151,8 @@ export default function reducer(state: TChartsState = INITIAL_STATE, action?: TA
       return requestZoom(state, action);
     case 'charts/BEGIN_ZOOM':
       return beginZoom(state, action);
-    case 'charts/SET_ZOOM_FACTOR':
-      return setZoomFactor(state, action);
+    case 'charts/SET_MS_PER_PX':
+      return setMsPerPx(state, action);
     case 'charts/FINISH_ZOOM':
       return finishZoom(state, action);
     case 'charts/CYCLE_MODE':

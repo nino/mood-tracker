@@ -7,7 +7,7 @@ import moment from 'moment';
 import { min, max, map, flow, slice, findIndex, findLastIndex } from 'lodash/fp';
 import { Button } from '@blueprintjs/core';
 import ScrollBar from './ScrollBar';
-import { FOUR_WEEKS, LINE_COLORS, CHART_PADDING } from '../constants';
+import { LINE_COLORS, CHART_PADDING } from '../constants';
 import Line from './Line';
 import ChartGrid from './ChartGrid';
 import Legend from './Legend';
@@ -61,8 +61,8 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
 
   const dateRangeBegin: number = min(metrics.map(m => +moment(m.entries[0].date)));
   const dateRangeEnd: number = max(metrics.map(m => +moment(m.entries[m.entries.length - 1].date)));
-  const viewRangeBegin: number = chart.viewCenter - (FOUR_WEEKS / chart.zoomFactor);
-  const viewRangeEnd: number = chart.viewCenter + (FOUR_WEEKS / chart.zoomFactor);
+  const viewRangeBegin: number = chart.viewCenter - ((dimensions.width * chart.msPerPx) / 2);
+  const viewRangeEnd: number = chart.viewCenter + ((dimensions.width * chart.msPerPx) / 2);
   return (
     <div
       className="chart"

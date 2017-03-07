@@ -3,10 +3,11 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
+import moment from 'moment';
 import {
   requestZoom,
   beginZoom,
-  setZoomFactor,
+  setMsPerPx,
   finishZoom,
   cycleMode,
   scrollBy,
@@ -15,7 +16,7 @@ import {
 import type { TChartsState, TMetric } from '../types';
 import { MoodWithEntries, BurnsWithEntries } from '../../test/SampleMetrics';
 import reducer from './reducer';
-import { MS_PER_PX, FOUR_WEEKS, LINE_COLORS } from './constants';
+import { FOUR_WEEKS, LINE_COLORS } from './constants';
 
 describe('Charts reducer', () => {
   describe('charts/REQUEST_ZOOM', () => {
@@ -23,8 +24,9 @@ describe('Charts reducer', () => {
       const state: TChartsState = [{
         id: 1,
         lines: [{ metricId: 1, mode: 'on', color: LINE_COLORS[1] }],
-        zoomFactor: 1,
+        msPerPx: 1,
         viewCenter: 3,
+        dateRange: [0, 1000],
       }];
       expect(reducer(state, requestZoom(1, 2))).to.equal(state);
     });
@@ -36,40 +38,44 @@ describe('Charts reducer', () => {
         id: 1,
         lines: [{ metricId: 1, mode: 'loess', color: LINE_COLORS[1] }, { metricId: 3, mode: 'off', color: LINE_COLORS[3 % LINE_COLORS.length] }],
         viewCenter: 5,
-        zoomFactor: 3,
+        msPerPx: 3,
+        dateRange: [0, 1000],
       }, {
         id: 2,
         lines: [{ metricId: 2, mode: 'on', color: LINE_COLORS[2] }, { metricId: 5, mode: 'off', color: LINE_COLORS[5 % LINE_COLORS.length] }],
         viewCenter: 2,
-        zoomFactor: 5,
+        msPerPx: 5,
+        dateRange: [0, 1000],
       }];
       const newState: TChartsState = reducer(state, beginZoom(2, 1000, 3));
       expect(newState).to.have.length(2);
       expect(newState[0]).to.equal(state[0]);
       expect(newState[1]).to.have.property('animation').and.to.deep.eql({
         finishTime: 1000,
-        target: { zoomFactor: 3 },
+        target: { msPerPx: 3 },
       });
     });
   });
 
-  describe('charts/SET_ZOOM_FACTOR', () => {
-    it('sets the zoom factor of the selected chart', () => {
+  describe('charts/SET_MS_PER_PX', () => {
+    it('sets the ms/px of the selected chart', () => {
       const state: TChartsState = [{
         id: 1,
         lines: [{ metricId: 1, mode: 'on', color: LINE_COLORS[1] }, { metricId: 3, mode: 'loess', color: LINE_COLORS[3 % LINE_COLORS.length] }],
         viewCenter: 5,
-        zoomFactor: 3,
+        msPerPx: 3,
+        dateRange: [0, 1000],
       }, {
         id: 2,
         lines: [{ metricId: 2, mode: 'on', color: LINE_COLORS[2] }, { metricId: 5, mode: 'off', color: LINE_COLORS[5 % LINE_COLORS.length] }],
         viewCenter: 2,
-        zoomFactor: 5,
+        msPerPx: 5,
+        dateRange: [0, 1000],
       }];
-      const newState: TChartsState = reducer(state, setZoomFactor(2, 6));
+      const newState: TChartsState = reducer(state, setMsPerPx(2, 6));
       expect(newState).to.have.length(2);
       expect(newState[0]).to.deep.equal(state[0]);
-      expect(newState[1]).to.have.property('zoomFactor', 6);
+      expect(newState[1]).to.have.property('msPerPx', 6);
     });
   });
 
@@ -79,20 +85,22 @@ describe('Charts reducer', () => {
         id: 1,
         lines: [{ metricId: 1, mode: 'loess', color: LINE_COLORS[1] }, { metricId: 3, mode: 'off', color: LINE_COLORS[3 % LINE_COLORS.length] }],
         viewCenter: 5,
-        zoomFactor: 3,
+        msPerPx: 3,
+        dateRange: [0, 1000],
         animation: {
           finishTime: 2000,
-          target: { zoomFactor: 2 },
+          target: { msPerPx: 2 },
         },
       }, {
         id: 2,
         lines: [{ metricId: 2, mode: 'on', color: LINE_COLORS[2] }, { metricId: 5, mode: 'off', color: LINE_COLORS[5 % LINE_COLORS.length] }],
         viewCenter: 2,
-        zoomFactor: 5,
+        msPerPx: 5,
         animation: {
           finishTime: 1000,
-          target: { zoomFactor: 5 },
+          target: { msPerPx: 5 },
         },
+        dateRange: [0, 1000],
       }];
       const action = finishZoom(2);
       deepFreeze(state);
@@ -108,16 +116,21 @@ describe('Charts reducer', () => {
         id: 1,
         lines: [{ metricId: 1, mode: 'on', color: LINE_COLORS[1] }, { metricId: 3, mode: 'off', color: LINE_COLORS[3 % LINE_COLORS.length] }],
         viewCenter: 5,
-        zoomFactor: 3,
+        msPerPx: 3,
         animation: {
           finishTime: 2000,
-          target: { zoomFactor: 2 },
+          target: { msPerPx: 2 },
         },
+        dateRange: [12, 100],
       }, {
         id: 2,
         lines: [{ metricId: 2, mode: 'on', color: LINE_COLORS[2] }, { metricId: 5, mode: 'loess', color: LINE_COLORS[5 % LINE_COLORS.length] }],
         viewCenter: 2,
-        zoomFactor: 5,
+        msPerPx: 5,
+        dateRange: [
+          +moment('2012-01-02T04:56'),
+          +moment('2012-08-02T04:56'),
+        ],
       }];
       const action = finishZoom(2);
       deepFreeze(state);
@@ -133,16 +146,18 @@ describe('Charts reducer', () => {
         id: 1,
         lines: [{ metricId: 1, mode: 'on', color: LINE_COLORS[1] }, { metricId: 3, mode: 'off', color: LINE_COLORS[3 % LINE_COLORS.length] }],
         viewCenter: 5,
-        zoomFactor: 3,
+        msPerPx: 3,
         animation: {
           finishTime: 2000,
-          target: { zoomFactor: 2 },
+          target: { msPerPx: 2 },
         },
+        dateRange: [100, 1000],
       }, {
         id: 2,
         lines: [{ metricId: 2, mode: 'off', color: LINE_COLORS[2] }, { metricId: 5, mode: 'loess', color: LINE_COLORS[5 % LINE_COLORS.length] }],
         viewCenter: 2,
-        zoomFactor: 5,
+        msPerPx: 5,
+        dateRange: [2000, 3000],
       }];
       const action = cycleMode(2);
       deepFreeze(state);
@@ -158,16 +173,18 @@ describe('Charts reducer', () => {
         id: 1,
         lines: [{ metricId: 1, mode: 'off', color: LINE_COLORS[1] }, { metricId: 3, mode: 'on', color: LINE_COLORS[3 % LINE_COLORS.length] }],
         viewCenter: 5,
-        zoomFactor: 3,
+        msPerPx: 3,
         animation: {
           finishTime: 2000,
-          target: { zoomFactor: 2 },
+          target: { msPerPx: 2 },
         },
+        dateRange: [2000, 3000],
       }, {
         id: 2,
         lines: [{ metricId: 2, mode: 'loess', color: LINE_COLORS[2] }, { metricId: 5, mode: 'off', color: LINE_COLORS[5 % LINE_COLORS.length] }],
         viewCenter: 2,
-        zoomFactor: 5,
+        msPerPx: 5,
+        dateRange: [2000, 3000],
       }];
       const action = cycleMode(3);
       deepFreeze(state);
@@ -183,16 +200,18 @@ describe('Charts reducer', () => {
         id: 1,
         lines: [{ metricId: 1, mode: 'off', color: LINE_COLORS[1] }, { metricId: 3, mode: 'loess', color: LINE_COLORS[3 % LINE_COLORS.length] }],
         viewCenter: 5,
-        zoomFactor: 3,
+        msPerPx: 3,
         animation: {
           finishTime: 2000,
-          target: { zoomFactor: 2 },
+          target: { msPerPx: 2 },
         },
+        dateRange: [2000, 3000],
       }, {
         id: 2,
         lines: [{ metricId: 2, mode: 'loess', color: LINE_COLORS[2] }, { metricId: 5, mode: 'off', color: LINE_COLORS[5 % LINE_COLORS.length] }],
         viewCenter: 2,
-        zoomFactor: 5,
+        msPerPx: 5,
+        dateRange: [2000, 3000],
       }];
       const action = cycleMode(3);
       deepFreeze(state);
@@ -211,12 +230,14 @@ describe('Charts reducer', () => {
           id: 1,
           lines: [{ metricId: 1, mode: 'off', color: LINE_COLORS[1] }, { metricId: 3, mode: 'on', color: LINE_COLORS[3 % LINE_COLORS.length] }],
           viewCenter: 5,
-          zoomFactor: 1,
+          msPerPx: 42,
+          dateRange: [0, 1000],
         }, {
           id: 2,
           lines: [{ metricId: 2, mode: 'on', color: LINE_COLORS[2 % LINE_COLORS.length] }, { metricId: 5, mode: 'loess', color: LINE_COLORS[5 % LINE_COLORS.length] }],
           viewCenter: 2,
-          zoomFactor: 1,
+          msPerPx: 1,
+          dateRange: [0, 1000],
         },
       ];
       const action = scrollBy(1, 10);
@@ -224,8 +245,8 @@ describe('Charts reducer', () => {
       deepFreeze(action);
       const newState: TChartsState = reducer(state, action);
       expect(newState).to.have.length(2);
-      expect(newState[1]).to.deep.equal(state[1]);
-      expect(newState[0]).to.have.property('viewCenter', 5 + (10 * MS_PER_PX));
+      expect(newState[0]).to.have.property('viewCenter', 425);
+      expect(newState[1], 'must scroll by 42 * 10 pixels').to.deep.equal(state[1]);
     });
 
     it('decreases the viewCenter property of the selected metric by an amount', () => {
@@ -234,12 +255,14 @@ describe('Charts reducer', () => {
           id: 1,
           lines: [{ metricId: 1, mode: 'off', color: LINE_COLORS[1] }, { metricId: 3, mode: 'on', color: LINE_COLORS[3 % LINE_COLORS.length] }],
           viewCenter: 5,
-          zoomFactor: 1,
+          msPerPx: 13,
+          dateRange: [-200, 1000],
         }, {
           id: 2,
           lines: [{ metricId: 2, mode: 'off', color: LINE_COLORS[2] }, { metricId: 5, mode: 'off', color: LINE_COLORS[5 % LINE_COLORS.length] }],
           viewCenter: 2,
-          zoomFactor: 1,
+          msPerPx: 1,
+          dateRange: [0, 1000],
         },
       ];
       const action = scrollBy(1, -10);
@@ -247,8 +270,8 @@ describe('Charts reducer', () => {
       deepFreeze(action);
       const newState: TChartsState = reducer(state, action);
       expect(newState).to.have.length(2);
+      expect(newState[0], 'must scroll 13 * (-10)').to.have.property('viewCenter', -125);
       expect(newState[1]).to.deep.equal(state[1]);
-      expect(newState[0]).to.have.property('viewCenter', 5 - (10 * MS_PER_PX));
     });
 
     it('increases the viewCenter property by a smaller amount if zoomed in', () => {
@@ -257,12 +280,14 @@ describe('Charts reducer', () => {
           id: 1,
           lines: [{ metricId: 1, mode: 'off', color: LINE_COLORS[1] }, { metricId: 3, mode: 'on', color: LINE_COLORS[3 % LINE_COLORS.length] }],
           viewCenter: 5,
-          zoomFactor: 2,
+          msPerPx: 2,
+          dateRange: [0, 100],
         }, {
           id: 2,
           lines: [{ metricId: 2, mode: 'loess', color: LINE_COLORS[2] }, { metricId: 5, mode: 'off', color: LINE_COLORS[5 % LINE_COLORS.length] }],
           viewCenter: 2,
-          zoomFactor: 1,
+          msPerPx: 1,
+          dateRange: [0, 100],
         },
       ];
       const action = scrollBy(1, 10);
@@ -271,7 +296,26 @@ describe('Charts reducer', () => {
       const newState: TChartsState = reducer(state, action);
       expect(newState).to.have.length(2);
       expect(newState[1]).to.deep.equal(state[1]);
-      expect(newState[0]).to.have.property('viewCenter', 5 + (5 * MS_PER_PX));
+      expect(newState[0]).to.have.property('viewCenter', 25);
+    });
+
+    it('constrains viewCenter to lie within the chart\'s date range', () => {
+      const state: TChartsState = [
+        {
+          id: 1,
+          lines: [{
+            metricId: 1,
+            mode: 'on',
+            color: 'green',
+          }],
+          viewCenter: 5,
+          msPerPx: 1,
+          dateRange: [0, 10],
+        },
+      ];
+      const action = scrollBy(1, 10);
+      const newState = reducer(state, action);
+      expect(newState).to.have.deep.property('[0].viewCenter', 10);
     });
   });
 
@@ -314,7 +358,7 @@ describe('Charts reducer', () => {
       expect(newState[1].lines).to.eql([{ metricId: 2, mode: 'on', color: LINE_COLORS[2] }, { metricId: 4, mode: 'on', color: LINE_COLORS[4 % LINE_COLORS.length] }]);
     });
 
-    it('sets the zoomFactor and viewCenter such that all entries are in view if less than 4 weeks exist', () => {
+    it('sets the msPerPx and viewCenter such that all entries are in the 200 pixels left of the viewCenter', () => {
       const state: TChartsState = [];
       const metrics: TMetric[] = [
         {
@@ -336,12 +380,13 @@ describe('Charts reducer', () => {
         },
       ];
       const action = createCharts(metrics);
-      const dateRange = [(new Date(metrics[0].entries[0].date)).getTime(), (new Date(metrics[1].entries[1].date)).getTime()];
-      const expectedViewCenter = (dateRange[0] + dateRange[1]) / 2;
+      const dateRange = [+moment(metrics[0].entries[0].date), +moment(metrics[1].entries[1].date)];
+      const expectedViewCenter = dateRange[1];
       const newState = reducer(state, action);
       expect(newState).to.have.length(1);
+      expect(newState).to.have.deep.property('[0].dateRange').and.to.eql(dateRange);
       expect(newState[0].lines).to.eql([{ metricId: 33, mode: 'on', color: LINE_COLORS[33 % LINE_COLORS.length] }, { metricId: 34, mode: 'on', color: LINE_COLORS[34 % LINE_COLORS.length] }]);
-      expect(newState[0].zoomFactor, (dateRange[1] - dateRange[0])).to.be.closeTo(MS_PER_PX / (dateRange[1] - dateRange[0]), 0.1);
+      expect(newState[0].msPerPx).to.be.closeTo((dateRange[1] - dateRange[0]) / 200, 1);
       expect(newState[0].viewCenter).to.be.closeTo(expectedViewCenter, 100);
     });
 
@@ -367,12 +412,13 @@ describe('Charts reducer', () => {
         },
       ];
       const action = createCharts(metrics);
-      const dateRange = [(new Date(metrics[0].entries[0].date)).getTime(), (new Date(metrics[1].entries[1].date)).getTime()];
-      const expectedViewCenter = dateRange[1] - (FOUR_WEEKS / 2);
+      const dateRange = [+moment(metrics[0].entries[0].date), +moment(metrics[1].entries[1].date)];
+      const expectedViewCenter = dateRange[1];
       const newState = reducer(state, action);
       expect(newState).to.have.length(1);
-      expect(newState[0].zoomFactor).to.equal(1);
+      expect(newState[0].msPerPx).to.equal(FOUR_WEEKS / 400);
       expect(newState[0].viewCenter).to.be.closeTo(expectedViewCenter, 100);
     });
   });
 });
+
