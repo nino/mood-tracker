@@ -33,15 +33,20 @@ type TLineProps = {
   className?: string,
 };
 
-const Line = ({ points, width, color, className }: TLineProps) => (
-  <path
-    d={pathString(points)}
-    stroke={color}
-    strokeWidth={width}
-    {...(className === '' ? {} : { className })}
-    fill="none"
-  />
-);
+const Line = ({ points, width, color, className }: TLineProps) => {
+  if (points.length > 2) {
+    return (
+      <path
+        d={pathString(points)}
+        stroke={color}
+        strokeWidth={width}
+        {...(className === '' ? {} : { className })}
+        fill="none"
+      />
+    );
+  }
+  return <g />;
+};
 
 Line.defaultProps = {
   width: 2,

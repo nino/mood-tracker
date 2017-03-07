@@ -17,6 +17,11 @@ describe('Line', () => {
   ];
   const component = shallow(<Line points={points} color="green" />);
 
+  it('does not render a path if there are less than 2 points', () => {
+    const component2 = shallow(<Line points={[]} color="irrelevant" />);
+    expect(component2.find('path')).to.have.length(0);
+  });
+
   it('renders a path node with a control point at each point', () => {
     expect(component.find('path')).to.have.length(1);
     expect(component.find('path').get(0)).to.have.deep.property('props.d', 'M2,3L4,8L7,1L9,2');
