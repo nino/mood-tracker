@@ -86,5 +86,6 @@ const stateToProps = (state: TApplicationState) => ({
   metrics: state.metrics,
 });
 
-export default connect(stateToProps)(Radium(App));
+export const ConnectedApp = connect(stateToProps)(App);
+export default Radium(ConnectedApp);
 

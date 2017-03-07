@@ -63,5 +63,6 @@ const stateToProps = (state: TApplicationState) => ({
   charts: state.charts,
 });
 
-export default connect(stateToProps)(Radium(ChartsContainer));
+export const ConnectedComponent = connect(stateToProps)(ChartsContainer);
+export default Radium(ConnectedComponent);
 
