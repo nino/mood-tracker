@@ -1,6 +1,14 @@
 /* @flow */
 /* global window localStorage Generator */
 import { takeLatest, takeEvery } from 'redux-saga';
+import moment from 'moment';
+import {
+  reject,
+  every,
+  isNumber,
+  isArray,
+  includes,
+} from 'lodash';
 import Dropbox from 'dropbox';
 import queryString from 'query-string';
 import { put, select, call } from './effect-generators';
@@ -40,7 +48,7 @@ import {
   isValidMetricsArray,
   asTMetricProps,
 } from './lib';
-import type { TRequestUpdateMetricAction } from './actionTypes';
+import type { TDeleteMetricAction, TRequestUpdateMetricAction } from './actionTypes';
 import chartSagas from './Charts/sagas';
 
 export function* syncData(): Generator<any, any, any> {
@@ -65,7 +73,11 @@ export function* syncData(): Generator<any, any, any> {
       yield* put(errorSyncData(apiResponse.error));
     } else {
       const remoteMetrics = apiResponse.data ? apiResponse.data : [];
-      const mergedMetrics = mergeMetrics(localMetrics.concat(remoteMetrics));
+      let mergedMetrics = mergeMetrics(localMetrics.concat(remoteMetrics));
+      const toDelete: number[] = JSON.parse(localStorage.getItem('toDelete') || '[]');
+      if (isArray(toDelete) && every(toDelete, isNumber)) {
+        mergedMetrics = reject(mergedMetrics, m => includes(toDelete, m.id));
+      }
       localStorage.setItem('metrics', JSON.stringify(mergedMetrics));
       const uploadResponse: { ok: true} | { ok: false, error: string } = yield* call(
         uploadAsJSON,
@@ -78,7 +90,8 @@ export function* syncData(): Generator<any, any, any> {
         return;
       }
 
-      yield* put(successSyncData(mergedMetrics, (new Date()).getTime()));
+      localStorage.removeItem('toDelete');
+      yield* put(successSyncData(mergedMetrics, +moment()));
     }
   }
 }
@@ -144,8 +157,16 @@ export function* executeLogout(): Generator<any, any, any> {
   yield* put(successLogout());
 }
 
-export function* executeSyncData(): Generator<any, any, any> {
-  yield put(beginSyncData());
+export function* executeSyncData(action?: TDeleteMetricAction): Generator<any, any, any> {
+  if (action != null && action.type === 'DELETE_METRIC') {
+    try {
+      const toDeletePrev: number[] = JSON.parse(localStorage.getItem('toDelete') || '[]');
+      localStorage.setItem('toDelete', JSON.stringify([...toDeletePrev, action.metricId]));
+    } catch (error) {
+      localStorage.setItem('toDelete', JSON.stringify([action.metricId]));
+    }
+  }
+  yield* put(beginSyncData());
 }
 
 export function* updateMetric(action: TRequestUpdateMetricAction): Generator<any, any, any> {
