@@ -15,7 +15,7 @@ import {
 
 import type { TApplicationState } from '../types';
 
-import ConnectedApp, { App } from './App';
+import { App, ConnectedApp } from './App';
 import LoginScreen from '../components/LoginScreen';
 
 const mockStore = configureMockStore();
