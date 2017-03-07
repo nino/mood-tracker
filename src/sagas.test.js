@@ -5,6 +5,7 @@
 import { expect } from 'chai';
 import {
   syncData,
+  executeSyncData,
   restoreCache,
   checkLogin,
   executeCancelModal,
@@ -29,7 +30,7 @@ import type {
   TOldMetric,
   TModal,
  } from './types';
-import { requestUpdateMetric } from './actions';
+import { requestUpdateMetric, deleteMetric, beginSyncData } from './actions';
 import { getMetricsItems, getAuthentication } from './selectors';
 
 const authAuthenticated: TAuthenticationState = {
@@ -571,6 +572,42 @@ describe('sync data saga', () => {
     expect(generator.next()).to.have.property('done', true);
   });
 
+  it('discards all deleted metrics according to localStorage.toDelete', () => {
+    global.localStorage.setItem('toDelete', `[${BurnsWithEntries.id}]`);
+    const generator = syncData();
+    let next = generator.next();
+
+    // fetch authentication state -- authenticated
+    next = generator.next(authAuthenticated);
+
+    // PUT restore cache
+    next = generator.next();
+
+    // SELECT local metrics
+    // BurnsWithEntries got deleted
+    next = generator.next([MoodWithEntries]);
+
+    // Download data from dropbox
+    next = generator.next({
+      ok: true,
+      data: [MoodWithEntries, BurnsWithEntries],
+    });
+
+    // Upload data to dropbox
+    next = generator.next({ ok: true });
+
+    // PUT successSyncData
+    expect(next).to.have.deep.property('value.PUT.action.data');
+    if (next.value == null || next.value.PUT == null) {
+      return;
+    }
+    next.value.PUT.action.data.forEach((metric: TMetric) => {
+      expect(metric.id).to.not.equal(2);
+    });
+
+    expect(global.localStorage.getItem('toDelete')).to.not.be.ok;
+  });
+
   describe('error handling', () => {
     it('cancels on download-error, but updates localStorage', () => {
       const generator = syncData();
@@ -638,6 +675,23 @@ describe('sync data saga', () => {
       // PUT error
       expect(next, 'must PUT error sync data').to.have.deep.property('value.PUT.action.type', 'ERROR_SYNC_DATA');
     });
+  });
+});
+
+describe('execute-sync saga', () => {
+  it('dispatches a beginSyncData action', () => {
+    const generator = executeSyncData();
+    let next = generator.next();
+    expect(next).to.have.deep.property('value.PUT.action').and.to.eql(beginSyncData());
+    next = generator.next();
+    expect(next).to.have.property('done', true);
+  });
+
+  it('writes the id of the deleted metric into localStorage.toDelete if a metric needs to be deleted', () => {
+    global.localStorage.removeItem('toDelete');
+    const generator = executeSyncData(deleteMetric(2, true));
+    generator.next();
+    expect(global.localStorage.getItem('toDelete')).to.eql('[2]');
   });
 });
 
