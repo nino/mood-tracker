@@ -1,9 +1,13 @@
 /* @flow */
 import React from 'react';
+import Radium from 'radium';
 import Line from './Line';
 import type { TDimensions, TAxisTick, TChartPadding } from '../types';
 
 const axisColor = '#fff';
+const labelStyle = {
+  fontSize: '10px',
+};
 
 type TAxisProps = {
   /**
@@ -41,7 +45,18 @@ export const XAxis = ({ dimensions, ticks, padding }: TAxisProps) => (
           color={axisColor}
           className="axis-tick"
         />
-        <text textAnchor="middle" alignmentBaseline="baseline" x={tick.position} y={dimensions.height - (padding.bottom || 0)}>{tick.label}</text>
+        <text
+          textAnchor="middle"
+          alignmentBaseline="hanging"
+          x={tick.position}
+          y={dimensions.height - (padding.bottom || 0)}
+          style={{
+            zIndex: '100',
+            ...labelStyle,
+          }}
+        >
+          {tick.label}
+        </text>
       </g>
     ))}
   </g>
@@ -71,7 +86,11 @@ export const YAxis = ({ dimensions, ticks, padding }: TAxisProps) => (
           x={5}
           y={tick.position}
           textAnchor="left"
-          alignmentBaseline="hanging"
+          alignmentBaseline="middle"
+          style={{
+            zIndex: '100',
+            ...labelStyle,
+          }}
         >
           {tick.label}
         </text>
@@ -84,5 +103,5 @@ YAxis.defaultProps = { vertical: true };
 const Axis = (props: TAxisProps) => (props.vertical === false ? <XAxis {...props} /> : <YAxis {...props} />);
 Axis.defaultProps = { vertical: false };
 
-export default Axis;
+export default Radium(Axis);
 

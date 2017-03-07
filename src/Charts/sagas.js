@@ -1,7 +1,8 @@
 /* @flow */
 import { takeLatest, delay } from 'redux-saga';
+import moment from 'moment';
 import { select, put } from '../effect-generators';
-import { beginZoom, setZoomFactor, finishZoom } from './actions';
+import { beginZoom, setMsPerPx, finishZoom } from './actions';
 import type { TRequestZoomAction } from './actionTypes';
 import type { TChart } from '../types';
 import { getChart } from './selectors';
@@ -15,25 +16,27 @@ export function* animateZoom(action: TRequestZoomAction): Generator<any, any, an
     return;
   }
 
-  const finishTime = (new Date()).getTime() + animationDuration;
-  const targetZoomFactor = chart.animation != null && chart.animation.target.zoomFactor != null
-    ? chart.animation.target.zoomFactor * action.zoomFactor
-    : chart.zoomFactor * action.zoomFactor;
-  yield* put(beginZoom(action.chartId, finishTime, targetZoomFactor));
+  const finishTime = +moment() + animationDuration;
+  /* We divide by the zoom factor because zooming in (i.e. factor > 1) causes the ms/px
+   * ratio to decrease. */
+  const targetMsPerPx = chart.animation != null && chart.animation.target.msPerPx != null
+    ? chart.animation.target.msPerPx / action.factor
+    : chart.msPerPx / action.factor;
+  yield* put(beginZoom(action.chartId, finishTime, targetMsPerPx));
 
-  const startTime = (new Date()).getTime();
-  const initialZoomFactor = chart.zoomFactor;
-  let currentZoomFactor = chart.zoomFactor;
+  const startTime = +moment();
+  const initialMsPerPx = chart.msPerPx;
+  let currentMsPerPx = chart.msPerPx;
   let fractionOfAnimationLeft = 1;
   let fractionOfAnimationCompleted = 0;
-  for (let currentTime = (new Date()).getTime(); currentTime < finishTime; currentTime = (new Date()).getTime()) {
+  for (let currentTime = +moment(); currentTime < finishTime; currentTime = +moment()) {
     fractionOfAnimationLeft = (finishTime - currentTime) / (finishTime - startTime);
     fractionOfAnimationCompleted = 1 - fractionOfAnimationLeft;
-    currentZoomFactor = (fractionOfAnimationLeft * initialZoomFactor) + (fractionOfAnimationCompleted * targetZoomFactor);
-    yield put(setZoomFactor(action.chartId, currentZoomFactor));
+    currentMsPerPx = (fractionOfAnimationLeft * initialMsPerPx) + (fractionOfAnimationCompleted * targetMsPerPx);
+    yield* put(setMsPerPx(action.chartId, currentMsPerPx));
     yield delay(delayDuration);
   }
-  yield* put(setZoomFactor(action.chartId, targetZoomFactor));
+  yield* put(setMsPerPx(action.chartId, targetMsPerPx));
   yield delay(delayDuration);
   yield* put(finishZoom(action.chartId));
 }
@@ -41,3 +44,4 @@ export function* animateZoom(action: TRequestZoomAction): Generator<any, any, an
 export default function* rootSaga(): Generator<any, any, any> {
   yield* takeLatest('charts/REQUEST_ZOOM', animateZoom);
 }
+

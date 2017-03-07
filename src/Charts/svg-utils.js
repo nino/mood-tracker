@@ -6,7 +6,7 @@ import {
   rangeRight,
   range,
   filter,
-  find,
+  findLast,
 } from 'lodash/fp';
 import moment from 'moment';
 import type { TRange, TAxisTick, TChartPadding } from './types';
@@ -115,6 +115,21 @@ export function getMonthThirds(boundaries: [moment$Moment, moment$Moment]): TMom
     }, {
       label: `20 ${moment.monthsShort()[month.month()]}`,
       date: moment(month).add(19, 'days'),
+    }]),
+    flatten,
+    filter((tick: TMomentAxisTick) => tick.date.isBetween(boundaries[0], boundaries[1])),
+  ])(range(0, moment.duration(+moment(boundaries[1]) - +moment(boundaries[0])).asMonths() + 1));
+}
+
+export function getMonthHalfs(boundaries: [moment$Moment, moment$Moment]): TMomentAxisTick[] { // TODO write tests
+  return flow([
+    map((monthOffset: number) => moment(boundaries[0]).startOf('month').add(monthOffset, 'months')),
+    map((month: moment$Moment) => [{
+      label: `1 ${moment.monthsShort()[month.month()]}${maybeYear(month)}`,
+      date: moment(month),
+    }, {
+      label: `15 ${moment.monthsShort()[month.month()]}`,
+      date: moment(month).add(14, 'days'),
     }]),
     flatten,
     filter((tick: TMomentAxisTick) => tick.date.isBetween(boundaries[0], boundaries[1])),
@@ -249,65 +264,69 @@ export function getAllMinutes(boundaries: [moment$Moment, moment$Moment]): TMome
 
 export function getXAxisTicks(chartWidth: number, dateRange: TRange, padding: TChartPadding): TAxisTick[] {
   const dateDiff = dateRange[1] - dateRange[0];
+  const drawingWidth = chartWidth - ((padding.left || 0) + (padding.right || 0));
 
-  const dateTickLevels: { threshold: moment$MomentDuration, selector: TTicksSelectorFunction }[] = [{
-    threshold: moment.duration(10, 'years'),
+  /*
+   * The threshold is a number with the unit ms/px.
+   * We want something like one tick per 80px.
+   * We select the last level that has a higher threshold than the current ms/px of the chart.
+   */
+  const dateTickLevels: { threshold: number, selector: TTicksSelectorFunction }[] = [{
+    threshold: moment.duration(2, 'years').as('ms') / 80,
     selector: getAllYears,
   }, {
-    threshold: moment.duration(2, 'years'),
+    threshold: moment.duration(10, 'months').as('ms') / 80,
     selector: getHalfYears,
   }, {
-    threshold: moment.duration(1, 'year'),
+    threshold: moment.duration(6, 'months').as('ms') / 80,
     selector: getQuarterYears,
   }, {
-    threshold: moment.duration(6, 'months'),
+    threshold: moment.duration(2, 'months').as('ms') / 80,
     selector: getAllMonths,
   }, {
-    threshold: moment.duration(6, 'weeks'),
+    threshold: moment.duration(20, 'days').as('ms') / 80,
+    selector: getMonthHalfs,
+  }, {
+    threshold: moment.duration(10, 'days').as('ms') / 80,
     selector: getMonthThirds,
   }, {
-    threshold: moment.duration(4, 'weeks'),
+    threshold: moment.duration(5, 'days').as('ms') / 80,
     selector: getMonthSixths,
   }, {
-    threshold: moment.duration(10, 'days'),
-    selector: getMonthSixths,
-  }, {
-    threshold: moment.duration(5, 'days'),
+    threshold: moment.duration(2, 'days').as('ms') / 80,
     selector: getAllDays,
   }, {
-    threshold: moment.duration(2, 'days'),
+    threshold: moment.duration(1, 'days').as('ms') / 80,
     selector: getHalfDays,
   }, {
-    threshold: moment.duration(30, 'hours'),
+    threshold: moment.duration(12, 'hours').as('ms') / 80,
     selector: getDayQuarters,
   }, {
-    threshold: moment.duration(10, 'hours'),
+    threshold: moment.duration(6, 'hours').as('ms') / 80,
     selector: getDayEighths,
   }, {
-    threshold: moment.duration(6, 'hours'),
+    threshold: moment.duration(2, 'hours').as('ms') / 80,
     selector: getAllHours,
   }, {
-    threshold: moment.duration(2, 'hours'),
+    threshold: moment.duration(45, 'minutes').as('ms') / 80,
     selector: getHalfHours,
   }, {
-    threshold: moment.duration(70, 'minutes'),
+    threshold: moment.duration(25, 'minutes').as('ms') / 80,
     selector: getQuarterHours,
   }, {
-    threshold: moment.duration(30, 'minutes'),
+    threshold: moment.duration(12, 'minutes').as('ms') / 80,
     selector: getFiveMinutes,
   }, {
-    threshold: moment.duration(30, 'minutes'),
-    selector: getFiveMinutes,
-  }, {
-    threshold: moment.duration(6, 'minutes'),
+    threshold: moment.duration(2, 'minutes').as('ms') / 80,
     selector: getAllMinutes,
   }];
 
-  const currentLevel = find(
-    (level: { threshold: moment$MomentDuration, selector: TTicksSelectorFunction }) => (
-      level.threshold.as('milliseconds') <= dateDiff),
-    dateTickLevels,
-  );
+  const currentMsPerPx = dateDiff / drawingWidth;
+  const currentLevel = findLast(
+    (level: { threshold: number, selector: TTicksSelectorFunction }) => (
+      level.threshold > currentMsPerPx
+    ),
+  )(dateTickLevels);
   const momentTicks: TMomentAxisTick[] = currentLevel.selector([moment(dateRange[0]), moment(dateRange[1])]);
   const finalTicks: TAxisTick[] = map((momentTick: TMomentAxisTick) => ({
     label: momentTick.label,

@@ -3,7 +3,7 @@ import type {
   TDefaultAction,
   TRequestZoomAction,
   TBeginZoomAction,
-  TSetZoomFactorAction,
+  TSetMsPerPxAction,
   TFinishZoomAction,
   TCycleModeAction,
   TScrollByAction,
@@ -19,16 +19,16 @@ export function defaultAction(): TDefaultAction {
  * Request to begin animating the zoom-level of a chart.
  * The zoomFactor parameter is relative to the current zoom-level.
  */
-export function requestZoom(chartId: number, zoomFactor: number = 1): TRequestZoomAction {
-  return { type: 'charts/REQUEST_ZOOM', chartId, zoomFactor };
+export function requestZoom(chartId: number, factor: number = 1): TRequestZoomAction {
+  return { type: 'charts/REQUEST_ZOOM', chartId, factor };
 }
 
-export function beginZoom(chartId: number, finishTime: number, targetZoomFactor: number): TBeginZoomAction {
-  return { type: 'charts/BEGIN_ZOOM', chartId, finishTime, targetZoomFactor };
+export function beginZoom(chartId: number, finishTime: number, targetMsPerPx: number): TBeginZoomAction {
+  return { type: 'charts/BEGIN_ZOOM', chartId, finishTime, targetMsPerPx };
 }
 
-export function setZoomFactor(chartId: number, zoomFactor: number): TSetZoomFactorAction {
-  return { type: 'charts/SET_ZOOM_FACTOR', chartId, zoomFactor };
+export function setMsPerPx(chartId: number, msPerPx: number): TSetMsPerPxAction {
+  return { type: 'charts/SET_MS_PER_PX', chartId, msPerPx };
 }
 
 export function finishZoom(chartId: number): TFinishZoomAction {
@@ -46,3 +46,4 @@ export function scrollBy(chartId: number, deltaX: number): TScrollByAction {
 export function createCharts(metrics: TMetric[]): TCreateChartsAction {
   return { type: 'charts/CREATE_CHARTS', metrics };
 }
+

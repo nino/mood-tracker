@@ -9,7 +9,7 @@ import {
   MoodWithEntries,
   BurnsWithoutEntries,
 } from '../../test/SampleMetrics';
-import { LINE_COLORS } from './constants';
+import { LINE_COLORS, MS_PER_PX } from './constants';
 
 import { ChartsContainer } from './ChartsContainer';
 import Chart from './components/Chart';
@@ -42,8 +42,12 @@ describe('ChartsContainer', () => {
             mode: 'on',
             color: LINE_COLORS[MoodWithEntries.id % LINE_COLORS.length],
           }],
-          zoomFactor: 1,
-          viewCenter: +moment('2012-02-02T23:42'),
+          dateRange: [
+            +moment('2012-01-02T23:42'),
+            +moment('2012-04-01T23:42'),
+          ],
+          viewCenter: +moment('2012-02-02T23:23'),
+          msPerPx: MS_PER_PX,
         }, {
           id: 2,
           lines: [{
@@ -51,8 +55,12 @@ describe('ChartsContainer', () => {
             mode: 'on',
             color: LINE_COLORS[BurnsWithoutEntries.id % LINE_COLORS.length],
           }],
-          zoomFactor: 1,
-          viewCenter: +moment('2015-02-05T23:11'),
+          dateRange: [
+            +moment('2015-01-02T23:42'),
+            +moment('2015-04-01T23:42'),
+          ],
+          viewCenter: +moment('2015-02-02T23:42'),
+          msPerPx: MS_PER_PX,
         }]}
         dispatch={jest.fn()}
       />);

@@ -7,7 +7,7 @@ import moment from 'moment';
 import { min, max, map, flow, slice, findIndex, findLastIndex } from 'lodash/fp';
 import { Button } from '@blueprintjs/core';
 import ScrollBar from './ScrollBar';
-import { FOUR_WEEKS, LINE_COLORS } from '../constants';
+import { LINE_COLORS, CHART_PADDING } from '../constants';
 import Line from './Line';
 import ChartGrid from './ChartGrid';
 import Legend from './Legend';
@@ -61,14 +61,14 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
 
   const dateRangeBegin: number = min(metrics.map(m => +moment(m.entries[0].date)));
   const dateRangeEnd: number = max(metrics.map(m => +moment(m.entries[m.entries.length - 1].date)));
-  const viewRangeBegin: number = chart.viewCenter - (FOUR_WEEKS / chart.zoomFactor);
-  const viewRangeEnd: number = chart.viewCenter + (FOUR_WEEKS / chart.zoomFactor);
+  const viewRangeBegin: number = chart.viewCenter - ((dimensions.width * chart.msPerPx) / 2);
+  const viewRangeEnd: number = chart.viewCenter + ((dimensions.width * chart.msPerPx) / 2);
   return (
     <div
       className="chart"
       onWheel={handleWheel}
       style={{
-        height: '200px',
+        height: '240px',
         overflow: 'hidden',
         width: '100%',
         position: 'relative',
@@ -77,19 +77,23 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
         boxShadow: '0px 1px 0px rgba(0, 0, 0, 0.1)',
       }}
     >
-      <div className="chart-buttons">
+      <div
+        className="chart-buttons pt-button-group"
+        style={{
+          position: 'absolute',
+          top: '8px',
+          right: '8px',
+          zIndex: '10',
+        }}
+      >
         <Button
           onClick={() => dispatch(requestZoom(chart.id, 1.2))}
-          className="chart-zoom-in-button"
-        >
-          +
-        </Button>
+          className="chart-zoom-in-button pt-icon-small-plus"
+        />
         <Button
           onClick={() => dispatch(requestZoom(chart.id, 0.8))}
-          className="chart-zoom-out-button"
-        >
-          –
-        </Button>
+          className="chart-zoom-out-button pt-icon-small-minus"
+        />
       </div>
       <Draggable
         onDrag={(event: Event, data: DraggableData) => dispatch(scrollBy(chart.id, -data.deltaX))}
@@ -99,6 +103,7 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
           style={{
             width: dimensions.width,
             height: dimensions.height,
+            backgroundColor: '#f2f5f8',
           }}
         >
           <ChartGrid
@@ -106,15 +111,15 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
             dateRange={[viewRangeBegin, viewRangeEnd]}
             dimensions={dimensions}
             valueRange={[metrics[0].props.minValue, metrics[0].props.maxValue]}
-            padding={{ bottom: 20 }}
+            padding={CHART_PADDING}
           />
           {map((metric: TMetric) => (
             <Line
               key={metric.id}
               points={flow(
                 map((entry: TMetricEntry) => ({
-                  x: xValueToPixels(+moment(entry.date), [viewRangeBegin, viewRangeEnd], dimensions.width, { bottom: 20 }),
-                  y: yValueToPixels(entry.value, [metric.props.minValue, metric.props.maxValue], dimensions.height, { bottom: 20 }),
+                  x: xValueToPixels(+moment(entry.date), [viewRangeBegin, viewRangeEnd], dimensions.width, CHART_PADDING),
+                  y: yValueToPixels(entry.value, [metric.props.minValue, metric.props.maxValue], dimensions.height, CHART_PADDING),
                 })),
                 (ary: TLinePoint[]) => slice(
                   max([findLastIndex(item => item.x < 0)(ary), 0]),
@@ -146,10 +151,20 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
 };
 
 export default Radium((props: TChartProps) => (
-  <Measure>
-    {(dimensions: TDimensions) => (
-      <ChartMeasured metrics={props.metrics} chart={props.chart} dispatch={props.dispatch} dimensions={dimensions} />
-    )}
-  </Measure>
+  <div
+    className="outer-chart-container"
+    style={{
+      margin: '16px',
+      maxWidth: '600px',
+      minWidth: '200px',
+      flexGrow: '1',
+    }}
+  >
+    <Measure>
+      {(dimensions: TDimensions) => (
+        <ChartMeasured metrics={props.metrics} chart={props.chart} dispatch={props.dispatch} dimensions={dimensions} />
+      )}
+    </Measure>
+  </div>
 ));
 

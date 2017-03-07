@@ -1,5 +1,6 @@
 // @flow
 import type { TAction } from './actionTypes';
+import type { TRange } from './Charts/types';
 
 export type TChartLine = {
   +metricId: number,
@@ -12,13 +13,14 @@ export type TChart = {
   +lines: TChartLine[];
   +animation?: {
     +target: {
-      +zoomFactor?: number,
+      +msPerPx?: number,
       +viewCenter?: number,
     },
     +finishTime: number,
   },
-  +zoomFactor: number,
   +viewCenter: number,
+  +msPerPx: number,
+  +dateRange: TRange,
 };
 
 export type TMetricType = 'int';
