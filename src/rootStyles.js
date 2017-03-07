@@ -8,10 +8,11 @@ const rootStyles = {
     textAlign: 'center',
     verticalAlign: 'center',
     height: '4em',
-    backgroundColor: '#FAA',
-    borderColor: '#B33',
   },
   '.error-message': {
+    backgroundColor: '#FAA',
+    borderColor: '#B33',
+    borderSize: '1px',
     margin: '0px auto',
     textAlign: 'center',
     padding: '48px',
@@ -19,3 +20,4 @@ const rootStyles = {
 };
 
 export default rootStyles;
+

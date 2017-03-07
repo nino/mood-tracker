@@ -72,7 +72,7 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
         overflow: 'hidden',
         width: '100%',
         position: 'relative',
-        borderRadius: '4',
+        borderRadius: '4px',
         border: '1px solid #dadada',
         boxShadow: '0px 1px 0px rgba(0, 0, 0, 0.1)',
       }}
@@ -95,7 +95,9 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
           className="chart-zoom-out-button pt-icon-small-minus"
         />
       </div>
-      <Draggable onDrag={(event: Event, data: DraggableData) => dispatch(scrollBy(chart.id, -data.deltaX))}>
+      <Draggable
+        onDrag={(event: Event, data: DraggableData) => dispatch(scrollBy(chart.id, -data.deltaX))}
+      >
         <svg
           className="chart"
           style={{

@@ -50,7 +50,7 @@ const ScrollBar = ({ width, viewRange, dateRange, scrollBy }: TScrollBarProps) =
       <div
         className="chart-scrollbar"
         style={{
-          left: ((viewRange[0] - dateRange[0]) / (dateRange[1] - dateRange[0])) * width,
+          left: `${((viewRange[0] - dateRange[0]) / (dateRange[1] - dateRange[0])) * width}px`,
           display: 'block',
           position: 'relative',
           height: '5px',

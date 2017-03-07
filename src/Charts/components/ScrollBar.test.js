@@ -22,8 +22,10 @@ describe('ScrollBar', () => {
     const scrollBar = component.find('.chart-scrollbar').get(0);
     expect(scrollBar.props).to.have.deep.property('style.position', 'relative');
     expect(component.find('Draggable')).to.have.length(1);
-    expect(component.find('Draggable').get(0)).to.have.deep.property('props.position.x', 80);
+    expect(component.find('Draggable').get(0)).to.have.deep.property('props.position.x', 0);
     expect(component.find('Draggable').get(0)).to.have.deep.property('props.position.y', 0);
+    expect(scrollBar.props).to.have.deep.property('style.left', '80px');
     expect(scrollBar.props).to.have.deep.property('style.width', '40px');
   });
 });
+
