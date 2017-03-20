@@ -1,6 +1,11 @@
 /* @flow */
 /* global FileReader, Blob */
 import type { Dropbox } from 'dropbox';
+import {
+  isEqual,
+  omit,
+  slice,
+} from 'lodash';
 import type {
   TMetric,
   TMetricEntry,
@@ -242,3 +247,32 @@ export function uploadAsJSON(dbx: Dropbox, fileName: string, content: TMetric[])
     .then(() => ({ ok: true }))
     .catch(error => ({ ok: false, error }));
 }
+
+export function areMetricsSameGroup(a: TMetric, b: TMetric): boolean {
+  return isEqual(
+    omit(a.props, 'name'),
+    omit(b.props, 'name'),
+  );
+}
+
+export function withoutIndex<T>(array: Array<T>, index: number): Array<T> {
+  if (index < 0 || index >= array.length) {
+    return array;
+  }
+  return [
+    ...slice(array, 0, index),
+    ...slice(array, index + 1, array.length),
+  ];
+}
+
+export function setAt<T>(array: Array<T>, index: number, value: T): Array<T> {
+  if (index < 0 || index >= array.length) {
+    return array;
+  }
+  return [
+    ...slice(array, 0, index),
+    value,
+    ...slice(array, index + 1, array.length),
+  ];
+}
+
