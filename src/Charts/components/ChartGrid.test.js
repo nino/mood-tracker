@@ -1,7 +1,6 @@
 /* @flow */
 /* eslint-env jest */
 /* eslint-disable no-unused-expressions */
-/* TODO Find out why the axis lines are broken */
 import React from 'react';
 import { shallow } from 'enzyme';
 import moment from 'moment';
@@ -57,7 +56,7 @@ describe('ChartGrid', () => {
   it('renders a horizontal axis with 5 ticks', () => {
     const xAxis = component.find('Axis').findWhere(el => !el.get(0).props.vertical);
     expect(xAxis, 'xAxis must be rendered').to.have.length(1);
-    expect(xAxis.get(0)).to.have.deep.property('props.ticks').and.to.have.property('length').and.to.be.within(3, 7); // TODO rework tick selection
+    expect(xAxis.get(0)).to.have.deep.property('props.ticks').and.to.have.property('length').and.to.be.within(3, 7);
   });
 });
 

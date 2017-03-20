@@ -13,6 +13,9 @@ import {
   isValidMetricsArray,
   mergeMetrics,
   uploadAsJSON,
+  areMetricsSameGroup,
+  withoutIndex,
+  setAt,
 } from './lib';
 
 import type { TMetric } from './types';
@@ -341,4 +344,75 @@ describe('lib', () => {
       ]);
     });
   });
+
+  describe('areMetricsSameGroup()', () => {
+    it('returns true for metrics with same props', () => {
+      const a: TMetric = {
+        ...MoodWithEntries,
+        props: {
+          name: 'Mood 1',
+          maxValue: 10,
+          minValue: 1,
+          type: 'int',
+          colorGroups: [
+            { minValue: 1, maxValue: 5, color: 'green' },
+          ],
+        },
+      };
+      const b: TMetric = {
+        ...MoodWithEntries,
+        props: {
+          name: 'Mood 2',
+          type: 'int',
+          minValue: 1,
+          colorGroups: [
+            { maxValue: 5, color: 'green', minValue: 1 },
+          ],
+          maxValue: 10,
+        },
+      };
+      expect(areMetricsSameGroup(a, b)).to.be.ok;
+    });
+
+    it('returns false for metrics with different props', () => {
+      const a: TMetric = {
+        ...MoodWithEntries,
+        props: {
+          name: 'Mood 1',
+          maxValue: 10,
+          minValue: 1,
+          type: 'int',
+          colorGroups: [
+            { minValue: 1, maxValue: 5, color: 'green' },
+          ],
+        },
+      };
+      const b: TMetric = {
+        ...MoodWithEntries,
+        props: {
+          name: 'Mood 2',
+          type: 'int',
+          minValue: 1,
+          colorGroups: [
+            { maxValue: 5, color: 'green', minValue: 1 },
+          ],
+          maxValue: 8,
+        },
+      };
+      expect(areMetricsSameGroup(a, b)).to.not.be.ok;
+    });
+  });
+
+  describe('withoutIndex()', () => {
+    it('returns a copy of the given array, but without the element at the given index', () => {
+      expect(withoutIndex([1, 2, 3, 4, 5], 2)).to.eql([1, 2, 4, 5]);
+    });
+  });
+
+  describe('setAt()', () => {
+    it('returns a copy of the given array where the element at the given index is replaced by the new value', () => {
+      expect(setAt([0, 1, 2, 3, 4], 2, 3)).to.eql([0, 1, 3, 3, 4]);
+    });
+  });
 });
+

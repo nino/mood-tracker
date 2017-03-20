@@ -135,9 +135,9 @@ export type TSettingsState = {
 export type TChartsState = TChart[];
 
 export type TApplicationState = {
-  +metrics: TMetricsState,
-  +charts: TChartsState,
-  +authentication: TAuthenticationState,
-  +modals: TModal[],
-  +settings: TSettingsState,
+  metrics: TMetricsState,
+  charts: TChartsState,
+  authentication: TAuthenticationState,
+  modals: TModal[],
+  settings: TSettingsState,
 };

@@ -1,10 +1,27 @@
 /* @flow */
-import { takeLatest, delay } from 'redux-saga';
+import {
+  takeLatest,
+  takeEvery,
+  delay,
+} from 'redux-saga';
 import moment from 'moment';
 import { select, put } from '../effect-generators';
-import { beginZoom, setMsPerPx, finishZoom } from './actions';
+import {
+  beginZoom,
+  setMsPerPx,
+  finishZoom,
+  createCharts,
+} from './actions';
 import type { TRequestZoomAction } from './actionTypes';
-import type { TChart } from '../types';
+import type {
+  TSuccessUpdateMetricAction,
+  TDeleteMetricAction,
+} from '../actionTypes';
+import type {
+  TMetric,
+  TChart,
+} from '../types';
+import { getMetricsItems } from '../selectors';
 import { getChart } from './selectors';
 
 export function* animateZoom(action: TRequestZoomAction): Generator<any, any, any> {
@@ -41,7 +58,20 @@ export function* animateZoom(action: TRequestZoomAction): Generator<any, any, an
   yield* put(finishZoom(action.chartId));
 }
 
+export function* updateCharts(action: TDeleteMetricAction | TSuccessUpdateMetricAction): Generator<any, any, any> {
+  if (action.type === 'DELETE_METRIC' && action.confirm !== true) {
+    return;
+  }
+  const metrics: ?TMetric[] = yield* select(getMetricsItems);
+  if (metrics == null) {
+    return;
+  }
+  yield* put(createCharts(metrics));
+}
+
 export default function* rootSaga(): Generator<any, any, any> {
   yield* takeLatest('charts/REQUEST_ZOOM', animateZoom);
+  yield* takeEvery('DELETE_METRIC', updateCharts);
+  yield* takeEvery('SUCCESS_UPDATE_METRIC', updateCharts);
 }
 

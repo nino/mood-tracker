@@ -3,6 +3,7 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import deepFreeze from 'deep-freeze';
+import { map } from 'lodash';
 import moment from 'moment';
 import {
   requestZoom,
@@ -12,11 +13,23 @@ import {
   cycleMode,
   scrollBy,
   createCharts,
+  setDateRange,
 } from './actions';
+import type {
+  TSetDateRangeAction,
+} from './actionTypes';
+import {
+  logMetric,
+  deleteMetric,
+} from '../actions';
 import type { TChartsState, TMetric } from '../types';
+import type {
+  TLogMetricAction,
+} from '../actionTypes';
 import { MoodWithEntries, BurnsWithEntries } from '../../test/SampleMetrics';
 import reducer from './reducer';
 import { FOUR_WEEKS, LINE_COLORS } from './constants';
+import { msPerPxLimits } from './lib';
 
 describe('Charts reducer', () => {
   describe('charts/REQUEST_ZOOM', () => {
@@ -418,6 +431,142 @@ describe('Charts reducer', () => {
       expect(newState).to.have.length(1);
       expect(newState[0].msPerPx).to.equal(FOUR_WEEKS / 400);
       expect(newState[0].viewCenter).to.be.closeTo(expectedViewCenter, 100);
+    });
+  });
+
+  describe('charts/SET_DATE_RANGE', () => {
+    const state: TChartsState = [
+      {
+        id: 1,
+        lines: [
+          {
+            metricId: 1,
+            color: 'red',
+            mode: 'on',
+          },
+        ],
+        msPerPx: 1,
+        dateRange: [1000, 2000],
+        viewCenter: 1002,
+      },
+    ];
+    const action: TSetDateRangeAction = setDateRange(1, [1500, 1800]);
+    const newState: TChartsState = reducer(state, action);
+
+    it('sets the dateRange of the chosen chart', () => {
+      expect(newState).to.have.length(1);
+      expect(newState[0].dateRange).to.eql([1500, 1800]);
+    });
+
+    it('limits the viewCenter to be within the dateRange', () => {
+      expect(newState[0].viewCenter).to.equal(1500);
+    });
+  });
+
+  describe('LOG_METRIC', () => {
+    it('extends the metric\'s chart\'s dateRange if necessary', () => {
+      const state: TChartsState = [
+        {
+          id: 1,
+          lines: [
+            {
+              metricId: 1,
+              color: 'green',
+              mode: 'on',
+            }, {
+              metricId: 2,
+              color: 'blue',
+              mode: 'loess',
+            },
+          ],
+          msPerPx: 1,
+          dateRange: [
+            +moment('2012-02-12T01:22'),
+            +moment('2012-02-14T01:22'),
+          ],
+          viewCenter: 1500,
+        },
+      ];
+      const newDate = moment('2012-02-15T01:24');
+      const action: TLogMetricAction = logMetric(2, newDate.toJSON(), 2);
+      const newState: TChartsState = reducer(state, action);
+      expect(newState).to.have.length(1);
+      expect(newState[0].dateRange[0]).to.eql(state[0].dateRange[0]);
+      expect(newState[0].dateRange[1]).to.eql(+newDate);
+    });
+
+    it('leaves the metric\'s chart\'s dateRange unchanged otherwise', () => {
+      const state: TChartsState = [
+        {
+          id: 1,
+          lines: [
+            {
+              metricId: 1,
+              color: 'green',
+              mode: 'on',
+            }, {
+              metricId: 2,
+              color: 'blue',
+              mode: 'loess',
+            },
+          ],
+          msPerPx: 1,
+          dateRange: [
+            +moment('2012-02-12T01:22'),
+            +moment('2012-02-14T01:22'),
+          ],
+          viewCenter: 1500,
+        },
+      ];
+      const newDate = moment('2012-02-13T01:24');
+      const action: TLogMetricAction = logMetric(2, newDate.toJSON(), 2);
+      const newState: TChartsState = reducer(state, action);
+      expect(newState).to.have.length(1);
+      expect(newState[0].dateRange).to.eql(state[0].dateRange);
+    });
+  });
+
+  describe('DELETE_METRIC', () => {
+    const state: TChartsState = [
+      {
+        id: 1,
+        lines: [
+          { metricId: 1, mode: 'on', color: 'red' },
+          { metricId: 4, mode: 'off', color: 'green' },
+        ],
+        viewCenter: 1000,
+        msPerPx: 1,
+        dateRange: [1000, 2000],
+      }, {
+        id: 2,
+        lines: [
+          { metricId: 2, mode: 'loess', color: 'blue' },
+        ],
+        viewCenter: 1000,
+        msPerPx: 2,
+        dateRange: [1000, 2000],
+      },
+    ];
+
+    it('deletes the line from the metric\'s chart', () => {
+      const action = deleteMetric(4, true);
+      const newState = reducer(state, action);
+      expect(newState).to.have.length(2);
+      expect(newState[0].lines).to.have.length(1);
+      expect(newState[0].lines[0]).to.eql(state[0].lines[0]);
+      expect(newState[1]).to.deep.eql(state[1]);
+    });
+
+    it('deletes the metric\'s chart if it was the last metric', () => {
+      const action = deleteMetric(2, true);
+      const newState = reducer(state, action);
+      expect(newState).to.have.length(1);
+      expect(newState[0]).to.deep.eql(state[0]);
+    });
+
+    it('leaves the state unchanged if confirm=false', () => {
+      const action = deleteMetric(4);
+      expect(reducer(state, action)).to.deep.eql(state);
     });
   });
 });

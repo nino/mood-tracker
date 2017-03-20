@@ -1,10 +1,15 @@
 /* @flow */
+import { combineReducers } from 'redux';
 import { max } from 'lodash';
 import * as Actions from './actions';
 import { DEFAULT_METRIC_PROPS } from './constants';
 import chartsReducer from './Charts/reducer';
 import type {
   TApplicationState,
+  TMetricsState,
+  TAuthenticationState,
+  TModal,
+  TSettingsState,
   TEditedColorGroup,
   TNullableColorGroup,
   TEditedMetricProps,
@@ -42,6 +47,39 @@ export const INITIAL_STATE: TApplicationState = {
     isModified: false,
   },
 };
+
+function placeholderMetricsReducer(
+  state: TMetricsState = INITIAL_STATE.metrics,
+): TMetricsState {
+  return state;
+}
+
+function placeholderAuthenticationReducer(
+  state: TAuthenticationState = INITIAL_STATE.authentication,
+): TAuthenticationState {
+  return state;
+}
+
+function placeholderModalsReducer(
+  state: TModal[] = INITIAL_STATE.modals,
+): TModal[] {
+  return state;
+}
+
+function placeholderSettingsReducer(
+  state: TSettingsState = INITIAL_STATE.settings,
+): TSettingsState {
+  return state;
+}
+
+const externalReducers: (state: TApplicationState, action?: TAction) => TApplicationState =
+  combineReducers({
+    charts: chartsReducer,
+    metrics: placeholderMetricsReducer,
+    authentication: placeholderAuthenticationReducer,
+    modals: placeholderModalsReducer,
+    settings: placeholderSettingsReducer,
+  });
 
 function beginCheckLogin(state: TApplicationState): TApplicationState {
   return {
@@ -586,62 +624,84 @@ function errorRestoreCache(state: TApplicationState): TApplicationState {
 
 export function reducer(state: TApplicationState = INITIAL_STATE, action?: TAction): TApplicationState {
   if (!action || !action.type) {
-    return {
-      ...state,
-      charts: chartsReducer(state.charts),
-    };
+    return externalReducers(state);
   }
+  let newState: TApplicationState = { ...state };
   switch (action.type) {
     case 'BEGIN_CHECK_LOGIN':
-      return beginCheckLogin(state, action);
+      newState = beginCheckLogin(state, action);
+      break;
     case 'SUCCESS_CHECK_LOGIN':
-      return successCheckLogin(state, action);
+      newState = successCheckLogin(state, action);
+      break;
     case 'ERROR_CHECK_LOGIN':
-      return errorCheckLogin(state, action);
+      newState = errorCheckLogin(state, action);
+      break;
     case 'LOG_METRIC':
-      return logMetric(state, action);
+      newState = logMetric(state, action);
+      break;
     case 'START_EDITING':
-      return startEditingMetric(state, action);
+      newState = startEditingMetric(state, action);
+      break;
     case 'REQUEST_UPDATE_METRIC':
-      return requestUpdateMetric(state, action);
+      newState = requestUpdateMetric(state, action);
+      break;
     case 'SUCCESS_UPDATE_METRIC':
-      return successUpdateMetric(state, action);
+      newState = successUpdateMetric(state, action);
+      break;
     case 'ERROR_UPDATE_METRIC':
-      return errorUpdateMetric(state, action);
+      newState = errorUpdateMetric(state, action);
+      break;
     case 'STOP_EDITING':
-      return stopEditing(state, action);
+      newState = stopEditing(state, action);
+      break;
     case 'ADD_METRIC':
-      return addMetric(state, action);
+      newState = addMetric(state, action);
+      break;
     case 'REORDER_METRICS':
-      return reorderMetrics(state, action);
+      newState = reorderMetrics(state, action);
+      break;
     case 'DELETE_METRIC':
-      return deleteMetric(state, action);
+      newState = deleteMetric(state, action);
+      break;
     case 'UPDATE_EDITED_METRIC':
-      return updateEditedMetric(state, action);
+      newState = updateEditedMetric(state, action);
+      break;
     case 'REQUEST_CONFIRM_MODAL':
-      return requestConfirmModal(state, action);
+      newState = requestConfirmModal(state, action);
+      break;
     case 'REQUEST_CANCEL_MODAL':
-      return requestCancelModal(state, action);
+      newState = requestCancelModal(state, action);
+      break;
     case 'SUCCESS_CONFIRM_MODAL':
-      return successConfirmModal(state, action);
+      newState = successConfirmModal(state, action);
+      break;
     case 'SUCCESS_CANCEL_MODAL':
-      return successCancelModal(state, action);
+      newState = successCancelModal(state, action);
+      break;
     case 'BEGIN_SYNC_DATA':
-      return beginSyncData(state, action);
+      newState = beginSyncData(state, action);
+      break;
     case 'SUCCESS_SYNC_DATA':
-      return successSyncData(state, action);
+      newState = successSyncData(state, action);
+      break;
     case 'ERROR_SYNC_DATA':
-      return errorSyncData(state, action);
+      newState = errorSyncData(state, action);
+      break;
     case 'REQUEST_RESTORE_CACHE':
-      return requestRestoreCache(state, action);
+      newState = requestRestoreCache(state, action);
+      break;
     case 'SUCCESS_RESTORE_CACHE':
-      return successRestoreCache(state, action);
+      newState = successRestoreCache(state, action);
+      break;
     case 'ERROR_RESTORE_CACHE':
-      return errorRestoreCache(state, action);
+      newState = errorRestoreCache(state, action);
+      break;
     case 'REQUEST_LOGOUT':
-      return state;
+      newState = state;
+      break;
     case 'SUCCESS_LOGOUT':
-      return {
+      newState = {
         ...state,
         authentication: {
           isAuthenticated: false,
@@ -652,12 +712,13 @@ export function reducer(state: TApplicationState = INITIAL_STATE, action?: TActi
           isSyncing: false,
         },
       };
+      break;
     case 'REQUEST_SYNC':
-      return state;
+      newState = state;
+      break;
     default:
-      return {
-        ...state,
-        charts: chartsReducer(state.charts, action),
-      };
+      newState = state;
+      break;
   }
+  return externalReducers(newState, action);
 }

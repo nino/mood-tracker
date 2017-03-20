@@ -8,7 +8,9 @@ import type {
   TCycleModeAction,
   TScrollByAction,
   TCreateChartsAction,
+  TSetDateRangeAction,
  } from './actionTypes';
+import type { TRange } from './types';
 import type { TMetric } from '../types';
 
 export function defaultAction(): TDefaultAction {
@@ -45,5 +47,9 @@ export function scrollBy(chartId: number, deltaX: number): TScrollByAction {
 
 export function createCharts(metrics: TMetric[]): TCreateChartsAction {
   return { type: 'charts/CREATE_CHARTS', metrics };
+}
+
+export function setDateRange(chartId: number, dateRange: TRange): TSetDateRangeAction {
+  return { type: 'charts/SET_DATE_RANGE', chartId, dateRange };
 }
 

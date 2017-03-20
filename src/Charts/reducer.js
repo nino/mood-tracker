@@ -1,25 +1,45 @@
 /* @flow */
 import {
-  values,
-  map,
+  clamp,
+  findIndex,
+  first,
   flattenDeep,
   groupBy,
-  omit,
-  clamp,
-  first,
   last,
+  map,
+  max,
+  omit,
+  reject,
+  slice,
+  some,
+  values,
 } from 'lodash';
+import moment from 'moment';
 import type {
   TBeginZoomAction,
-  TSetMsPerPxAction,
-  TFinishZoomAction,
-  TCycleModeAction,
-  TScrollByAction,
   TCreateChartsAction,
+  TCycleModeAction,
+  TFinishZoomAction,
+  TScrollByAction,
+  TSetDateRangeAction,
+  TSetMsPerPxAction,
 } from './actionTypes';
-import type { TAction } from '../actionTypes';
-import type { TChart, TMetric } from '../types';
-import { MS_PER_PX, FOUR_WEEKS, LINE_COLORS } from './constants';
+import type {
+  TAction,
+  TDeleteMetricAction,
+  TLogMetricAction,
+} from '../actionTypes';
+import type {
+  TChart,
+  TChartLine,
+  TMetric,
+} from '../types';
+import {
+  FOUR_WEEKS,
+  LINE_COLORS,
+  MS_PER_PX,
+} from './constants';
+import { chartIndexFromMetricId } from './lib';
 
 export type TChartsState = TChart[];
 
@@ -30,7 +50,7 @@ function requestZoom(state: TChartsState): TChartsState {
 }
 
 function beginZoom(state: TChartsState, action: TBeginZoomAction): TChartsState {
-  const index = state.findIndex((chart: TChart) => chart.id === action.chartId);
+  const index = findIndex(state, (chart: TChart) => chart.id === action.chartId);
   return index === -1 ? state : [
     ...state.slice(0, index),
     {
@@ -63,7 +83,7 @@ function finishZoom(state: TChartsState, action: TFinishZoomAction): TChartsStat
   }
 
   const updatedChart = { ...state[index] };
-  delete updatedChart.animation;
+  delete updatedChart.animation; // TODO don't do this
 
   return [
     ...state.slice(0, index),
@@ -139,6 +159,81 @@ function createCharts(state: TChartsState, action: TCreateChartsAction): TCharts
   });
 }
 
+function logMetric(state: TChartsState, action: TLogMetricAction): TChartsState {
+  const chartIndex: number = findIndex(
+    state,
+    (chart: TChart) => some(
+      chart.lines,
+      (line: TChartLine) => line.metricId === action.metricId,
+    ),
+  );
+  if (chartIndex === -1) {
+    return state;
+  }
+  const entryDate: number = +moment(action.date);
+  return [
+    ...slice(state, 0, chartIndex),
+    {
+      ...state[chartIndex],
+      dateRange: [
+        state[chartIndex].dateRange[0],
+        max([entryDate, state[chartIndex].dateRange[1]]),
+      ],
+    },
+    ...slice(state, chartIndex + 1, state.length),
+  ];
+}
+
+function deleteMetric(state: TChartsState, action: TDeleteMetricAction): TChartsState {
+  if (action.confirm !== true) {
+    return state;
+  }
+
+  const index: ?number = chartIndexFromMetricId(state, action.metricId);
+  if (index == null) {
+    return state;
+  }
+
+  const updatedChart: TChart = {
+    ...state[index],
+    lines: reject(state[index].lines, line => line.metricId === action.metricId),
+  };
+
+  if (updatedChart.lines.length === 0) {
+    return [
+      ...slice(state, 0, index),
+      ...slice(state, index + 1, state.length),
+    ];
+  }
+
+  return [
+    ...slice(state, 0, index),
+    updatedChart,
+    ...slice(state, index + 1, state.length),
+  ];
+}
+
+function setDateRange(state: TChartsState, action: TSetDateRangeAction): TChartsState {
+  const index: number = findIndex(state, chart => chart.id === action.chartId);
+  if (index === -1) {
+    return state;
+  }
+
+  return [
+    ...slice(state, 0, index),
+    {
+      ...state[index],
+      dateRange: action.dateRange,
+      viewCenter: clamp(
+        state[index].viewCenter,
+        action.dateRange[0],
+        action.dateRange[1],
+      ),
+    },
+    ...slice(state, index + 1, state.length),
+  ];
+}
+
 export default function reducer(state: TChartsState = INITIAL_STATE, action?: TAction): TChartsState {
   if (!action || !action.type) {
     return state;
@@ -161,6 +256,12 @@ export default function reducer(state: TChartsState = INITIAL_STATE, action?: TA
       return scrollBy(state, action);
     case 'charts/CREATE_CHARTS':
       return createCharts(state, action);
+    case 'LOG_METRIC':
+      return logMetric(state, action);
+    case 'DELETE_METRIC':
+      return deleteMetric(state, action);
+    case 'charts/SET_DATE_RANGE':
+      return setDateRange(state, action);
     default:
       return state;
   }

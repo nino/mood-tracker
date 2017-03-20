@@ -3,11 +3,20 @@
 /* eslint-disable no-unused-expressions */
 import { expect } from 'chai';
 import moment from 'moment';
-import { animateZoom } from './sagas';
+import {
+  animateZoom,
+  updateCharts,
+} from './sagas';
 import { requestZoom } from './actions';
+import { deleteMetric } from '../actions';
+import type { TDeleteMetricAction } from '../actionTypes';
 import { getChart } from './selectors';
 import type { TChartsState } from '../types';
 import { LINE_COLORS } from './constants';
+import {
+  MoodWithEntries,
+  BurnsWithEntries,
+} from '../../test/SampleMetrics';
 
 describe('Charts sagas', () => {
   describe('animateZoom', () => {
@@ -149,6 +158,35 @@ describe('Charts sagas', () => {
 
         expect(next).to.have.property('done', true);
       });
+    });
+  });
+
+  describe('updateCharts()', () => {
+    describe('triggered by DELETE_METRIC', () => {
+      const action: TDeleteMetricAction = deleteMetric(1, true);
+      const generator = updateCharts(action);
+      let next = generator.next();
+
+      it('SELECTs the metrics from the store', () => {
+        expect(next).to.have.deep.property('value.SELECT.selector');
+        next = generator.next([MoodWithEntries, BurnsWithEntries]);
+      });
+
+      it('PUTs charts/CREATE_CHARTS', () => {
+        expect(next).to.have.deep.property('value.PUT.action.type', 'charts/CREATE_CHARTS');
+        expect(next).to.have.deep.property('value.PUT.action.metrics').and.to.eql([MoodWithEntries, BurnsWithEntries]);
+        next = generator.next();
+      });
+
+      it('is done', () => {
+        expect(next).to.have.property('done', true);
+      });
+    });
+
+    it('does nothing if triggered by DELETE_METRIC with confirm=false', () => {
+      const action: TDeleteMetricAction = deleteMetric(1);
+      const generator = updateCharts(action);
+      expect(generator.next()).to.have.property('done', true);
     });
   });
 });

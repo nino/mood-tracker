@@ -104,7 +104,6 @@ const ColorGroupsSettings = ({ colorGroups, onUpdate, editing }: TColorGroupsSet
     onUpdate({ colorGroups: [...before, ...after] });
   }
 
-  // TODO give eveyrthing an ID
   /* eslint-disable react/no-array-index-key */
   return (
     <div
