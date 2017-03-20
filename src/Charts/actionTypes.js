@@ -1,6 +1,7 @@
 /* @flow */
 /* TODO add docs */
 import type { TMetric } from '../types';
+import type { TRange } from './types';
 
 export type TDefaultAction = {
   type: 'charts/DEFAULT_ACTION',
@@ -63,6 +64,12 @@ export type TCreateChartsAction = {
   metrics: TMetric[]
 };
 
+export type TSetDateRangeAction = {
+  type: 'charts/SET_DATE_RANGE',
+  chartId: number,
+  dateRange: TRange,
+};
+
 export type TChartsAction
   = TDefaultAction
   | TRequestZoomAction
@@ -72,4 +79,6 @@ export type TChartsAction
   | TCycleModeAction
   | TScrollByAction
   | TCreateChartsAction
+  | TSetDateRangeAction
   ;
+
