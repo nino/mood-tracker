@@ -121,7 +121,7 @@ export function getMonthThirds(boundaries: [moment$Moment, moment$Moment]): TMom
   ])(range(0, moment.duration(+moment(boundaries[1]) - +moment(boundaries[0])).asMonths() + 1));
 }
 
-export function getMonthHalfs(boundaries: [moment$Moment, moment$Moment]): TMomentAxisTick[] { // TODO write tests
+export function getMonthHalfs(boundaries: [moment$Moment, moment$Moment]): TMomentAxisTick[] {
   return flow([
     map((monthOffset: number) => moment(boundaries[0]).startOf('month').add(monthOffset, 'months')),
     map((month: moment$Moment) => [{
