@@ -4,14 +4,21 @@ import Radium from 'radium';
 import Measure from 'react-measure';
 import Draggable, { type DraggableData } from 'react-draggable';
 import moment from 'moment';
-import { min, max, map, flow, slice, findIndex, findLastIndex } from 'lodash/fp';
+import {
+  min,
+  max,
+  map,
+  slice,
+  find,
+  findIndex,
+  findLastIndex,
+} from 'lodash';
 import { Button } from '@blueprintjs/core';
 import ScrollBar from './ScrollBar';
 import { LINE_COLORS, CHART_PADDING } from '../constants';
 import Line from './Line';
 import ChartGrid from './ChartGrid';
 import Legend from './Legend';
-
 import type {
   TMetric,
   TChart,
@@ -45,7 +52,7 @@ type TChartProps = {
   /**
    * Dispatch Redux actions
    */
-   dispatch: (TAction) => void,
+  dispatch: (TAction) => void,
 };
 
 export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartProps & { dimensions: TDimensions }) => {
@@ -63,6 +70,27 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
   const dateRangeEnd: number = max(metrics.map(m => +moment(m.entries[m.entries.length - 1].date)));
   const viewRangeBegin: number = chart.viewCenter - ((dimensions.width * chart.msPerPx) / 2);
   const viewRangeEnd: number = chart.viewCenter + ((dimensions.width * chart.msPerPx) / 2);
+
+  function getLinePoints(line: TChartLine): TLinePoint[] {
+    const metric: ?TMetric = find(metrics, m => m.id === line.metricId);
+    if (metric == null) {
+      return [];
+    }
+    const pointsAll: TLinePoint[] = map(
+      metric.entries,
+      (entry: TMetricEntry) => ({
+        x: xValueToPixels(+moment(entry.date), [viewRangeBegin, viewRangeEnd], dimensions.width, CHART_PADDING),
+        y: yValueToPixels(entry.value, [metric.props.minValue, metric.props.maxValue], dimensions.height, CHART_PADDING),
+      }),
+    );
+    const pointsFiltered: TLinePoint[] = slice(
+      pointsAll,
+      max([findLastIndex(pointsAll, item => item.x < 0), 0]),
+      (findIndex(pointsAll, item => item.x > dimensions.width) + 1 || pointsAll.length),
+    );
+    return pointsFiltered;
+  }
+
   return (
     <div
       className="chart"
@@ -113,22 +141,13 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
             valueRange={[metrics[0].props.minValue, metrics[0].props.maxValue]}
             padding={CHART_PADDING}
           />
-          {map((metric: TMetric) => (
+          {map(chart.lines, (line: TChartLine) => (
             <Line
-              key={metric.id}
-              points={flow(
-                map((entry: TMetricEntry) => ({
-                  x: xValueToPixels(+moment(entry.date), [viewRangeBegin, viewRangeEnd], dimensions.width, CHART_PADDING),
-                  y: yValueToPixels(entry.value, [metric.props.minValue, metric.props.maxValue], dimensions.height, CHART_PADDING),
-                })),
-                (ary: TLinePoint[]) => slice(
-                  max([findLastIndex(item => item.x < 0)(ary), 0]),
-                  (findIndex(item => item.x > dimensions.width)(ary) + 1 || ary.length),
-                )(ary),
-              )(metric.entries)}
-              color={LINE_COLORS[metric.id % LINE_COLORS.length]}
+              key={line.metricId}
+              points={getLinePoints(line)}
+              color={LINE_COLORS[line.metricId % LINE_COLORS.length]}
             />
-          ))(metrics)}
+          ))}
         </svg>
       </Draggable>
       <ScrollBar

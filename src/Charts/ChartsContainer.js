@@ -47,7 +47,7 @@ export class ChartsContainer extends React.Component { // eslint-disable-line re
       >
         {charts.map((chart, idx) => (
           <Chart
-            metrics={[metrics[metrics.findIndex(m => m.id === charts[idx].lines[0].metricId)]]}
+            metrics={metrics}
             chart={charts[idx]}
             key={chart.id}
             dispatch={dispatch}
