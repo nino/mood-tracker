@@ -1,6 +1,7 @@
 /* @flow */
 import React from 'react';
 import Radium from 'radium';
+import Loess, { type LoessData } from 'loess';
 import Measure from 'react-measure';
 import Draggable, { type DraggableData } from 'react-draggable';
 import moment from 'moment';
@@ -12,6 +13,8 @@ import {
   find,
   findIndex,
   findLastIndex,
+  zip,
+  range,
 } from 'lodash';
 import { Button } from '@blueprintjs/core';
 import ScrollBar from './ScrollBar';
@@ -28,7 +31,6 @@ import type {
 import type { TDimensions, TLinePoint } from '../types';
 import type { TAction } from '../../actionTypes';
 import { xValueToPixels, yValueToPixels } from '../svg-utils';
-
 import { scrollBy, requestZoom, cycleMode } from '../actions';
 
 type TChartProps = {
@@ -73,7 +75,7 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
 
   function getLinePoints(line: TChartLine): TLinePoint[] {
     const metric: ?TMetric = find(metrics, m => m.id === line.metricId);
-    if (metric == null) {
+    if (metric == null || line.mode === 'off') {
       return [];
     }
     const pointsAll: TLinePoint[] = map(
@@ -83,12 +85,39 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
         y: yValueToPixels(entry.value, [metric.props.minValue, metric.props.maxValue], dimensions.height, CHART_PADDING),
       }),
     );
-    const pointsFiltered: TLinePoint[] = slice(
-      pointsAll,
-      max([findLastIndex(pointsAll, item => item.x < 0), 0]),
-      (findIndex(pointsAll, item => item.x > dimensions.width) + 1 || pointsAll.length),
+    let pointsSelected: TLinePoint[] = pointsAll;
+    if (line.mode === 'loess') {
+      const x: number[] = map(pointsSelected, p => p.x);
+      const y: number[] = map(pointsSelected, p => p.y);
+      const xHat: number[] = range(0, dimensions.width, 5);
+      const loessData: LoessData = { x, y };
+      const loessOptions = {
+        span: 0.4,
+        degree: 1,
+        band: 0.8,
+      };
+      const model: Loess = new Loess(loessData, loessOptions);
+      const predicted = model.predict({ x: xHat }).fitted;
+      pointsSelected = map(zip(xHat, predicted), p => ({
+        x: p[0],
+        y: p[1],
+      }));
+      pointsSelected = slice(
+        pointsSelected,
+        findIndex(xHat, i => i > min(x)),
+        findIndex(xHat, i => i > max(x)),
+      );
+    }
+
+    pointsSelected = slice(
+      pointsSelected,
+      max([findLastIndex(pointsSelected, item => item.x < 0), 0]),
+      (
+        findIndex(pointsSelected, item => item.x > dimensions.width) + 1
+        || pointsSelected.length
+      ),
     );
-    return pointsFiltered;
+    return pointsSelected;
   }
 
   return (
