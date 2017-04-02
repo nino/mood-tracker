@@ -70,8 +70,8 @@ export function* updateCharts(action: TDeleteMetricAction | TSuccessUpdateMetric
 }
 
 export default function* rootSaga(): Generator<any, any, any> {
-  yield* takeLatest('charts/REQUEST_ZOOM', animateZoom);
-  yield* takeEvery('DELETE_METRIC', updateCharts);
-  yield* takeEvery('SUCCESS_UPDATE_METRIC', updateCharts);
+  yield takeLatest('charts/REQUEST_ZOOM', animateZoom);
+  yield takeEvery('DELETE_METRIC', updateCharts);
+  yield takeEvery('SUCCESS_UPDATE_METRIC', updateCharts);
 }
 
