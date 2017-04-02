@@ -19,6 +19,27 @@ describe('MetricEntryContainer', () => {
       .to.have.property('values').and.to.have.length(10);
   });
 
+  it('assigns the ButtonRow the correct colors', () => {
+    const component = shallow(
+      <MetricEntryContainer
+        metric={MoodWithEntries}
+        dispatch={jest.fn()}
+      />);
+    expect(component.find(ButtonRow).first().props())
+      .to.have.property('colors').and.to.eql([
+        'red',
+        'red',
+        'red',
+        'yellow',
+        'yellow',
+        'yellow',
+        'green',
+        'green',
+        'green',
+        'blue',
+      ]);
+  });
+
   it('renders a TextInput for more than 10 allowed values', () => {
     const component = shallow(
       <MetricEntryContainer metric={BurnsWithoutEntries} dispatch={jest.fn()} />);

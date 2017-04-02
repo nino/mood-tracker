@@ -18,8 +18,8 @@ export const ColorGroupRect = ({ colorGroup, dimensions, valueRange, padding }: 
   if (dimensions.width <= 0 || dimensions.height <= 0) {
     return null;
   }
-  const topEdge = yValueToPixels(colorGroup.maxValue + 1, valueRange, dimensions.height, padding);
-  const bottomEdge = yValueToPixels(colorGroup.minValue + 1, valueRange, dimensions.height, padding);
+  const topEdge = yValueToPixels(colorGroup.maxValue + 0.5, valueRange, dimensions.height, padding);
+  const bottomEdge = yValueToPixels(colorGroup.minValue - 0.5, valueRange, dimensions.height, padding);
   return (
     <rect
       className="chart-background-rect"
