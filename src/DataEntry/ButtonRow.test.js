@@ -20,4 +20,18 @@ describe('TMetric-entry button-row', () => {
     expect(onClick.mock.calls).to.have.length(1);
     expect(onClick.mock.calls[0][0]).to.equal(1);
   });
+
+  it('gives all buttons their correct color', () => {
+    const component = shallow(
+      <ButtonRow
+        values={[1, 2, 3, 4]}
+        colors={['red', 'green', 'blue', 'pink']}
+        onClick={jest.fn()}
+      />);
+    const buttons = component.find('Button');
+    expect(buttons.get(0)).to.have.deep.property('props.style.color', 'red');
+    expect(buttons.get(1)).to.have.deep.property('props.style.color', 'green');
+    expect(buttons.get(2)).to.have.deep.property('props.style.color', 'blue');
+    expect(buttons.get(3)).to.have.deep.property('props.style.color', 'pink');
+  });
 });

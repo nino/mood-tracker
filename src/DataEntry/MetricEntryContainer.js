@@ -2,6 +2,10 @@
 import React from 'react';
 import Radium, { Style } from 'radium';
 import { connect } from 'react-redux';
+import {
+  map,
+  findLast,
+} from 'lodash';
 import type { TMetric, TColorGroup } from '../types';
 import type { TAction } from '../actionTypes';
 import { logMetric } from '../actions';
@@ -10,17 +14,11 @@ import ButtonRow from './ButtonRow';
 import TextInput from './TextInput';
 
 function getColors(values: number[], colorGroups: TColorGroup[]): string[] {
-  if (!colorGroups || colorGroups.length === 0) {
-    return values.map(() => '');
-  }
-
-  const colors: string[] = values.map(() => '');
-  colorGroups.forEach((cg) => {
-    for (let i = cg.minValue; i <= cg.maxValue; i += 1) {
-      colors[i] = cg.color;
-    }
-  });
-  return colors;
+  const matchCondition = (cg, value) => cg.minValue <= value && cg.maxValue >= value;
+  const colorForValue = value => (
+    findLast(colorGroups, cg => matchCondition(cg, value)) || { color: '' }
+  ).color;
+  return map(values, colorForValue);
 }
 
 type MetricEntryContainerProps = {
