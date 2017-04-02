@@ -19,8 +19,8 @@ describe('ColorGroupRect', () => {
     const backgroundRect = component.find('rect');
     expect(backgroundRect.get(0)).to.have.deep.property('props.x', 0);
     expect(backgroundRect.get(0)).to.have.deep.property('props.width', 400);
-    expect(backgroundRect.get(0)).to.have.deep.property('props.y', 80);
-    expect(backgroundRect.get(0)).to.have.deep.property('props.height', 60);
+    expect(backgroundRect.get(0)).to.have.deep.property('props.y', 90);
+    expect(backgroundRect.get(0)).to.have.deep.property('props.height', 80);
     expect(backgroundRect.get(0)).to.have.deep.property('props.fill', 'green');
     expect(backgroundRect.get(0)).to.have.deep.property('props.fillOpacity', 0.2);
   });
