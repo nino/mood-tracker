@@ -264,7 +264,7 @@ describe('reducer', () => {
       expect(props).to.have.property('colorGroups').and.to.eql([]);
       expect(props).to.have.property('type', 'int');
       expect(items[2]).to.have.property('entries').and.to.have.length(0);
-      expect(items[2]).to.not.have.property('lastModified');
+      expect(items[2]).to.have.property('lastModified', 0);
     });
 
     it('starts editing the new metric', () => {
