@@ -91,7 +91,7 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
       }),
     );
     let pointsSelected: TLinePoint[] = pointsAll;
-    if (line.mode === 'loess') {
+    if (pointsAll.length > 3 && line.mode === 'loess') {
       const x: number[] = map(pointsSelected, p => p.x);
       const y: number[] = map(pointsSelected, p => p.y);
       const xHat: number[] = range(0, dimensions.width, 5);
