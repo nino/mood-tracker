@@ -59,7 +59,14 @@ type TChartProps = {
   dispatch: (TAction) => void,
 };
 
-export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartProps & { dimensions: TDimensions }) => {
+type TChartMeasuredProps = {
+  metrics: TMetric[],
+  chart: TChart,
+  dispatch: (TAction) => void,
+  dimensions: TDimensions,
+};
+
+export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartMeasuredProps) => {
   function handleWheel(event: SyntheticWheelEvent): void {
     if (Math.abs(event.deltaY) < Math.abs(event.deltaX)) {
       event.preventDefault();
@@ -69,6 +76,10 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
       dispatch(scrollBy(chart.id, event.deltaX));
     }
   }
+
+  const aMetricId = chart.lines.length > 0 ? chart.lines[0].metricId : null;
+  const aMetric = find(metrics, m => m.id === aMetricId);
+  const colorGroups = aMetric != null ? aMetric.props.colorGroups : [];
 
   const metricsWithEntries = filter(metrics, m => m.entries.length > 0);
   const metricToEntryDates = (m: TMetric) => map(m.entries, e => +moment(e.date));
@@ -169,7 +180,7 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
           }}
         >
           <ChartGrid
-            colorGroups={metrics[0].props.colorGroups}
+            colorGroups={colorGroups}
             dateRange={[viewRangeBegin, viewRangeEnd]}
             dimensions={dimensions}
             valueRange={[metrics[0].props.minValue, metrics[0].props.maxValue]}
