@@ -76,7 +76,7 @@ export type TMetricEntry = {
 export type TMetric = {
   +id: number,
   +props: TMetricProps,
-  +lastModified?: number,
+  +lastModified: number,
   +entries: TMetricEntry[],
 };
 

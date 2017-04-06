@@ -15,6 +15,8 @@ import {
   findLastIndex,
   zip,
   range,
+  filter,
+  flatten,
 } from 'lodash';
 import { Button } from '@blueprintjs/core';
 import ScrollBar from './ScrollBar';
@@ -68,8 +70,11 @@ export const ChartMeasured = ({ metrics, chart, dispatch, dimensions }: TChartPr
     }
   }
 
-  const dateRangeBegin: number = min(metrics.map(m => +moment(m.entries[0].date)));
-  const dateRangeEnd: number = max(metrics.map(m => +moment(m.entries[m.entries.length - 1].date)));
+  const metricsWithEntries = filter(metrics, m => m.entries.length > 0);
+  const metricToEntryDates = (m: TMetric) => map(m.entries, e => +moment(e.date));
+  const metricEntryDates = flatten(map(metricsWithEntries, metricToEntryDates));
+  const dateRangeBegin = min(metricEntryDates) || +moment();
+  const dateRangeEnd: number = max(metricEntryDates) || +moment();
   const viewRangeBegin: number = chart.viewCenter - ((dimensions.width * chart.msPerPx) / 2);
   const viewRangeEnd: number = chart.viewCenter + ((dimensions.width * chart.msPerPx) / 2);
 

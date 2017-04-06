@@ -125,11 +125,13 @@ describe('sync data saga', () => {
           id: metricsMock[0].id,
           props: metricsMock[0].props,
           entries: metricsMock[0].entries.slice(0, 6),
+          lastModified: 0,
         },
         {
           id: metricsMock[1].id,
           props: metricsMock[1].props,
           entries: metricsMock[1].entries,
+          lastModified: 0,
         },
       ],
     };

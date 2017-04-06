@@ -31,6 +31,14 @@ import type {
   TErrorCheckLoginAction,
   TSuccessRestoreCacheAction,
 } from './actionTypes';
+import {
+  getMetricsItems,
+  getEditedMetric,
+  isEditedMetricModified,
+  getModals,
+  getMetrics,
+} from './selectors';
+import { createMetric, metric2editedMetric } from './lib';
 
 export const INITIAL_STATE: TApplicationState = {
   metrics: {
@@ -302,9 +310,11 @@ function stopEditing(state: TApplicationState, action: TStopEditingAction): TApp
 
 function addMetric(state: TApplicationState, action: TAddMetricAction): TApplicationState {
   const { discard } = action;
-  const { metrics, settings, modals } = state;
-  const { items } = metrics;
-  const { editedMetric, isModified } = settings;
+  const metrics = getMetrics(state);
+  const items = getMetricsItems(state);
+  const editedMetric = getEditedMetric(state);
+  const isModified = isEditedMetricModified(state);
+  const modals = getModals(state);
   if (!items) {
     return {
       ...state,
@@ -314,11 +324,12 @@ function addMetric(state: TApplicationState, action: TAddMetricAction): TApplica
           id: 1,
           props: DEFAULT_METRIC_PROPS,
           entries: [],
+          lastModified: 0,
         }],
       },
     };
   } else if (editedMetric && isModified && !discard) {
-    const newModal = {
+    const newModal: TModal = {
       title: 'Discard changes?',
       message: (`There are unsaved changes in "${editedMetric.props.name}". `
         + 'Do you wish to discard them and create a new metric?'),
@@ -340,23 +351,21 @@ function addMetric(state: TApplicationState, action: TAddMetricAction): TApplica
     };
   }
 
+  // Actually creating a new metric
   const id: number = max(items.map(item => item.id)) + 1;
-  const editedMetricProps: TEditedMetricProps = { ...DEFAULT_METRIC_PROPS };
+  const metric = createMetric(id);
+  const newEditedMetric = metric2editedMetric(metric);
   return {
     ...state,
     metrics: {
       ...metrics,
-      items: items.concat({
-        id,
-        props: DEFAULT_METRIC_PROPS,
-        entries: [],
-      }),
+      items: [
+        ...items,
+        metric,
+      ],
     },
     settings: {
-      editedMetric: {
-        id,
-        props: editedMetricProps,
-      },
+      editedMetric: newEditedMetric,
       isModified: true,
     },
   };

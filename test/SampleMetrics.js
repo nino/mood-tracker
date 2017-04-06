@@ -107,6 +107,7 @@ export const MoodWithoutEntries: TMetric = {
     ],
   },
   entries: [],
+  lastModified: 0,
 };
 
 export const BurnsWithEntries: TMetric = {

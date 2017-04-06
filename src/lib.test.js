@@ -16,6 +16,8 @@ import {
   areMetricsSameGroup,
   withoutIndex,
   setAt,
+  metric2editedMetric,
+  createMetric,
 } from './lib';
 
 import type { TMetric } from './types';
@@ -412,6 +414,54 @@ describe('lib', () => {
   describe('setAt()', () => {
     it('returns a copy of the given array where the element at the given index is replaced by the new value', () => {
       expect(setAt([0, 1, 2, 3, 4], 2, 3)).to.eql([0, 1, 3, 3, 4]);
+    });
+  });
+
+  describe('metric2editedMetric()', () => {
+    it('creates an object with name, ?maxValue, ?minValue, colorGroups, ?type', () => {
+      const edMet = metric2editedMetric(MoodWithEntries);
+      expect(edMet).to.have.property('id', 1);
+      expect(edMet).not.to.have.property('lastModified');
+      expect(edMet).not.to.have.property('entries');
+      expect(edMet).to.have.deep.property('props.name', 'Mood');
+      expect(edMet).to.have.deep.property('props.minValue', 1);
+      expect(edMet).to.have.deep.property('props.maxValue', 10);
+      expect(edMet).to.have.deep.property('props.type', 'int');
+    });
+  });
+
+  describe('createMetric()', () => {
+    it('returns a metric with default props and provided id', () => {
+      const metric = createMetric(23);
+      expect(metric).to.have.property('id', 23);
+      expect(metric).to.have.deep.property('props.name', 'Untitled metric');
+      expect(metric).to.have.deep.property('props.maxValue', 10);
+      expect(metric).to.have.deep.property('props.minValue', 1);
+      expect(metric).to.have.deep.property('props.type', 'int');
+      expect(metric).to.have.deep.property('props.colorGroups').and.to.eql([]);
+      expect(metric).to.have.property('lastModified', 0);
+      expect(metric).to.have.property('entries').and.to.eql([]);
+    });
+
+    it('returns a metric with given id and props', () => {
+      const props = {
+        name: 'Boom',
+        minValue: 3,
+        maxValue: 13,
+        colorGroups: [
+          { maxValue: 3, minValue: 1, color: 'turquoise' },
+        ],
+        type: 'int',
+      };
+      const metric = createMetric(23, props);
+      expect(metric).to.have.property('id', 23);
+      expect(metric).to.have.deep.property('props.name', 'Boom');
+      expect(metric).to.have.deep.property('props.maxValue', 13);
+      expect(metric).to.have.deep.property('props.minValue', 3);
+      expect(metric).to.have.deep.property('props.type', 'int');
+      expect(metric).to.have.property('lastModified', 0);
+      expect(metric).to.have.property('entries').and.to.eql([]);
+      expect(metric).to.have.deep.property('props.colorGroups').and.to.eql(props.colorGroups);
     });
   });
 });

@@ -14,6 +14,7 @@ import Line from './Line';
 import ChartGrid from './ChartGrid';
 import Legend from './Legend';
 import ScrollBar from './ScrollBar';
+import { createMetric } from '../../lib';
 
 const chart1: TChart = {
   id: 1,
@@ -105,6 +106,21 @@ describe('Chart', () => {
     expect(lines).to.have.length(1);
     expect(lines.get(0)).to.have.deep.property('props.points').and.to.have.length(1);
     expect(lines.get(0)).to.have.deep.property('props.color', LINE_COLORS[2]);
+  });
+
+  it('only renders a line if the metric has entries', () => {
+    const metric = createMetric(1);
+    const component2 = shallow(
+      <Chart
+        chart={chart2}
+        dispatch={jest.fn()}
+        metrics={[metric]}
+        dimensions={{
+          width: 400,
+          height: 200,
+        }}
+      />);
+    expect(component2.find(Line)).to.have.length(0);
   });
 
   it('only passes those points to the Line components that are in view or have a next neighbor that is in view', () => {
