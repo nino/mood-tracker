@@ -13,7 +13,9 @@ import type {
   TEditedMetricProps,
   TColorGroup,
   TEditedColorGroup,
+  TEditedMetric,
 } from './types';
+import { DEFAULT_METRIC_PROPS } from './constants';
 
 function readFileBlobAsJSON(fileBlob: Blob): Promise<Object | Error> {
   const blobReader = new FileReader();
@@ -274,5 +276,21 @@ export function setAt<T>(array: Array<T>, index: number, value: T): Array<T> {
     value,
     ...slice(array, index + 1, array.length),
   ];
+}
+
+export function metric2editedMetric(metric: TMetric): TEditedMetric {
+  return {
+    id: metric.id,
+    props: metric.props,
+  };
+}
+
+export function createMetric(id: number, props?: TMetricProps = DEFAULT_METRIC_PROPS) {
+  return {
+    id,
+    props,
+    lastModified: 0,
+    entries: [],
+  };
 }
 
