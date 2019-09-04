@@ -65,7 +65,7 @@
     "immutability-helper": "^3.0.1",
     "immutable": "^3.8.1",
     "lodash": "^4.16.6",
-    "loess": "^1.3.4",
+    "loess": "^1.3.5",
     "moment": "^2.19.3",
     "query-string": "^4.2.3",
     "radium": "^0.18.1",
