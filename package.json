@@ -45,7 +45,7 @@
     "promise": "7.1.1",
     "react-addons-test-utils": "^15.6.2",
     "react-dev-utils": "^0.4.2",
-    "recursive-readdir": "2.1.0",
+    "recursive-readdir": "2.2.2",
     "redux-mock-store": "^1.2.1",
     "sinon": "^7.4.1",
     "strip-ansi": "5.2.0",
